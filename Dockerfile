@@ -33,8 +33,8 @@ RUN npx nx build web --prod
 FROM node:20-alpine AS api-runner
 WORKDIR /app
 
-# Install dumb-init for proper signal handling
-RUN apk add --no-cache dumb-init
+# Install dumb-init and curl for proper signal handling and health checks
+RUN apk add --no-cache dumb-init curl
 
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs && \
@@ -60,6 +60,9 @@ RUN apk add --no-cache dumb-init
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S hanapp -u 1001
 
+# Install serve globally for serving static files
+RUN npm install -g serve
+
 # Copy built web app
 COPY --from=builder --chown=hanapp:nodejs /app/dist/apps/web ./dist/apps/web
 COPY --from=builder --chown=hanapp:nodejs /app/package.json ./
@@ -69,4 +72,4 @@ USER hanapp
 EXPOSE 3000
 
 ENTRYPOINT ["dumb-init", "--"]
-CMD ["npx", "serve", "-s", "dist/apps/web", "-l", "3000"]
+CMD ["serve", "-s", "dist/apps/web", "-l", "3000"]
