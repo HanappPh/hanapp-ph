@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  # Development database
+  postgres:
+    image: postgres:15-alpine
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_DB=hanapp_dev
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - hanapp-network
+    restart: unless-stopped
+
+  # Optional: Redis for caching/sessions
+  redis:
+    image: redis:7-alpine
+    ports:
+      - '6379:6379'
+    networks:
+      - hanapp-network
+    restart: unless-stopped
+
+  # Optional: Adminer for database management
+  adminer:
+    image: adminer:latest
+    ports:
+      - '8080:8080'
+    depends_on:
+      - postgres
+    networks:
+      - hanapp-network
+    restart: unless-stopped
+
+networks:
+  hanapp-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
