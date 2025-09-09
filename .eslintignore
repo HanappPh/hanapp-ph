@@ -1,0 +1,45 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+
+# Generated files
+*.d.ts
+next-env.d.ts
+
+# Template/Generated test files (remove these lines when you create your own tests)
+apps/api/src/**/*.spec.ts
+apps/web/specs/**/*
+apps/web-e2e/src/support/**/*
+
+# Configuration files (you can remove these lines if you want to lint config files)
+*.config.js
+*.config.ts
+jest.config.*
+cypress.config.*
+tailwind.config.*
+postcss.config.*
+
+# Test coverage
+coverage/
+
+# Cypress generated
+**/cypress/downloads/
+**/cypress/screenshots/
+**/cypress/videos/
+
+# Environment files
+.env*
+
+# Lock files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Nx cache
+.nx/

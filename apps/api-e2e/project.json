@@ -1,0 +1,30 @@
+{
+  "name": "api-e2e",
+  "sourceRoot": "apps/api-e2e/src",
+  "projectType": "application",
+  "targets": {
+    "e2e": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "apps/api-e2e/jest.config.ts",
+        "passWithNoTests": true
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "coverageReporters": ["text"]
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/api-e2e/**/*.ts"]
+      }
+    }
+  },
+  "tags": ["type:e2e", "scope:api"],
+  "implicitDependencies": ["api"]
+}
