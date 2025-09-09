@@ -1,91 +1,154 @@
-# HanappPh
+# HanApp PH
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+A modern fullstack application built with Next.js, NestJS, and Supabase.
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is almost ready ✨.
+## 🚀 Tech Stack
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/nx-api/js?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+- **Frontend**: Next.js 15, React 19, TypeScript, Tailwind CSS
+- **Backend**: NestJS, TypeScript
+- **Database**: Supabase (PostgreSQL)
+- **Storage**: AWS S3 + CloudFront
+- **Monorepo**: Nx
+- **Testing**: Jest, Cypress
+- **CI/CD**: GitHub Actions
+- **Code Quality**: ESLint, Prettier, Husky
 
-## Finish your CI setup
+## 📋 Prerequisites
 
-[Click here to finish setting up your workspace!](https://cloud.nx.app/connect/0k6bHSEvOD)
+- Node.js 20.x or later
+- npm 10.x or later
+- Docker (optional, for containerization)
 
+## 🛠️ Development Setup
 
-## Generate a library
+1. **Clone the repository**
 
-```sh
-npx nx g @nx/js:lib packages/pkg1 --publishable --importPath=@my-org/pkg1
+   ```bash
+   git clone https://github.com/your-username/hanapp-ph.git
+   cd hanapp-ph
+   ```
+
+2. **Install dependencies**
+
+   ```bash
+   npm install
+   ```
+
+3. **Environment setup**
+
+   ```bash
+   cp .env.example .env
+   # Edit .env with your actual values
+   ```
+
+4. **Start development servers**
+
+   ```bash
+   # Start both API and Web concurrently
+   npm run start:dev
+
+   # Or start individually
+   npm run dev:api    # API server on port 3001
+   npm run dev:web    # Web server on port 3000
+   ```
+
+## 🧪 Testing
+
+```bash
+# Run all tests
+npm run test:all
+
+# Run affected tests only
+npm run test:affected
+
+# Run E2E tests
+npm run e2e:web
 ```
 
-## Run tasks
+## 🔍 Code Quality
 
-To build the library use:
+```bash
+# Lint all projects
+npm run lint
 
-```sh
-npx nx build pkg1
+# Fix linting issues
+npm run lint:fix
+
+# Format code
+npm run format
+
+# Type check
+npm run typecheck
 ```
 
-To run any task with Nx use:
+## 🏗️ Building
 
-```sh
-npx nx <target> <project-name>
+```bash
+# Build all projects
+npm run build:all
+
+# Build specific project
+npm run build:web
+npm run build:api
 ```
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+## 🐳 Docker
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+```bash
+# Build Docker image
+npm run docker:build
 
-## Versioning and releasing
-
-To version and release the library use
-
-```
-npx nx release
+# Run containerized application
+npm run docker:run
 ```
 
-Pass `--dry-run` to see what would happen without actually releasing the library.
+## 📁 Project Structure
 
-[Learn more about Nx release &raquo;](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+```
+apps/
+├── api/              # NestJS backend
+├── api-e2e/          # API E2E tests
+├── web/              # Next.js frontend
+└── web-e2e/          # Web E2E tests
 
-## Keep TypeScript project references up to date
+libs/                 # Shared libraries (when created)
 
-Nx automatically updates TypeScript [project references](https://www.typescriptlang.org/docs/handbook/project-references.html) in `tsconfig.json` files to ensure they remain accurate based on your project dependencies (`import` or `require` statements). This sync is automatically done when running tasks such as `build` or `typecheck`, which require updated references to function correctly.
-
-To manually trigger the process to sync the project graph dependencies information to the TypeScript project references, run the following command:
-
-```sh
-npx nx sync
+tools/                # Custom tools and scripts
 ```
 
-You can enforce that the TypeScript project references are always in the correct state when running in CI by adding a step to your CI job configuration that runs the following command:
+## 🚀 Deployment
 
-```sh
-npx nx sync:check
-```
+The application is configured for deployment on various platforms:
 
-[Learn more about nx sync](https://nx.dev/reference/nx-commands#sync)
+- **Frontend**: Vercel, Netlify
+- **Backend**: Railway, Heroku, AWS
+- **Database**: Supabase
+- **Storage**: AWS S3 + CloudFront
 
+## 📖 Available Scripts
 
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+| Script              | Description                           |
+| ------------------- | ------------------------------------- |
+| `npm run start:dev` | Start both API and Web in development |
+| `npm run dev:web`   | Start Web app only                    |
+| `npm run dev:api`   | Start API only                        |
+| `npm run build:all` | Build all applications                |
+| `npm run test:all`  | Run all tests                         |
+| `npm run lint`      | Lint all projects                     |
+| `npm run format`    | Format code with Prettier             |
 
-## Install Nx Console
+## 🤝 Contributing
 
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Commit your changes: `git commit -m 'Add amazing feature'`
+4. Push to the branch: `git push origin feature/amazing-feature`
+5. Open a Pull Request
 
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+## 📝 License
 
-## Useful links
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-Learn more:
+## 📧 Support
 
-- [Learn more about this workspace setup](https://nx.dev/nx-api/js?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-And join the Nx community:
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-# hanapp-ph
+For support, email support@hanapp-ph.com or join our Slack channel.

@@ -1,0 +1,12 @@
+{
+  "extends": ["plugin:cypress/recommended"],
+  "ignorePatterns": [
+    "!**/*",
+    "downloads/**/*",
+    "screenshots/**/*",
+    "videos/**/*",
+    "fixtures/example.json",
+    "src/support/**/*"
+  ],
+  "rules": {}
+}
