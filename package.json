@@ -23,8 +23,6 @@
     "lint:affected": "nx affected -t lint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "typecheck": "nx run-many -t typecheck",
-    "typecheck:affected": "nx affected -t typecheck",
     "e2e:web": "nx e2e web-e2e",
     "e2e:affected": "nx affected -t e2e",
     "graph": "nx graph",
