@@ -1,5 +1,5 @@
 {
-  "extends": ["eslint:recommended"],
+  "extends": ["../../.eslintrc.json"],
   "ignorePatterns": [
     "!**/*",
     "dist/**/*",
@@ -9,19 +9,18 @@
     "*.config.ts",
     "src/**/*.spec.ts"
   ],
-  "overrides": [
-    {
-      "files": ["*.ts"],
-      "parser": "@typescript-eslint/parser",
-      "parserOptions": {
-        "ecmaVersion": "latest",
-        "sourceType": "module"
-      },
-      "rules": {
-        "no-unused-vars": "off",
-        "no-undef": "off"
+  "rules": {
+    // Allow unused parameters in NestJS dependency injection
+    "unused-imports/no-unused-vars": [
+      "error",
+      {
+        "vars": "all",
+        "varsIgnorePattern": "^_",
+        "args": "after-used",
+        "argsIgnorePattern": "^_|^(req|res|next)$"
       }
-    }
-  ],
-  "rules": {}
+    ],
+    // Allow console.log for server logging
+    "no-console": "off"
+  }
 }
