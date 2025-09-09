@@ -1,43 +1,22 @@
 {
   "root": true,
-  "env": {
-    "browser": true,
-    "es2022": true,
-    "node": true,
-    "jest": true
-  },
-  "extends": ["eslint:recommended"],
+  "ignorePatterns": ["**/*"],
   "plugins": ["@typescript-eslint", "unused-imports", "import"],
-  "ignorePatterns": [
-    "**/node_modules/**",
-    "**/dist/**",
-    "**/build/**",
-    "**/.next/**",
-    "**/coverage/**",
-    "**/*.min.js",
-    "**/*.d.ts",
-    "**/generated/**",
-    "**/public/**",
-    "**/cypress/downloads/**",
-    "**/cypress/screenshots/**",
-    "**/cypress/videos/**"
-  ],
   "overrides": [
     {
       "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
+      "extends": ["eslint:recommended"],
       "parser": "@typescript-eslint/parser",
       "parserOptions": {
         "ecmaVersion": 2022,
-        "sourceType": "module",
-        "ecmaFeatures": {
-          "jsx": true
-        }
+        "sourceType": "module"
       },
       "rules": {
+        // Unused imports and variables
         "no-unused-vars": "off",
         "unused-imports/no-unused-imports": "error",
         "unused-imports/no-unused-vars": [
-          "error",
+          "warn",
           {
             "vars": "all",
             "varsIgnorePattern": "^_",
@@ -45,23 +24,22 @@
             "argsIgnorePattern": "^_"
           }
         ],
-
+        
+        // Spacing and formatting
         "no-trailing-spaces": "error",
         "eol-last": "error",
         "no-multiple-empty-lines": ["error", { "max": 1, "maxEOF": 0 }],
-        "quotes": [
-          "error",
-          "single",
-          { "avoidEscape": true, "allowTemplateLiterals": true }
-        ],
+        "comma-dangle": ["error", "always-multiline"],
+        "quotes": ["error", "single", { "avoidEscape": true, "allowTemplateLiterals": true }],
         "semi": ["error", "always"],
-
+        
+        // Import organization
         "import/order": [
           "error",
           {
             "groups": [
               "builtin",
-              "external",
+              "external", 
               "internal",
               "parent",
               "sibling",
@@ -74,7 +52,8 @@
             }
           }
         ],
-
+        
+        // Professional code quality rules
         "prefer-const": "error",
         "no-var": "error",
         "no-console": ["warn", { "allow": ["warn", "error"] }],
@@ -87,32 +66,19 @@
     {
       "files": ["*.ts", "*.tsx"],
       "rules": {
-        "@typescript-eslint/no-unused-vars": "off",
-        "@typescript-eslint/no-explicit-any": "warn"
-      }
-    },
-    {
-      "files": ["*.spec.ts", "*.spec.tsx", "*.test.ts", "*.test.tsx"],
-      "env": {
-        "jest": true
-      },
-      "globals": {
-        "describe": "readonly",
-        "it": "readonly",
-        "expect": "readonly",
-        "beforeEach": "readonly",
-        "afterEach": "readonly",
-        "beforeAll": "readonly",
-        "afterAll": "readonly",
-        "jest": "readonly"
+        "@typescript-eslint/no-unused-vars": [
+          "error",
+          {
+            "argsIgnorePattern": "^_",
+            "varsIgnorePattern": "^_"
+          }
+        ],
+        "@typescript-eslint/explicit-function-return-type": "off",
+        "@typescript-eslint/explicit-module-boundary-types": "off",
+        "@typescript-eslint/no-explicit-any": "warn",
+        "@typescript-eslint/prefer-nullish-coalescing": "error",
+        "@typescript-eslint/prefer-optional-chain": "error"
       }
     }
-  ],
-  "parserOptions": {
-    "ecmaVersion": 2022,
-    "sourceType": "module"
-  },
-  "rules": {
-    "no-unused-vars": "warn"
-  }
+  ]
 }

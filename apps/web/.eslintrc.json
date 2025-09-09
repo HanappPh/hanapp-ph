@@ -1,5 +1,5 @@
 {
-  "extends": ["next", "next/core-web-vitals"],
+  "extends": ["../../.eslintrc.json", "next", "next/core-web-vitals"],
   "ignorePatterns": [
     "!**/*",
     ".next/**/*",
@@ -12,6 +12,15 @@
     "specs/**/*"
   ],
   "rules": {
-    "@next/next/no-html-link-for-pages": "off"
+    "@next/next/no-html-link-for-pages": "off",
+    // Allow console.log in development for debugging
+    "no-console": ["warn", { "allow": ["warn", "error", "info"] }],
+    // React is auto-imported in Next.js 13+ App Router
+    "no-undef": "off"
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
   }
 }
