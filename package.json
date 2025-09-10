@@ -25,6 +25,8 @@
     "format:check": "prettier --check .",
     "e2e:web": "nx e2e web-e2e",
     "e2e:affected": "nx affected -t e2e",
+    "typecheck": "nx run-many -t typecheck",
+    "typecheck:affected": "nx affected -t typecheck",
     "graph": "nx graph",
     "clean": "nx reset && rm -rf dist node_modules",
     "clean:cache": "nx reset",
