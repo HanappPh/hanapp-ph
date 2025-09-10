@@ -67,10 +67,10 @@
       }
     },
     "typecheck": {
-      "executor": "@nx/eslint:lint",
+      "executor": "nx:run-commands",
       "options": {
-        "lintFilePatterns": ["apps/api/**/*.ts"],
-        "eslintConfig": "apps/api/.eslintrc.json"
+        "command": "tsc --noEmit",
+        "cwd": "apps/api"
       }
     }
   },

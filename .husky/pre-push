@@ -2,4 +2,5 @@
 echo "Running pre-push checks..."
 npm run test:affected
 npm run lint:affected
+npm run typecheck:affected
 echo "Pre-push checks passed!"

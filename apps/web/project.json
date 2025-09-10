@@ -63,8 +63,11 @@
       }
     },
     "typecheck": {
-      "executor": "@nx/next:type-check",
-      "options": {}
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --noEmit",
+        "cwd": "apps/web"
+      }
     }
   },
   "tags": ["type:app", "scope:web"]

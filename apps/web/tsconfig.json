@@ -32,14 +32,12 @@
     "rootDir": "."
   },
   "include": [
-    "../dist/web/.next/types/**/*.ts",
-    "../web/.next/types/**/*.ts",
+    ".next/types/**/*.ts",
     "app/**/*.js",
     "app/**/*.jsx",
     "app/**/*.ts",
     "app/**/*.tsx",
-    "next-env.d.ts",
-    ".next/types/**/*.ts"
+    "next-env.d.ts"
   ],
   "exclude": [
     "out-tsc",
