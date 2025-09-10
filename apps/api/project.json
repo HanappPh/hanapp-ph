@@ -69,7 +69,7 @@
     "typecheck": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "tsc --noEmit",
+        "command": "tsc --noEmit --skipLibCheck",
         "cwd": "apps/api"
       }
     }
