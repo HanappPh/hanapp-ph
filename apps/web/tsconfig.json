@@ -28,7 +28,7 @@
       "@/styles/*": ["./app/styles/*"]
     },
     "types": ["jest", "node"],
-    "outDir": "dist",
+    "outDir": "../../dist/apps/web",
     "rootDir": "."
   },
   "include": [
@@ -42,6 +42,7 @@
   "exclude": [
     "out-tsc",
     "dist",
+    "../../dist/**/*",
     "node_modules",
     "jest.config.ts",
     "app/**/*.spec.ts",

@@ -9,7 +9,9 @@ const { composePlugins, withNx } = require('@nx/next');
 const nextConfig = {
   // Use this to set Nx-specific options
   // See: https://nx.dev/recipes/next/next-config-setup
-  nx: {},
+  nx: {
+    svgr: false,
+  },
 
   experimental: {
     // Enable Turbopack for faster development builds
@@ -20,6 +22,9 @@ const nextConfig = {
       },
     },
   },
+
+  // Ensure correct path resolution
+  distDir: '.next',
 };
 
 const plugins = [
