@@ -22,7 +22,9 @@ declare global {
 
 // -- This is a parent command --
 Cypress.Commands.add('login', (email, password) => {
-  console.log('Custom command example: Login', email, password);
+  // Custom login implementation would go here
+  // For now, this is a placeholder for future authentication flows
+  cy.log(`Login attempt for user: ${email}`);
 });
 //
 // -- This is a child command --
