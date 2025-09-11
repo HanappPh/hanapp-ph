@@ -4,7 +4,11 @@
     "outDir": "out-tsc/cypress",
     "allowJs": true,
     "types": ["cypress", "node"],
-    "sourceMap": false
+    "sourceMap": false,
+    "composite": false,
+    "emitDeclarationOnly": false,
+    "declarationMap": false,
+    "noEmit": true
   },
   "include": [
     "**/*.ts",
