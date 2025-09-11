@@ -3,20 +3,6 @@
   "sourceRoot": "apps/web",
   "projectType": "application",
   "targets": {
-    "build": {
-      "executor": "@nx/next:build",
-      "outputs": ["{options.outputPath}"],
-      "defaultConfiguration": "production",
-      "options": {
-        "outputPath": "dist/apps/web"
-      },
-      "configurations": {
-        "development": {
-          "outputPath": "apps/web"
-        },
-        "production": {}
-      }
-    },
     "serve": {
       "executor": "@nx/next:server",
       "defaultConfiguration": "development",
@@ -33,6 +19,14 @@
           "buildTarget": "web:build:production",
           "dev": false
         }
+      }
+    },
+    "start": {
+      "executor": "@nx/next:server",
+      "options": {
+        "buildTarget": "web:build:production",
+        "dev": false,
+        "port": 3000
       }
     },
     "export": {

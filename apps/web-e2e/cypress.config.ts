@@ -6,11 +6,11 @@ export default defineConfig({
     ...nxE2EPreset(__filename, {
       cypressDir: 'src',
       webServerCommands: {
-        default: 'npx nx run @hanapp-ph/web:dev',
+        default: 'npx nx run web:serve',
       },
-      ciWebServerCommand: 'npx nx run @hanapp-ph/web:start',
+      ciWebServerCommand: 'npx nx run web:serve:production',
       ciBaseUrl: 'http://localhost:3000',
     }),
-    baseUrl: 'http://127.0.0.1:3000',
+    baseUrl: 'http://localhost:3000',
   },
 });
