@@ -138,13 +138,5 @@
     "*.{json,md,yml,yaml,css,scss}": [
       "prettier --write"
     ]
-  },
-  "targets": {
-    "typecheck": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "tsc --noEmit"
-      }
-    }
   }
 }
