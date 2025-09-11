@@ -16,6 +16,11 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "es2022",
-    "customConditions": ["@hanapp-ph/source"]
+    "customConditions": ["@hanapp-ph/source"],
+    "baseUrl": ".",
+    "paths": {
+      "@hanapp-ph/ui": ["libs/ui/src/index.ts"],
+      "@hanapp-ph/ui/*": ["libs/ui/src/*"]
+    }
   }
 }
