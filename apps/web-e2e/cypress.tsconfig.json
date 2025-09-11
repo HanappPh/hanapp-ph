@@ -1,20 +1,22 @@
 {
   "compilerOptions": {
-    "target": "es2022",
-    "lib": ["es2022", "dom"],
-    "module": "esnext",
-    "moduleResolution": "bundler",
+    "target": "es2018",
+    "lib": ["es2018", "dom"],
+    "module": "commonjs",
+    "moduleResolution": "node",
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "allowJs": true,
-    "strict": true,
+    "strict": false,
     "noEmit": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "types": ["cypress", "node"],
-    "outDir": "out-tsc/cypress",
-    "sourceMap": false
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
   },
   "include": [
     "**/*.ts",
@@ -26,11 +28,5 @@
     "**/*.cy.jsx",
     "**/*.d.ts"
   ],
-  "exclude": [
-    "out-tsc",
-    "test-output",
-    "eslint.config.js",
-    "eslint.config.cjs",
-    "eslint.config.mjs"
-  ]
+  "exclude": ["node_modules", "out-tsc", "test-output"]
 }
