@@ -2,7 +2,7 @@
 
 A modern fullstack application built with Next.js, NestJS, and Supabase.
 
-## 🚀 Tech Stack
+## Tech Stack
 
 - **Frontend**: Next.js 15, React 19, TypeScript, Tailwind CSS
 - **Backend**: NestJS, TypeScript
@@ -13,13 +13,13 @@ A modern fullstack application built with Next.js, NestJS, and Supabase.
 - **CI/CD**: GitHub Actions
 - **Code Quality**: ESLint, Prettier, Husky
 
-## 📋 Prerequisites
+## Prerequisites
 
 - Node.js 20.x or later
 - npm 10.x or later
 - Docker (optional, for containerization)
 
-## 🛠️ Development Setup
+## Development Setup
 
 1. **Clone the repository**
 
@@ -52,7 +52,7 @@ A modern fullstack application built with Next.js, NestJS, and Supabase.
    npm run dev:web    # Web server on port 3000
    ```
 
-## 🧪 Testing
+## Testing
 
 ```bash
 # Run all tests
@@ -65,7 +65,7 @@ npm run test:affected
 npm run e2e:web
 ```
 
-## 🔍 Code Quality
+## Code Quality
 
 ```bash
 # Lint all projects
@@ -81,7 +81,7 @@ npm run format
 npm run typecheck
 ```
 
-## 🏗️ Building
+## Building
 
 ```bash
 # Build all projects
@@ -116,7 +116,7 @@ libs/                 # Shared libraries (when created)
 tools/                # Custom tools and scripts
 ```
 
-## 🚀 Deployment
+## Deployment
 
 The application is configured for deployment on various platforms:
 
@@ -145,7 +145,7 @@ The application is configured for deployment on various platforms:
 4. Push to the branch: `git push origin feature/amazing-feature`
 5. Open a Pull Request
 
-## 📝 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 

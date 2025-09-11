@@ -1,10 +1,32 @@
-import { killPort } from '@nx/node/utils';
 /* eslint-disable */
 
 module.exports = async function () {
-  // Put clean up logic here (e.g. stopping services, docker-compose, etc.).
-  // Hint: `globalThis` is shared between setup and teardown.
-  const port = process.env.PORT ? Number(process.env.PORT) : 3000;
-  await killPort(port);
   console.log(globalThis.__TEARDOWN_MESSAGE__);
+
+  // Clean up API process if we started it
+  if (globalThis.__GLOBAL_TEST_CONTEXT__?.apiProcess) {
+    console.log('Stopping API server...');
+
+    try {
+      // Gracefully terminate the process
+      globalThis.__GLOBAL_TEST_CONTEXT__.apiProcess.kill('SIGTERM');
+
+      // Wait a bit for graceful shutdown
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      // Force kill if still running
+      if (!globalThis.__GLOBAL_TEST_CONTEXT__.apiProcess.killed) {
+        globalThis.__GLOBAL_TEST_CONTEXT__.apiProcess.kill('SIGKILL');
+      }
+
+      console.log('API server stopped');
+    } catch (error) {
+      console.warn('Error stopping API server:', error);
+    }
+  }
+
+  // Clean up global context
+  if (globalThis.__GLOBAL_TEST_CONTEXT__) {
+    globalThis.__GLOBAL_TEST_CONTEXT__ = undefined as any;
+  }
 };

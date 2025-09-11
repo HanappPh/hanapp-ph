@@ -7,7 +7,7 @@
 
 ## Quick Start Guide
 
-### 🚀 For Development (Recommended for beginners)
+### For Development (Recommended for beginners)
 
 #### 1. Start Development Database
 
@@ -39,7 +39,7 @@ npx nx serve web
 npm run docker:dev:down
 ```
 
-### 🚀 For Production-like Testing
+### For Production-like Testing
 
 #### 1. Build and Run Everything in Docker
 
@@ -70,7 +70,7 @@ npm run docker:prod:down
 
 ## When to Use Docker?
 
-### ✅ Use Docker When:
+### Use Docker When:
 
 - **Joining team members** - Ensure everyone has the same environment
 - **Deploying to production** - Consistent deployment across cloud providers
@@ -78,7 +78,7 @@ npm run docker:prod:down
 - **Database needed** - Easy PostgreSQL setup for development
 - **Microservices** - Running API and Web separately
 
-### ❌ Don't Use Docker When:
+### Don't Use Docker When:
 
 - **Just starting development** - npm run serve is simpler for learning
 - **Only front-end changes** - Next.js hot reload is faster without Docker

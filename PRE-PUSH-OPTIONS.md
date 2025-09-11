@@ -1,4 +1,4 @@
-# 🚀 Pre-Push Hook Options for HanApp-PH
+# Pre-Push Hook Options for HanApp-PH
 
 ## Current Configuration (Comprehensive)
 
@@ -11,7 +11,7 @@ Your current pre-push hook runs:
 
 ## Alternative Configurations
 
-### 1. 🔥 Full Production Ready (Recommended for Startup)
+### 1. Full Production Ready (Recommended for Startup)
 
 ```bash
 echo "Running comprehensive pre-push checks..."
@@ -19,7 +19,7 @@ npm run test:affected
 npm run lint:affected
 npm run typecheck:affected
 npm run build:affected:prod
-echo "✅ All checks passed - ready for production!"
+echo "All checks passed - ready for production!"
 ```
 
 ### 2. ⚡ Fast Development (Good for rapid iteration)
@@ -28,10 +28,10 @@ echo "✅ All checks passed - ready for production!"
 echo "Running essential pre-push checks..."
 npm run lint:affected
 npm run typecheck:affected
-echo "✅ Code quality checks passed!"
+echo "Code quality checks passed!"
 ```
 
-### 3. 🛡️ Maximum Safety (For critical releases)
+### 3. Maximum Safety (For critical releases)
 
 ```bash
 echo "Running maximum safety checks..."
@@ -39,10 +39,10 @@ npm run test:all
 npm run lint
 npm run typecheck
 npm run build:prod
-echo "✅ Full codebase verified!"
+echo "Full codebase verified!"
 ```
 
-### 4. 🎯 Custom Startup Balance (Recommended)
+### 4. Custom Startup Balance (Recommended)
 
 ```bash
 echo "Running startup-optimized checks..."
@@ -50,17 +50,17 @@ npm run test:affected
 npm run lint:affected
 npm run typecheck:affected
 npm run build:affected
-npm run e2e:affected || echo "⚠️  E2E tests failed but continuing..."
-echo "✅ Startup checks complete!"
+npm run e2e:affected || echo "WARNING: E2E tests failed but continuing..."
+echo "Startup checks complete!"
 ```
 
 ## Benefits of Production Build in Pre-Push
 
-✅ **Catches build errors before deployment**
-✅ **Verifies all imports and dependencies work**
-✅ **Ensures production optimizations don't break functionality**
-✅ **Validates environment-specific configurations**
-✅ **Prevents broken deployments to staging/production**
+- **Catches build errors before deployment**
+- **Verifies all imports and dependencies work**
+- **Ensures production optimizations don't break functionality**
+- **Validates environment-specific configurations**
+- **Prevents broken deployments to staging/production**
 
 ## Performance Considerations
 
