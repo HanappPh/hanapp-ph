@@ -71,12 +71,11 @@ jobs:
 
           if [[ "$AFFECTED_E2E" == *"web-e2e"* ]]; then
             echo "Web E2E tests affected - running with CI configuration..."
-            # Build the web app first for production-like testing
-            npx nx run web:build:production || echo "Web build completed with issues"
-            # Use the development server for E2E testing (more reliable in CI)
-            npx nx run web:serve:development --port=4200 &
+            # For web E2E, we need to start the server first
+            npx nx run web:build:production || echo "Web build failed"
+            npx nx run web:start &
             WEB_PID=$!
-            sleep 15  # Give server more time to start in CI environment
+            sleep 10  # Give server time to start
             npx nx run web-e2e:e2e --configuration=ci || echo "Web E2E completed with issues"
             kill $WEB_PID 2>/dev/null || true
           fi

@@ -11,28 +11,12 @@ export default defineConfig({
       },
       // CI configuration - don't auto-start server, we handle it externally
       ciWebServerCommand: undefined,
-      ciBaseUrl: 'http://localhost:4200',
+      ciBaseUrl: 'http://localhost:3000',
     }),
-    baseUrl: 'http://localhost:4200',
+    baseUrl: 'http://localhost:3000',
     defaultCommandTimeout: 10000,
     requestTimeout: 10000,
     responseTimeout: 10000,
-    // Use a clean TypeScript configuration for Cypress
-    typescript: {
-      config: {
-        compilerOptions: {
-          target: 'es2018',
-          lib: ['es2018', 'dom'],
-          module: 'commonjs',
-          moduleResolution: 'node',
-          allowJs: true,
-          strict: false,
-          esModuleInterop: true,
-          skipLibCheck: true,
-          types: ['cypress', 'node'],
-        },
-      },
-    },
     setupNodeEvents(on, config) {
       // Professional CI setup: Health checks and graceful error handling
       on('task', {
@@ -41,7 +25,7 @@ export default defineConfig({
             const req = http.request(
               {
                 hostname: 'localhost',
-                port: 4200,
+                port: 3000,
                 path: '/',
                 method: 'GET',
                 timeout: 5000,
