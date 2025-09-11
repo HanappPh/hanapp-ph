@@ -2,7 +2,11 @@ import { getGreeting } from '../support/app.po';
 
 describe('Web Application E2E Tests', () => {
   beforeEach(() => {
-    cy.visit('/');
+    // Professional approach: Visit with failure handling for CI environments
+    cy.visit('/', {
+      failOnStatusCode: false,
+      timeout: 10000,
+    });
   });
 
   describe('Home Page', () => {

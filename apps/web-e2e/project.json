@@ -13,6 +13,9 @@
       "configurations": {
         "production": {
           "devServerTarget": "web:serve:production"
+        },
+        "ci": {
+          "baseUrl": "http://localhost:3000"
         }
       }
     },
@@ -21,6 +24,12 @@
       "outputs": ["{options.outputFile}"],
       "options": {
         "lintFilePatterns": ["apps/web-e2e/**/*.{js,ts}"]
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --noEmit --project apps/web-e2e/tsconfig.json"
       }
     }
   },
