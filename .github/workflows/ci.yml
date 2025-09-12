@@ -43,19 +43,19 @@ jobs:
           path: |
             node_modules
             ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-node-v2-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-node-
+            ${{ runner.os }}-node-v2-
 
       # Cache Nx cache directory
       - name: Cache Nx cache
         uses: actions/cache@v4
         with:
           path: .nx/cache
-          key: ${{ runner.os }}-nx-${{ hashFiles('nx.json', 'package-lock.json') }}-${{ github.sha }}
+          key: ${{ runner.os }}-nx-v2-${{ hashFiles('nx.json', 'package-lock.json') }}-${{ github.sha }}
           restore-keys: |
-            ${{ runner.os }}-nx-${{ hashFiles('nx.json', 'package-lock.json') }}-
-            ${{ runner.os }}-nx-
+            ${{ runner.os }}-nx-v2-${{ hashFiles('nx.json', 'package-lock.json') }}-
+            ${{ runner.os }}-nx-v2-
 
       - name: Install dependencies
         if: steps.cache-node-modules.outputs.cache-hit != 'true'
@@ -71,8 +71,10 @@ jobs:
           npm ls --depth=0 || npm ci --prefer-offline --no-audit --progress=false
         timeout-minutes: 5
 
+      # Setup Nx Cloud with error handling
       - name: Setup Nx Cloud
         uses: nrwl/nx-set-shas@v4
+        continue-on-error: true
 
       # Set Nx base and head for affected commands
       - name: Set Nx affected base
