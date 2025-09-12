@@ -122,7 +122,8 @@ jobs:
             npx nx run web:start &
             WEB_PID=$!
             sleep 10  # Give server time to start
-            npx nx run web-e2e:e2e --configuration=ci || echo "Web E2E completed with issues"
+            # Set TS_NODE_PROJECT explicitly for CI to use our compatible tsconfig
+            TS_NODE_PROJECT=./apps/web-e2e/tsconfig.cypress.json npx nx run web-e2e:e2e --configuration=ci || echo "Web E2E completed with issues"
             kill $WEB_PID 2>/dev/null || true
           fi
 
