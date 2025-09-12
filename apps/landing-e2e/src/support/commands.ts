@@ -21,8 +21,8 @@ declare global {
 
 // -- This is a parent command --
 Cypress.Commands.add('login', (email, _password) => {
-  // Custom command example: Login functionality would go here
-  cy.task('log', `Login command called with email: ${email}`);
+  // Custom command example: Login
+  cy.log('Login command executed', email);
 });
 //
 // -- This is a child command --
