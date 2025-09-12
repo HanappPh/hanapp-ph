@@ -35,26 +35,70 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
 
+      # Cache node_modules for faster subsequent runs
+      - name: Cache node_modules
+        id: cache-node-modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      # Cache Nx cache directory
+      - name: Cache Nx cache
+        uses: actions/cache@v4
+        with:
+          path: .nx/cache
+          key: ${{ runner.os }}-nx-${{ hashFiles('nx.json', 'package-lock.json') }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-nx-${{ hashFiles('nx.json', 'package-lock.json') }}-
+            ${{ runner.os }}-nx-
+
       - name: Install dependencies
-        run: npm ci --legacy-peer-deps
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
+        run: |
+          echo "Cache miss - installing dependencies..."
+          npm ci --prefer-offline --no-audit --progress=false
+        timeout-minutes: 15
+
+      - name: Verify installation (if cache hit)
+        if: steps.cache-node-modules.outputs.cache-hit == 'true'
+        run: |
+          echo "Cache hit - verifying installation..."
+          npm ls --depth=0 || npm ci --prefer-offline --no-audit --progress=false
+        timeout-minutes: 5
 
       - name: Setup Nx Cloud
         uses: nrwl/nx-set-shas@v4
 
+      # Set Nx base and head for affected commands
+      - name: Set Nx affected base
+        run: |
+          echo "NX_BASE=${{ github.event.before }}" >> $GITHUB_ENV
+          echo "NX_HEAD=${{ github.sha }}" >> $GITHUB_ENV
+
       - name: Check formatting
         run: npm run format:check
+        timeout-minutes: 5
 
       - name: Lint affected projects
         run: npx nx affected -t lint --parallel=3
+        timeout-minutes: 10
 
       - name: Type check affected projects
         run: npx nx affected -t typecheck --parallel=3
+        timeout-minutes: 10
 
       - name: Test affected projects
         run: npx nx affected -t test --parallel=3 --ci --code-coverage --watch=false
+        timeout-minutes: 15
 
       - name: Build affected projects
         run: npx nx affected -t build --parallel=3
+        timeout-minutes: 20
 
       - name: E2E test affected projects (if any)
         run: |
