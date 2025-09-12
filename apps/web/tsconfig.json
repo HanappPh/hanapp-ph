@@ -25,9 +25,7 @@
       "@/utils/*": ["./app/utils/*"],
       "@/types/*": ["./app/types/*"],
       "@/hooks/*": ["./app/hooks/*"],
-      "@/styles/*": ["./app/styles/*"],
-      "@hanapp-ph/ui": ["../../libs/ui/src"],
-      "@hanapp-ph/ui/*": ["../../libs/ui/src/*"]
+      "@/styles/*": ["./app/styles/*"]
     },
     "types": ["jest", "node"],
     "outDir": "../../dist/apps/web",
