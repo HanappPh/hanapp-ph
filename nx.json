@@ -17,14 +17,12 @@
     ],
     "sharedGlobals": ["{workspaceRoot}/.github/workflows/ci.yml"]
   },
-  "nxCloudId": "68c06c7ac08bfa466df57ffd",
+  "nxCloudId": "68c48ff07e1fac5b283cca7c",
   "plugins": [
     {
       "plugin": "@nx/js/typescript",
       "options": {
-        "typecheck": {
-          "targetName": "typecheck"
-        },
+        "typecheck": { "targetName": "typecheck" },
         "build": {
           "targetName": "build",
           "configName": "tsconfig.lib.json",
@@ -55,9 +53,7 @@
     },
     {
       "plugin": "@nx/jest/plugin",
-      "options": {
-        "targetName": "test"
-      },
+      "options": { "targetName": "test" },
       "exclude": ["apps/api-e2e/**/*"]
     },
     {
@@ -72,21 +68,9 @@
       }
     }
   ],
-  "targetDefaults": {
-    "test": {
-      "dependsOn": ["^build"]
-    }
-  },
+  "targetDefaults": { "test": { "dependsOn": ["^build"] } },
   "generators": {
-    "@nx/next": {
-      "application": {
-        "style": "tailwind",
-        "linter": "eslint"
-      }
-    }
+    "@nx/next": { "application": { "style": "tailwind", "linter": "eslint" } }
   },
-  "workspaceLayout": {
-    "appsDir": "apps",
-    "libsDir": "libs"
-  }
+  "workspaceLayout": { "appsDir": "apps", "libsDir": "libs" }
 }
