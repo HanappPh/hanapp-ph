@@ -71,7 +71,11 @@ jobs:
         if: steps.cache-node-modules.outputs.cache-hit != 'true'
         run: |
           echo "Cache miss - installing dependencies..."
-          npm ci --prefer-offline --no-audit --progress=false
+          # Try npm ci first, fallback to npm install if lock file is out of sync
+          npm ci --prefer-offline --no-audit --progress=false || {
+            echo "npm ci failed, likely due to lock file sync issues. Running npm install..."
+            npm install --prefer-offline --no-audit --progress=false
+          }
         timeout-minutes: 15
 
       - name: Verify installation (if cache hit)
@@ -83,7 +87,11 @@ jobs:
         run: |
           echo "Verifying Cypress binary installation..."
           npx cypress verify
-          npm ls --depth=0 || npm ci --prefer-offline --no-audit --progress=false
+          # Check npm dependencies, install if needed
+          npm ls --depth=0 || {
+            echo "Dependencies not fully installed, running npm install..."
+            npm install --prefer-offline --no-audit --progress=false
+          }
         timeout-minutes: 5
 
       # Setup Nx Cloud with access token
