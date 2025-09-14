@@ -22,7 +22,9 @@
     {
       "plugin": "@nx/js/typescript",
       "options": {
-        "typecheck": { "targetName": "typecheck" },
+        "typecheck": {
+          "targetName": "typecheck"
+        },
         "build": {
           "targetName": "build",
           "configName": "tsconfig.lib.json",
@@ -53,7 +55,9 @@
     },
     {
       "plugin": "@nx/jest/plugin",
-      "options": { "targetName": "test" },
+      "options": {
+        "targetName": "test"
+      },
       "exclude": ["apps/api-e2e/**/*"]
     },
     {
@@ -66,11 +70,29 @@
         "watchDepsTargetName": "watch-deps",
         "serveStaticTargetName": "serve-static"
       }
+    },
+    {
+      "plugin": "@nx/eslint/plugin",
+      "options": {
+        "targetName": "eslint:lint"
+      }
     }
   ],
-  "targetDefaults": { "test": { "dependsOn": ["^build"] } },
-  "generators": {
-    "@nx/next": { "application": { "style": "tailwind", "linter": "eslint" } }
+  "targetDefaults": {
+    "test": {
+      "dependsOn": ["^build"]
+    }
   },
-  "workspaceLayout": { "appsDir": "apps", "libsDir": "libs" }
+  "generators": {
+    "@nx/next": {
+      "application": {
+        "style": "tailwind",
+        "linter": "eslint"
+      }
+    }
+  },
+  "workspaceLayout": {
+    "appsDir": "apps",
+    "libsDir": "libs"
+  }
 }
