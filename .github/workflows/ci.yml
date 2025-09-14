@@ -86,9 +86,13 @@ jobs:
           npm ls --depth=0 || npm ci --prefer-offline --no-audit --progress=false
         timeout-minutes: 5
 
-      # Setup Nx Cloud with error handling
+      # Setup Nx Cloud with access token
       - name: Setup Nx Cloud
         uses: nrwl/nx-set-shas@v4
+        with:
+          main-branch-name: 'main'
+        env:
+          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
         continue-on-error: true
 
       # Set Nx base and head for affected commands
@@ -103,18 +107,26 @@ jobs:
 
       - name: Lint affected projects
         run: npx nx affected -t lint --parallel=3
+        env:
+          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
         timeout-minutes: 10
 
       - name: Type check affected projects
         run: npx nx affected -t typecheck --parallel=3
+        env:
+          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
         timeout-minutes: 10
 
       - name: Test affected projects
         run: npx nx affected -t test --parallel=3 --ci --code-coverage --watch=false
+        env:
+          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
         timeout-minutes: 15
 
       - name: Build affected projects
         run: npx nx affected -t build --parallel=3
+        env:
+          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
         timeout-minutes: 20
 
       - name: E2E test affected projects (if any)
@@ -149,7 +161,23 @@ jobs:
             kill $WEB_PID 2>/dev/null || true
           fi
 
+          if [[ "$AFFECTED_E2E" == *"landing-e2e"* ]]; then
+            echo "Landing E2E tests affected - running with CI configuration..."
+            
+            # For landing E2E, we need to start the server first
+            npx nx run landing:build:production || echo "Landing build failed"
+            npx nx run landing:start &
+            LANDING_PID=$!
+            sleep 10  # Give server time to start
+            
+            echo "Running Landing E2E tests..."
+            npx nx run landing-e2e:e2e --configuration=ci || echo "Landing E2E completed with issues"
+            kill $LANDING_PID 2>/dev/null || true
+          fi
+
           echo "E2E testing phase completed"
+        env:
+          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
         continue-on-error: true
 
       - name: Upload coverage reports
