@@ -1,6 +1,6 @@
 import { Button, Card, Input } from '@hanapp-ph/commons';
 
-export default function Index() {
+export default function TestComponents() {
   return (
     <div className="p-4 space-y-4">
       <h2 className="text-2xl font-bold">Testing Shared Components</h2>
