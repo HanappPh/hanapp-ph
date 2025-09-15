@@ -108,8 +108,10 @@ npm run docker:run
 apps/
 ├── api/              # NestJS backend
 ├── api-e2e/          # API E2E tests
-├── web/              # Next.js frontend
-└── web-e2e/          # Web E2E tests
+├── web/              # Next.js frontend app
+├── web-e2e/          # Web E2E tests
+├── landing/          # Next.js frontend app
+└── landing/-e2e      # Landing E2E tests
 
 libs/                 # Shared libraries (when created)
 
