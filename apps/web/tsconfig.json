@@ -20,6 +20,7 @@
     ],
     "paths": {
       "@/*": ["./app/*"],
+      "@/components/*": ["./app/components/*"],
       "@/lib/*": ["./app/lib/*"],
       "@/utils/*": ["./app/utils/*"],
       "@/types/*": ["./app/types/*"],
@@ -27,27 +28,25 @@
       "@/styles/*": ["./app/styles/*"]
     },
     "types": ["jest", "node"],
-    "outDir": "../../dist/apps/web",
-    "rootDir": "."
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
   },
   "include": [
-    ".next/types/**/*.ts",
+    "../../apps/web/.next/types/**/*.ts",
+    "../../dist/apps/web/.next/types/**/*.ts",
+    "next-env.d.ts",
     "app/**/*.js",
     "app/**/*.jsx",
     "app/**/*.ts",
     "app/**/*.tsx",
-    "next-env.d.ts"
+    ".next/types/**/*.ts"
   ],
   "exclude": [
     "out-tsc",
     "dist",
-    "../../dist/**/*",
     "node_modules",
     "jest.config.ts",
     "app/**/*.spec.ts",
     "app/**/*.test.ts",
-    "src/**/*.spec.ts",
-    "src/**/*.test.ts",
     ".next",
     "eslint.config.js",
     "eslint.config.cjs",
