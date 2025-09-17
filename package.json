@@ -21,7 +21,7 @@
     "test:all": "nx run-many -t test",
     "test:affected": "nx affected -t test",
     "test:watch": "nx run-many -t test --watch",
-    "test:coverage": "nx run-many -t test --code-coverage",
+    "test:coverage": "nx run-many -t test --coverage",
     "lint": "nx run-many -t lint",
     "lint:fix": "nx run-many -t lint --fix",
     "lint:affected": "nx affected -t lint",
