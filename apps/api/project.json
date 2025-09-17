@@ -1,55 +1,44 @@
 {
-  "name": "api",
+  "name": "@hanapp-ph/api",
   "sourceRoot": "apps/api/src",
   "projectType": "application",
   "targets": {
     "build": {
-      "executor": "@nx/webpack:webpack",
-      "outputs": ["{options.outputPath}"],
-      "defaultConfiguration": "production",
+      "executor": "nx:run-commands",
+      "outputs": ["{workspaceRoot}/apps/api/dist"],
       "options": {
-        "target": "node",
-        "compiler": "tsc",
-        "outputPath": "dist/apps/api",
-        "main": "apps/api/src/main.ts",
-        "tsConfig": "apps/api/tsconfig.app.json",
-        "assets": ["apps/api/src/assets"],
-        "isolatedConfig": true,
-        "webpackConfig": "apps/api/webpack.config.js"
+        "command": "webpack-cli build",
+        "args": ["--node-env=production"],
+        "cwd": "apps/api"
       },
       "configurations": {
         "development": {
-          "optimization": false,
-          "extractLicenses": false,
-          "inspect": false,
-          "sourceMap": true
-        },
-        "production": {
-          "optimization": true,
-          "extractLicenses": true,
-          "inspect": false,
-          "fileReplacements": [
-            {
-              "replace": "apps/api/src/environments/environment.ts",
-              "with": "apps/api/src/environments/environment.prod.ts"
-            }
-          ]
+          "args": ["--node-env=development"]
         }
       }
     },
     "serve": {
-      "executor": "@nx/node:node",
+      "executor": "@nx/js:node",
       "defaultConfiguration": "development",
+      "dependsOn": ["build"],
       "options": {
-        "buildTarget": "api:build:development",
-        "watch": true
+        "buildTarget": "@hanapp-ph/api:build",
+        "runBuildTargetDependencies": false
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "@hanapp-ph/api:build:development"
+        },
+        "production": {
+          "buildTarget": "@hanapp-ph/api:build:production"
+        }
       }
     },
     "lint": {
       "executor": "@nx/eslint:lint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["apps/api/**/*.ts"]
+        "lintFilePatterns": ["apps/api/**/*.{ts,tsx,js,jsx}"]
       }
     },
     "test": {
