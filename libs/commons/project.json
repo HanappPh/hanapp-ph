@@ -3,6 +3,35 @@
   "sourceRoot": "libs/commons/src",
   "projectType": "library",
   "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "outputs": ["{workspaceRoot}/libs/commons/dist"],
+      "options": {
+        "commands": [
+          "tsc -p libs/commons/tsconfig.lib.json",
+          "powershell -c \"Copy-Item 'libs/commons/dist/src/index.d.ts' 'libs/commons/dist/index.d.ts' -ErrorAction SilentlyContinue\"",
+          "powershell -c \"if (Test-Path 'libs/commons/dist/src/index.js') { Copy-Item 'libs/commons/dist/src/index.js' 'libs/commons/dist/index.js' }\""
+        ],
+        "parallel": false,
+        "cwd": "{workspaceRoot}"
+      },
+      "configurations": {
+        "development": {
+          "commands": [
+            "tsc -p libs/commons/tsconfig.lib.json",
+            "powershell -c \"Copy-Item 'libs/commons/dist/src/index.d.ts' 'libs/commons/dist/index.d.ts' -ErrorAction SilentlyContinue\"",
+            "powershell -c \"if (Test-Path 'libs/commons/dist/src/index.js') { Copy-Item 'libs/commons/dist/src/index.js' 'libs/commons/dist/index.js' }\""
+          ]
+        },
+        "production": {
+          "commands": [
+            "tsc -p libs/commons/tsconfig.lib.json --sourceMap false",
+            "powershell -c \"Copy-Item 'libs/commons/dist/src/index.d.ts' 'libs/commons/dist/index.d.ts' -ErrorAction SilentlyContinue\"",
+            "powershell -c \"if (Test-Path 'libs/commons/dist/src/index.js') { Copy-Item 'libs/commons/dist/src/index.js' 'libs/commons/dist/index.js' }\""
+          ]
+        }
+      }
+    },
     "test": {
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
