@@ -199,6 +199,9 @@ jobs:
           name: codecov-umbrella
         continue-on-error: true
 
+      - run: npx nx-cloud fix-ci
+        if: always()
+
       # Optional: Enable task distribution (uncomment when ready)
       # - name: Start CI run with distribution
       #   run: npx nx-cloud start-ci-run --distribute-on="3 linux-medium-js" --stop-agents-after="build"
