@@ -9,7 +9,16 @@ const { composePlugins, withNx } = require('@nx/next');
 const nextConfig = {
   // Use this to set Nx-specific options
   // See: https://nx.dev/recipes/next/next-config-setup
-  nx: {},
+  nx: {
+    svgr: false,
+  },
+  // Experimental features for better performance
+  experimental: {
+    // Use source files directly in development for better DX
+    externalDir: true,
+  },
+  // Ensure transpilation of monorepo packages
+  transpilePackages: ['@hanapp-ph/commons'],
 };
 
 const plugins = [
