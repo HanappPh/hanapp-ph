@@ -21,6 +21,7 @@
     "paths": {
       "@hanapp-ph/commons": ["libs/commons/src/index.ts"],
       "@hanapp-ph/commons/*": ["libs/commons/src/*"],
+      "@hanapp-ph/components": ["libs/commons/src/components/index.ts"],
       "@hanapp-ph/components/*": ["libs/commons/src/components/*"],
       "@hanapp-ph/utils": ["libs/commons/src/libs/utils.ts"]
     }
