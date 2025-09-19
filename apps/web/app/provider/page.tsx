@@ -1,4 +1,4 @@
-import { Button, Card } from 'libs/commons/src';
+import { Button, Card } from '@hanapp-ph/commons';
 import {
   MapPin,
   ShieldCheck,
