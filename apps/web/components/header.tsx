@@ -1,5 +1,7 @@
 'use client';
 
+import Image from 'next/image';
+
 interface MainHeaderProps {
   logoSrc?: string;
   logoAlt?: string;
@@ -9,6 +11,8 @@ interface MainHeaderProps {
 }
 
 export function MainHeader({
+  logoSrc = '/Hanapp-Logo-Registered-2.png',
+  logoAlt = 'Hanapp Logo',
   showUserAvatar = true,
   userInitials = 'L',
   className = '',
@@ -23,7 +27,19 @@ export function MainHeader({
           flexShrink: 0,
           filter: 'drop-shadow(0 3px 4px rgba(0, 0, 0, 0.25))',
         }}
-      ></div>
+      >
+        <Image
+          src={logoSrc}
+          alt={logoAlt}
+          width={287}
+          height={100}
+          style={{
+            width: '100%',
+            height: '100%',
+          }}
+          priority
+        />
+      </div>
 
       <div
         className="hidden lg:block fixed bottom-20 left-16 z-10"

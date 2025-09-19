@@ -22,7 +22,7 @@ export function LoginDialog({
         <div className="flex flex-col h-full p-4 sm:p-12 justify-center items-center">
           <div className="flex flex-col space-y-8">
             <div className="flex flex-col justify-center">
-              <DialogHeader imageClassName="w-[160px] h-[50px] sm:w-[250px] sm:h-[80px] lg:w-32 lg:h-32" />
+              <DialogHeader />
             </div>
             <div className="px-4 pb-4 sm:px-8 sm:pb-8">
               <AuthButtons
