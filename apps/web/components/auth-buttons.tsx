@@ -11,28 +11,28 @@ interface AuthButtonsProps {
 }
 
 export function AuthButtons({
-  onSendOTP,
-  onGoogleLogin,
+  // onSendOTP,
+  // onGoogleLogin,
   className = '',
 }: AuthButtonsProps) {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [showOtpVerification, setShowOtpVerification] = useState(false);
 
   const handleSendOTP = () => {
-    if (onSendOTP) {
-      onSendOTP(phoneNumber);
-    } else {
-      console.log('Sending OTP to:', phoneNumber);
-    }
-    setShowOtpVerification(true);
+    // if (onSendOTP) {
+    //   onSendOTP(phoneNumber);
+    // } else {
+    //   console.log('Sending OTP to:', phoneNumber);
+    // }
+    // setShowOtpVerification(true);
   };
 
   const handleGoogleLogin = () => {
-    if (onGoogleLogin) {
-      onGoogleLogin();
-    } else {
-      console.log('Continue with Google');
-    }
+    // if (onGoogleLogin) {
+    //   onGoogleLogin();
+    // } else {
+    //   console.log('Continue with Google');
+    // }
   };
 
   const handleBackToLogin = () => {
@@ -45,8 +45,8 @@ export function AuthButtons({
         <OtpVerificationButtons
           phoneNumber={phoneNumber}
           onBackToLogin={handleBackToLogin}
-          onVerifyOtp={otp => console.log('OTP Verified:', otp)}
-          onResendCode={() => console.log('Resending code...')}
+          // onVerifyOtp={otp => console.log('OTP Verified:', otp)}
+          // onResendCode={() => console.log('Resending code...')}
         />
       ) : (
         <>
