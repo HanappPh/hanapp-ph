@@ -9,8 +9,6 @@ interface MainHeaderProps {
 }
 
 export function MainHeader({
-  logoSrc = '/Hanapp-Logo-Registered-2.png',
-  logoAlt = 'Hanapp Logo',
   showUserAvatar = true,
   userInitials = 'L',
   className = '',
@@ -25,17 +23,7 @@ export function MainHeader({
           flexShrink: 0,
           filter: 'drop-shadow(0 3px 4px rgba(0, 0, 0, 0.25))',
         }}
-      >
-        <img
-          src={logoSrc}
-          alt={logoAlt}
-          style={{
-            width: '100%',
-            height: '100%',
-            aspectRatio: '287/100',
-          }}
-        />
-      </div>
+      ></div>
 
       <div
         className="hidden lg:block fixed bottom-20 left-16 z-10"
