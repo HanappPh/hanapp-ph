@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@100..900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -20,6 +22,7 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 222.2 84% 4.9%;
     --radius: 0.5rem;
+    --font-sans: 'League Spartan', sans-serif;
   }
 
   .dark {
@@ -46,5 +49,6 @@
 
   body {
     @apply bg-background text-foreground;
+    font-family: 'League Spartan', sans-serif;
   }
 }
