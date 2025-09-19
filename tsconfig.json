@@ -7,13 +7,7 @@
       "path": "./apps/web-e2e"
     },
     {
-      "path": "./apps/web"
-    },
-    {
       "path": "./apps/api-e2e"
-    },
-    {
-      "path": "./apps/api"
     },
     {
       "path": "./apps/landing-e2e"
@@ -23,6 +17,12 @@
     },
     {
       "path": "./libs/commons"
+    },
+    {
+      "path": "./apps/web"
+    },
+    {
+      "path": "./apps/api"
     }
   ]
 }
