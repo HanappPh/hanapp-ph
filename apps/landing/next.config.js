@@ -14,6 +14,8 @@ const nextConfig = {
   },
 
   experimental: {
+    // Use source files directly in development for better DX
+    externalDir: true,
     // Enable Turbopack for faster development builds
     turbo: {
       // Configure Turbopack-specific settings if needed
@@ -22,6 +24,9 @@ const nextConfig = {
       },
     },
   },
+
+  // Ensure transpilation of monorepo packages
+  transpilePackages: ['@hanapp-ph/commons'],
 
   // Ensure correct path resolution
   distDir: '.next',
