@@ -3,9 +3,9 @@
   "version": "0.0.1",
   "private": true,
   "nx": {
-    "name": "api-e2e",
+    "name": "@hanapp-ph/api-e2e",
     "implicitDependencies": [
-      "api"
+      "@hanapp-ph/api"
     ],
     "targets": {
       "e2e": {
@@ -18,8 +18,8 @@
           "passWithNoTests": true
         },
         "dependsOn": [
-          "api:build",
-          "api:serve"
+          "@hanapp-ph/api:build",
+          "@hanapp-ph/api:serve"
         ]
       }
     }

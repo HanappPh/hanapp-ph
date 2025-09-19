@@ -13,7 +13,7 @@ export default defineConfig({
     ...nxE2EPreset(__filename, {
       cypressDir: 'src',
       webServerCommands: {
-        default: 'npx nx run web:serve',
+        default: 'npx nx run temp:serve',
       },
       // CI configuration - don't auto-start server, we handle it externally
       ciWebServerCommand: undefined,
