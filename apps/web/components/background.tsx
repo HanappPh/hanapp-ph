@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 interface BackgroundImageProps {
   children?: React.ReactNode;
   imageSrc?: string;
