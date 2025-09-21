@@ -2,6 +2,7 @@ import { Card } from '@hanapp-ph/commons';
 import { MapPin, ShieldCheck, Clock } from 'lucide-react';
 
 import { BookingsSection } from '../../components/bookings-section';
+import { Footer } from '../../components/footer';
 import { HeroSection } from '../../components/hero-section';
 import { ListingsSection } from '../../components/listings-section';
 import { OnboardingSection } from '../../components/onboarding-section';
@@ -96,6 +97,7 @@ export default function ProviderPage() {
       <ListingsSection />
 
       <OnboardingSection />
+      <Footer />
     </div>
   );
 }
