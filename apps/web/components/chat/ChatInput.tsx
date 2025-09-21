@@ -31,7 +31,7 @@ export const ChatInput = ({
   };
 
   return (
-    <div className="bg-white border-t border-gray-200 p-4 flex-shrink-0">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mt-4 flex-shrink-0">
       <form onSubmit={handleSubmit} className="flex items-center gap-3">
         <Button
           type="button"
