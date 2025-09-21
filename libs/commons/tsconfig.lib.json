@@ -31,5 +31,13 @@
     "eslint.config.cjs",
     "eslint.config.mjs"
   ],
-  "include": ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx"]
+  "include": [
+    "src/**/*.js",
+    "src/**/*.jsx",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "../../apps/web/components/BrandHeader.tsx",
+    "../../apps/web/components/SignUpForm.tsx",
+    "../../apps/web/components/ServiceSelector.tsx"
+  ]
 }
