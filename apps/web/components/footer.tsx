@@ -3,16 +3,12 @@ import { Instagram, Facebook } from 'lucide-react';
 
 export function Footer() {
   return (
-    <footer className="bg-gradient-to-b from-[#014182] to-[#102E50] text-white py-12">
+    <footer className="bg-gradient-to-b from-[#FFDD8E] to-[#F5C45E] text-[#102E50] py-12">
       <div className="max-w-7xl mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
           {/* Logo column */}
           <div className="flex md:block justify-start mb-8 md:mb-0">
-            <img
-              src="/assets/logo-yellow.png"
-              className="h-12"
-              alt="Yellow Logo"
-            />
+            <img src="/assets/logo-blue.png" className="h-12" alt="Blue Logo" />
           </div>
 
           {/* Company Info */}
@@ -45,13 +41,13 @@ export function Footer() {
             <div className="space-y-3">
               <Input
                 placeholder="Email"
-                className="bg-white/10 border-white/20 text-white placeholder:text-white/70"
+                className="bg-gray/10 border-gray/20 text-[#102E50] placeholder:text-[#102E50]/70"
               />
               <Input
                 placeholder="Message"
-                className="bg-white/10 border-white/20 text-white placeholder:text-white/70"
+                className="bg-gray/10 border-gray/20 text-[#102E50] placeholder:text-[#102E50]/70"
               />
-              <Button className="w-full bg-[#F5C45E] hover:bg-amber-500 text-black font-semibold">
+              <Button className="w-full bg-[#102E50] hover:bg-gray-800 text-white font-semibold">
                 Send
               </Button>
             </div>
@@ -64,14 +60,14 @@ export function Footer() {
               <Button
                 size="icon"
                 variant="outline"
-                className="border-white/20 text-white hover:bg-white hover:text-blue-900 bg-transparent"
+                className="border-white/20 text-[#102E50] hover:bg-white hover:text-blue-900 bg-transparent"
               >
                 <Instagram className="w-4 h-4" />
               </Button>
               <Button
                 size="icon"
                 variant="outline"
-                className="border-white/20 text-white hover:bg-white hover:text-blue-900 bg-transparent"
+                className="border-white/20 text-[#102E50] hover:bg-white hover:text-blue-900 bg-transparent"
               >
                 <Facebook className="w-4 h-4" />
               </Button>
@@ -79,7 +75,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-white/20 mt-8 pt-8 text-center text-sm">
+        <div className="border-t border-[#102E50]/40 mt-8 pt-8 text-center text-sm">
           © Hanapp Technologies
         </div>
       </div>
