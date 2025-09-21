@@ -1,45 +1,14 @@
-import { Button, Card } from '@hanapp-ph/commons';
-import {
-  MapPin,
-  ShieldCheck,
-  Clock,
-  Camera,
-  NotebookPen,
-  BellRing,
-  Sparkles,
-} from 'lucide-react';
+import { Card } from '@hanapp-ph/commons';
+import { MapPin, ShieldCheck, Clock } from 'lucide-react';
+
+import { BookingsSection } from '../../components/bookings-section';
+import { HeroSection } from '../../components/hero-section';
+import { ListingsSection } from '../../components/listings-section';
+import { OnboardingSection } from '../../components/onboarding-section';
 export default function ProviderPage() {
   return (
-    <div>
-      <section
-        className="px-6 py-16"
-        style={{
-          background: 'linear-gradient(180deg, #FFDD8E 0%, #F5C45E 100%)',
-        }}
-      >
-        <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-[#102E50] mb-4 text-balance">
-            Turn Your Skills Into Income
-          </h1>
-          <p className="text-xl text-[#102E50] mb-8 text-balance">
-            List your service today and connect with nearby customers.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-4">
-            <Button
-              size="lg"
-              className="bg-gradient-to-b from-[#014182] to-[#102E50] hover:from-[#014c6d] hover:to-[#0a233a] font-semibold px-8 rounded-xl"
-            >
-              + List My Service
-            </Button>
-            <Button
-              size="lg"
-              className="bg-[#FFF3DB] hover:bg-white/90 text-black font-semibold px-8 rounded-xl"
-            >
-              Preview My Listings
-            </Button>
-          </div>
-        </div>
-      </section>
+    <div className="bg-[#F3F5F9]">
+      <HeroSection />
 
       <section className="px-6 py-8">
         <div className="max-w-7xl mx-auto">
@@ -99,7 +68,9 @@ export default function ProviderPage() {
         </div>
       </section>
 
-      <section className="px-6 py-8">
+      <BookingsSection />
+
+      {/* <section className="px-6 py-8">
         <div className="max-w-7xl mx-auto">
           <div className='bg-[url("/assets/gradient.png")] bg-cover bg-center rounded-2xl p-10 shadow-xl'>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2 items-center">
@@ -120,101 +91,11 @@ export default function ProviderPage() {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
-      <section className="px-6 py-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Create Your First Listing */}
-            <Card className="p-8 bg-[#FFF3DB] border border-[#F5C45E] rounded-xl shadow-md flex flex-col">
-              <h3 className="text-2xl font-bold text-[#102E50] mb-6">
-                Create Your First Listing
-              </h3>
-              <ul className="space-y-4 mb-8">
-                <li className="font-semibold text-[#102E50]">
-                  1. Choose a category (Cleaning, Tutoring, Handyman etc.)
-                </li>
-                <li className="font-semibold text-[#102E50]">
-                  2. Add Photos and a short bio
-                </li>
-                <li className="font-semibold text-[#102E50]">
-                  3. Set your rates and service areas
-                </li>
-                <li className="font-semibold text-[#102E50]">
-                  {' '}
-                  4. Publish and start connecting clients
-                </li>
-              </ul>
-              <div className="mt-auto pt-6 flex flex-wrap gap-4 justify-start w-full">
-                <Button className="bg-[#102E50] hover:bg-primary/90 text-white rounded-md">
-                  List My Service
-                </Button>
-                <Button className="bg-white border-primary text-[#102E50] hover:bg-gray-100 rounded-md">
-                  See Sample Listing
-                </Button>
-              </div>
-            </Card>
+      <ListingsSection />
 
-            {/* Elevate Your Profile */}
-            <div>
-              <h3 className="text-2xl font-bold text-[#102E50] mb-6">
-                Elevate Your Profile
-              </h3>
-              <div className="space-y-4">
-                <div className="flex items-center gap-3 p-4 border-2 border-[#F5C45E] rounded-lg shadow-md">
-                  <Camera className="h-6 w-6 text-[#102E50]" />
-                  <div className="flex-1">
-                    <div className="font-semibold text-[#102E50]">
-                      Use a clear photo
-                    </div>
-                    <div className="text-sm text-[#102E50]">
-                      Customers trust real faces. Smile, good lighting, no
-                      filters.
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3 p-4 border-2 border-[#F5C45E] rounded-lg shadow-md">
-                  <NotebookPen className="h-6 w-6 text-[#102E50]" />
-                  <div className="flex-1">
-                    <div className="font-semibold text-[#102E50]">
-                      Describe your expertise
-                    </div>
-                    <div className="text-sm text-[#102E50]">
-                      List tools, years of experience, and sample tasks you can
-                      handle.
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3 p-4 border-2 border-[#F5C45E] rounded-lg shadow-md">
-                  <BellRing className="h-6 w-6 text-[#102E50]" />
-                  <div className="flex-1">
-                    <div className="font-semibold text-[#102E50]">
-                      Reply fast to win bookings
-                    </div>
-                    <div className="text-sm text-[#102E50]">
-                      Enable notifications and answer within minutes to rank
-                      higher.
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3 p-4 bg-[#102E50] text-primary-foreground rounded-lg shadow-md">
-                  <Sparkles className="h-6 w-6" />
-                  <div className="flex-1">
-                    <div className="font-semibold">Coming soon</div>
-                    <div className="text-sm">
-                      Bidding System & Rewards: boost visibility, earn credits
-                      by referring fellow providers.
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <OnboardingSection />
     </div>
   );
 }
