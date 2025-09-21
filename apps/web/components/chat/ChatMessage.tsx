@@ -41,8 +41,10 @@ export const ChatMessage = ({ message }: ChatMessageProps) => {
         }`}
       >
         <div
-          className={`rounded-lg px-4 py-2 ${
-            message.isCurrentUser ? 'text-white' : 'bg-gray-100 text-gray-800'
+          className={`rounded-xl px-4 py-3 shadow-sm border ${
+            message.isCurrentUser
+              ? 'text-white border-blue-600'
+              : 'bg-gray-50 text-gray-800 border-gray-200'
           }`}
           style={{
             backgroundColor: message.isCurrentUser ? '#064283' : undefined,
