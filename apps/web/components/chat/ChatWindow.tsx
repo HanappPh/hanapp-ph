@@ -4,7 +4,7 @@ import {
   AvatarImage,
   Button,
 } from '@hanapp-ph/commons';
-import { MoreVertical } from 'lucide-react';
+import { MoreVertical, ArrowLeft } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 
 import { ChatInput } from './ChatInput';
@@ -19,6 +19,7 @@ interface ChatWindowProps {
   recipientInitials: string;
   isOnline?: boolean;
   isTyping?: boolean;
+  onBackToChatList?: () => void;
 }
 
 export const ChatWindow = ({
@@ -29,6 +30,7 @@ export const ChatWindow = ({
   recipientInitials,
   isOnline = false,
   isTyping = false,
+  onBackToChatList,
 }: ChatWindowProps) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -41,12 +43,22 @@ export const ChatWindow = ({
   }, [messages]);
 
   return (
-    <div className="flex-1 flex flex-col bg-gray-50 p-4">
-      {/* Modern Card Header */}
+    <div className="flex-1 flex flex-col bg-gray-50 p-4 min-h-0">
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-4 flex-shrink-0">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="relative">
+          <div className="flex items-center space-x-4 min-w-0 flex-1">
+            {onBackToChatList && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onBackToChatList}
+                className="lg:hidden text-gray-500 hover:text-gray-700 flex-shrink-0"
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+            )}
+
+            <div className="relative flex-shrink-0">
               <Avatar className="h-12 w-12">
                 <AvatarImage src={recipientAvatar} alt={recipientName} />
                 <AvatarFallback
@@ -60,7 +72,7 @@ export const ChatWindow = ({
                 <div className="absolute -bottom-1 -right-1 h-4 w-4 bg-green-500 border-2 border-white rounded-full"></div>
               )}
             </div>
-            <div>
+            <div className="min-w-0 flex-1">
               <h3 className="font-semibold text-gray-900 text-lg">
                 {recipientName}
               </h3>
@@ -75,11 +87,11 @@ export const ChatWindow = ({
             </div>
           </div>
 
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 flex-shrink-0">
             <Button
               variant="ghost"
               size="icon"
-              className="text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
+              className="text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg h-10 w-10 flex items-center justify-center"
             >
               <MoreVertical className="h-5 w-5" />
             </Button>
@@ -87,7 +99,8 @@ export const ChatWindow = ({
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      {/* Messages Area - Scrollable */}
+      <div className="flex-1 overflow-y-auto bg-white rounded-xl shadow-sm border border-gray-100 p-6 min-h-0">
         <div className="space-y-4">
           {messages.map(message => (
             <ChatMessage key={message.id} message={message} />
@@ -127,7 +140,9 @@ export const ChatWindow = ({
         <div ref={messagesEndRef} />
       </div>
 
-      <ChatInput onSendMessage={onSendMessage} />
+      <div className="flex-shrink-0 mt-4">
+        <ChatInput onSendMessage={onSendMessage} />
+      </div>
     </div>
   );
 };

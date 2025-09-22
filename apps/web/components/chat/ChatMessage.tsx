@@ -36,12 +36,12 @@ export const ChatMessage = ({ message }: ChatMessageProps) => {
       </Avatar>
 
       <div
-        className={`flex flex-col max-w-xs lg:max-w-md ${
+        className={`flex flex-col max-w-[75%] sm:max-w-xs lg:max-w-md ${
           message.isCurrentUser ? 'items-end' : 'items-start'
         }`}
       >
         <div
-          className={`rounded-xl px-4 py-3 shadow-sm border ${
+          className={`rounded-xl px-3 py-2 lg:px-4 lg:py-3 shadow-sm border ${
             message.isCurrentUser
               ? 'text-white border-blue-600'
               : 'bg-gray-50 text-gray-800 border-gray-200'
@@ -50,7 +50,9 @@ export const ChatMessage = ({ message }: ChatMessageProps) => {
             backgroundColor: message.isCurrentUser ? '#064283' : undefined,
           }}
         >
-          <p className="text-sm leading-relaxed">{message.content}</p>
+          <p className="text-sm leading-relaxed break-words">
+            {message.content}
+          </p>
         </div>
 
         <div
