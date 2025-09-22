@@ -90,6 +90,7 @@ const mockMessages: ChatMessageData[] = [
 const Chat = () => {
   const [selectedChatId, setSelectedChatId] = useState<string>('1');
   const [messages, setMessages] = useState<ChatMessageData[]>(mockMessages);
+  const [showChatList, setShowChatList] = useState<boolean>(false);
 
   const selectedChat = mockChats.find(chat => chat.id === selectedChatId);
 
@@ -106,37 +107,77 @@ const Chat = () => {
     setMessages(prev => [...prev, newMessage]);
   };
 
+  const handleSelectChat = (chatId: string) => {
+    setSelectedChatId(chatId);
+    // on mobile hide chat list after selection
+    setShowChatList(false);
+  };
+
   return (
     <div className="h-screen bg-gray-50 flex flex-col">
       <NavigationHeader activeTab="chat" />
 
-      <div className="flex-1 flex overflow-hidden">
-        <ChatList
-          chats={mockChats}
-          selectedChatId={selectedChatId}
-          onSelectChat={setSelectedChatId}
-        />
-
-        {selectedChat ? (
-          <ChatWindow
-            messages={messages}
-            onSendMessage={handleSendMessage}
-            recipientName={selectedChat.name}
-            recipientAvatar={selectedChat.avatar}
-            recipientInitials={selectedChat.initials}
-            isOnline={selectedChat.isOnline}
-            isTyping={false}
+      <div className="flex-1 flex overflow-hidden relative">
+        {showChatList && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+            onClick={() => setShowChatList(false)}
           />
-        ) : (
-          <div className="flex-1 flex items-center justify-center">
-            <div className="text-center">
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
-                Select a conversation
-              </h3>
-              <p className="text-gray-500">Choose a chat to start messaging</p>
-            </div>
-          </div>
         )}
+
+        <div
+          className={`
+          ${showChatList ? 'translate-x-0' : '-translate-x-full'}
+          lg:translate-x-0
+          fixed lg:relative
+          top-0 left-0
+          h-full w-80 max-w-[85vw]
+          bg-white lg:bg-gray-50
+          z-50 lg:z-auto
+          transition-transform duration-300 ease-in-out
+          lg:transition-none
+          shadow-xl lg:shadow-none
+        `}
+        >
+          <ChatList
+            chats={mockChats}
+            selectedChatId={selectedChatId}
+            onSelectChat={handleSelectChat}
+            onClose={() => setShowChatList(false)}
+          />
+        </div>
+
+        <div className="flex-1 flex flex-col min-w-0">
+          {selectedChat ? (
+            <ChatWindow
+              messages={messages}
+              onSendMessage={handleSendMessage}
+              recipientName={selectedChat.name}
+              recipientAvatar={selectedChat.avatar}
+              recipientInitials={selectedChat.initials}
+              isOnline={selectedChat.isOnline}
+              isTyping={false}
+              onBackToChatList={() => setShowChatList(true)}
+            />
+          ) : (
+            <div className="flex-1 flex items-center justify-center p-4">
+              <div className="text-center">
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  Select a conversation
+                </h3>
+                <p className="text-gray-500 mb-4">
+                  Choose a chat to start messaging
+                </p>
+                <button
+                  onClick={() => setShowChatList(true)}
+                  className="lg:hidden bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  View Messages
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
