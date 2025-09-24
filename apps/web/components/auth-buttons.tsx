@@ -11,7 +11,7 @@ interface AuthButtonsProps {
 }
 
 export function AuthButtons({
-  // onSendOTP,
+  onSendOTP,
   // onGoogleLogin,
   className = '',
 }: AuthButtonsProps) {
@@ -19,12 +19,10 @@ export function AuthButtons({
   const [showOtpVerification, setShowOtpVerification] = useState(false);
 
   const handleSendOTP = () => {
-    // if (onSendOTP) {
-    //   onSendOTP(phoneNumber);
-    // } else {
-    //   console.log('Sending OTP to:', phoneNumber);
-    // }
-    // setShowOtpVerification(true);
+    if (onSendOTP) {
+      onSendOTP(phoneNumber);
+    }
+    setShowOtpVerification(true);
   };
 
   const handleGoogleLogin = () => {

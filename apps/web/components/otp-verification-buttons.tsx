@@ -12,7 +12,7 @@ interface OtpVerificationButtonsProps {
 
 export function OtpVerificationButtons({
   // onVerifyOtp,
-  // onBackToLogin,
+  onBackToLogin,
   className = '',
   phoneNumber = '09xx xxx xxxx',
 }: OtpVerificationButtonsProps) {
@@ -52,11 +52,9 @@ export function OtpVerificationButtons({
   };
 
   const handleBackToLogin = () => {
-    // if (onBackToLogin) {
-    //   onBackToLogin();
-    // } else {
-    //   console.log('Going back to login');
-    // }
+    if (onBackToLogin) {
+      onBackToLogin();
+    }
   };
 
   return (
@@ -84,6 +82,8 @@ export function OtpVerificationButtons({
               value={digit}
               onChange={e => handleInputChange(index, e.target.value)}
               onKeyDown={e => handleKeyDown(index, e)}
+              aria-label={`Digit ${index + 1} of 6`}
+              autoComplete="one-time-code"
               className="w-12 h-12 sm:w-[53px] sm:h-[47px] text-center text-lg font-semibold border-[1px] border-[#E0E0E0] rounded-[10px] focus:border-yellow-400 focus:outline-none bg-[#F6F6F6]"
             />
           ))}
