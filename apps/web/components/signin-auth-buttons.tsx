@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-import { OtpVerificationButtons } from './otp-verification-buttons';
+import { OtpVerificationButtons } from './signin-otp-verification-buttons';
 
 interface AuthButtonsProps {
   onSendOTP?: (phoneNumber: string) => void;
