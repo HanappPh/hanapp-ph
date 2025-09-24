@@ -20,7 +20,7 @@ export function MainHeader({
   return (
     <header className={`relative ${className}`}>
       <div
-        className="hidden lg:block fixed top-12 left-16 z-10"
+        className="hidden lg:block fixed top-12 left-12 z-10"
         style={{
           width: '287px',
           height: '100px',
