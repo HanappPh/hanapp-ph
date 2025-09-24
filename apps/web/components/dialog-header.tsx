@@ -8,15 +8,15 @@ interface DialogHeaderProps {
 }
 
 export function DialogHeader({ className = '' }: DialogHeaderProps) {
-  const mobileLogoWidth = 160;
-  const mobileLogoHeight = 50;
+  const mobileLogoWidth = 170;
+  const mobileLogoHeight = 0;
   const smMobileLogoWidth = 250;
-  const desktopLogoWidth = 80;
-  const desktopLogoHeight = 80;
+  const desktopLogoWidth = 90;
+  const desktopLogoHeight = 90;
 
   return (
     <div
-      className={`text-center mb-4 sm:mb-16 mt-0 sm:mt-24 ml-4 sm:ml-0 ${className}`}
+      className={`text-center mt-4 sm:mt-24 ml-4 sm:ml-0 pt-4 sm:pt-6 ${className}`}
     >
       <div className="mb-2 sm:mb-12 ml-4 sm:ml-0 flex justify-center">
         <Image
