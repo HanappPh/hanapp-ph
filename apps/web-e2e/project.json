@@ -10,12 +10,12 @@
       "executor": "@nx/cypress:cypress",
       "options": {
         "cypressConfig": "apps/web-e2e/cypress.config.ts",
-        "devServerTarget": "temp:serve:development",
+        "devServerTarget": "@hanapp-ph/web:serve:development",
         "testingType": "e2e"
       },
       "configurations": {
         "production": {
-          "devServerTarget": "temp:serve:production"
+          "devServerTarget": "@hanapp-ph/web:serve:production"
         },
         "ci": {
           "baseUrl": "http://localhost:3000"
