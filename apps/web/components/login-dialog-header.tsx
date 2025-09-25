@@ -16,7 +16,7 @@ export function DialogHeader({ className = '' }: DialogHeaderProps) {
 
   return (
     <div
-      className={`text-center mt-4 sm:mt-24 ml-4 sm:ml-0 pt-4 sm:pt-6 ${className}`}
+      className={`text-center ml-4 sm:ml-0 pt-4 md:pt-6 lg:pt-8 xl:pt-12 sm:pt-6 ${className}`}
     >
       <div className="mb-2 sm:mb-12 ml-4 sm:ml-0 flex justify-center">
         <Image

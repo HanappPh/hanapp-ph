@@ -88,7 +88,7 @@ export function AuthButtons({
 
             <button
               onClick={handleGoogleLogin}
-              className="w-full sm:mx-auto sm:w-[320px] h-[48px] sm:h-[60px] border border-gray-500 hover:bg-gray-50 rounded-[18px] transition-colors flex items-center justify-center shadow-sm"
+              className="w-full sm:mx-auto sm:w-[320px] h-[48px] sm:h-[60px] border border-gray-500 hover:bg-gray-50 rounded-[18px] transition-colors flex items-center justify-center shadow-sm mb-8 sm:mb-12"
             >
               <svg className="w-5 h-5 sm:w-6 sm:h-6 mr-3" viewBox="0 0 24 24">
                 <path
