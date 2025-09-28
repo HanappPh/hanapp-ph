@@ -14,7 +14,7 @@ export function TermsSubmitSection() {
           <a href="#" className="text-blue-600 underline">
             Terms and Conditions
           </a>{' '}
-          of Hanapp and swear that all the info they filled up is true and
+          of Hanapp and confirm that all information provided is true and
           legitimate
         </label>
       </div>
