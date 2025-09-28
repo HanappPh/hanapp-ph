@@ -177,15 +177,69 @@ jobs:
       - name: Configure Nx execution environment
         run: |
           echo "Configuring Nx execution environment with cloud fallback..."
+
+          # Create a backup of nx.json and modify it to disable cloud if needed
+          cp nx.json nx.json.backup || echo "No nx.json found"
+
           cat <<'EOF' > run-nx.sh
           #!/bin/bash
           set -euo pipefail
 
           COMMAND="$*"
           CLOUD_AVAILABLE=false
-          EXIT_CODE=0
+          ORIGINAL_NX_JSON=""
 
           echo "Executing Nx command: $COMMAND"
+
+          # Function to disable Nx Cloud in configuration
+          disable_nx_cloud() {
+            echo "Disabling Nx Cloud in configuration..."
+            if [[ -f "nx.json" ]]; then
+              # Remove nxCloudId and any cloud configuration
+              node -e "
+                const fs = require('fs');
+                const config = JSON.parse(fs.readFileSync('nx.json', 'utf8'));
+                
+                // Remove all Nx Cloud related configuration
+                delete config.nxCloudAccessToken;
+                delete config.nxCloudUrl;
+                delete config.nxCloudId;
+                
+                // Remove cloud task runner configuration
+                if (config.tasksRunnerOptions && config.tasksRunnerOptions.default) {
+                  if (config.tasksRunnerOptions.default.runner === '@nrwl/nx-cloud' || 
+                      config.tasksRunnerOptions.default.runner === '@nx/nx-cloud') {
+                    config.tasksRunnerOptions.default.runner = 'nx/tasks-runners/default';
+                  }
+                  if (config.tasksRunnerOptions.default.options) {
+                    delete config.tasksRunnerOptions.default.options.accessToken;
+                    delete config.tasksRunnerOptions.default.options.url;
+                  }
+                }
+                
+                fs.writeFileSync('nx.json', JSON.stringify(config, null, 2));
+                console.log('Successfully disabled Nx Cloud in configuration');
+              " 2>/dev/null || {
+                echo "Node.js modification failed, using sed fallback..."
+                # Fallback: use sed to remove cloud configuration
+                sed -i 's/"nxCloudAccessToken"[^,}]*//' nx.json 2>/dev/null || true
+                sed -i 's/"nxCloudUrl"[^,}]*//' nx.json 2>/dev/null || true  
+                sed -i 's/"nxCloudId"[^,}]*//' nx.json 2>/dev/null || true
+                sed -i 's/"@nrwl\/nx-cloud"/"nx\/tasks-runners\/default"/g' nx.json 2>/dev/null || true
+                sed -i 's/"@nx\/nx-cloud"/"nx\/tasks-runners\/default"/g' nx.json 2>/dev/null || true
+                # Clean up any trailing commas that might be left
+                sed -i 's/,\s*}/}/g' nx.json 2>/dev/null || true
+                sed -i 's/,\s*]/]/g' nx.json 2>/dev/null || true
+              }
+            fi
+          }
+
+          # Function to restore original nx.json
+          restore_nx_config() {
+            if [[ -f "nx.json.backup" ]]; then
+              mv nx.json.backup nx.json 2>/dev/null || true
+            fi
+          }
 
           # Test Nx Cloud availability if token is provided
           if [[ -n "${NX_CLOUD_ACCESS_TOKEN:-}" ]]; then
@@ -210,7 +264,6 @@ jobs:
               exit 0
             else
               echo "Nx Cloud execution failed - falling back to local execution"
-              EXIT_CODE=$?
               CLOUD_AVAILABLE=false
             fi
           fi
@@ -218,14 +271,23 @@ jobs:
           # Execute locally without Nx Cloud
           if [[ "$CLOUD_AVAILABLE" == "false" ]]; then
             echo "Executing locally without Nx Cloud..."
+            
+            # Disable Nx Cloud completely
+            disable_nx_cloud
+            
+            # Set environment variables to ensure local execution
             export NX_SKIP_NX_CLOUD=true
+            export NX_CLOUD_ACCESS_TOKEN=""
             unset NX_CLOUD_ACCESS_TOKEN
             
+            # Execute the command
             if npx nx $COMMAND; then
               echo "Local execution completed successfully"
+              restore_nx_config
               exit 0
             else
               echo "Local execution failed"
+              restore_nx_config
               exit 1
             fi
           fi
