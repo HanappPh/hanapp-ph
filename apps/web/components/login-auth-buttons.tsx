@@ -1,8 +1,9 @@
 'use client';
 
+import { Button } from '@hanapp-ph/commons';
 import { useState } from 'react';
 
-import { OtpVerificationButtons } from './otp-verification-buttons';
+import { OtpVerificationButtons } from './login-otp-verification-buttons';
 
 interface AuthButtonsProps {
   onSendOTP?: (phoneNumber: string) => void;
@@ -66,16 +67,16 @@ export function AuthButtons({
           </div>
 
           <div className="pt-12 sm:pt-16">
-            <button
+            <Button
               onClick={handleSendOTP}
-              className="w-full sm:mx-auto sm:w-[320px] h-[48px] sm:h-[60px] bg-[#F5C45E] text-gray-900 text-lg font-semibold rounded-[18px] transition-colors disabled:opacity-80 disabled:cursor-not-allowed block shadow-md flex items-center justify-center mb-4 sm:mb-6"
+              className="w-full sm:mx-auto sm:w-[320px] h-[48px] sm:h-[60px] bg-[#F5C45E] hover:bg-[#F5C45E]/90 text-gray-900 text-lg font-semibold rounded-[18px] transition-colors disabled:opacity-80 disabled:cursor-not-allowed shadow-md flex items-center justify-center mb-4 sm:mb-6 border-0"
               style={{ backdropFilter: 'blur(2px)' }}
               disabled={!phoneNumber.trim()}
             >
               <span className="font-bold text-black text-base sm:text-[16px]">
                 Send OTP
               </span>
-            </button>
+            </Button>
 
             <div className="relative mb-4 sm:mb-6">
               <div className="absolute inset-0 flex items-center">
@@ -86,9 +87,10 @@ export function AuthButtons({
               </div>
             </div>
 
-            <button
+            <Button
               onClick={handleGoogleLogin}
-              className="w-full sm:mx-auto sm:w-[320px] h-[48px] sm:h-[60px] border border-gray-500 hover:bg-gray-50 rounded-[18px] transition-colors flex items-center justify-center shadow-sm"
+              variant="outline"
+              className="w-full sm:mx-auto sm:w-[320px] h-[48px] sm:h-[60px] border border-gray-500 hover:bg-gray-50 bg-white rounded-[18px] transition-colors flex items-center justify-center shadow-sm mb-8 sm:mb-12"
             >
               <svg className="w-5 h-5 sm:w-6 sm:h-6 mr-3" viewBox="0 0 24 24">
                 <path
@@ -111,7 +113,7 @@ export function AuthButtons({
               <span className="text-black text-base sm:text-[17px] font-normal">
                 Continue with Google
               </span>
-            </button>
+            </Button>
           </div>
         </>
       )}
