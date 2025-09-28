@@ -1,12 +1,11 @@
-import { Input } from '@hanapp-ph/commons/';
-
 import {
+  Input,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../../../libs/commons/src/components/ui/select';
+} from '@hanapp-ph/commons';
 
 export function PricingInformationSection() {
   return (

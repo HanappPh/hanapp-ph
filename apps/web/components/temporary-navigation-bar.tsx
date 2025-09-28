@@ -1,9 +1,6 @@
 import { Bell, ChevronDown } from 'lucide-react';
 
-import {
-  Avatar,
-  AvatarFallback,
-} from '../../../libs/commons/src/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@hanapp-ph/commons';
 
 export function Header() {
   return (
