@@ -333,7 +333,17 @@ jobs:
       - name: Build affected libraries
         run: |
           echo "Building affected libraries..."
-          ./run-nx.sh "affected -t build --parallel=3 --type=lib"
+
+          # Get affected library projects specifically
+          AFFECTED_LIBS=$(./run-nx.sh "show projects --affected --type=lib" 2>/dev/null | tr '\n' ' ' || echo "")
+
+          if [[ -z "$AFFECTED_LIBS" ]]; then
+            echo "No affected libraries to build"
+          else
+            echo "Building affected libraries: $AFFECTED_LIBS"
+            ./run-nx.sh "affected -t build --parallel=3 --projects=$AFFECTED_LIBS"
+          fi
+
           echo "Library build phase completed"
         env:
           NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
