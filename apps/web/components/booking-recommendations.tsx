@@ -34,7 +34,7 @@ const defaultServices: Service[] = [
   },
   {
     id: '2',
-    title: 'Lipat bahay Luzon area only',
+    title: 'Lipat bahay Luzon Area to Visayas only',
     category: 'Transport',
     price: 'P2.5K',
     rating: 5,
@@ -84,11 +84,6 @@ export function RecommendedServices({
                   height={160}
                   className="w-full h-40 object-cover rounded-t-lg"
                 />
-                <div className="absolute top-2 right-2">
-                  <Badge className="bg-hanapp-accent text-hanapp-secondary font-semibold px-2 py-1 text-sm">
-                    {service.price}
-                  </Badge>
-                </div>
               </div>
 
               <div className="p-4">
@@ -96,6 +91,9 @@ export function RecommendedServices({
                   <h3 className="font-medium text-hanapp-secondary text-sm leading-tight flex-1">
                     {service.title}
                   </h3>
+                  <Badge className="bg-hanapp-accent text-hanapp-secondary font-semibold px-2 py-1 text-sm">
+                    {service.price}
+                  </Badge>
                 </div>
 
                 <div className="mb-3">
