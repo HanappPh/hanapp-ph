@@ -1,4 +1,4 @@
-import { Input } from '@hanapp-ph/commons/';
+import { Input } from '@hanapp-ph/commons';
 
 export function LocationAvailabilitySection() {
   return (

@@ -1,5 +1,4 @@
-import { Button } from '../../../libs/commons/src/components/ui/button';
-import { Checkbox } from '../../../libs/commons/src/components/ui/checkbox';
+import { Button, Checkbox } from '@hanapp-ph/commons';
 
 export function TermsSubmitSection() {
   return (

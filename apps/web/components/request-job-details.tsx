@@ -1,13 +1,12 @@
-import { Input } from '@hanapp-ph/commons/';
-
 import {
+  Input,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../../../libs/commons/src/components/ui/select';
-import { Textarea } from '../../../libs/commons/src/components/ui/textarea';
+  Textarea,
+} from '@hanapp-ph/commons';
 
 export function JobDetailsSection() {
   return (
