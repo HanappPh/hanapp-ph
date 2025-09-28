@@ -1,8 +1,8 @@
 'use client';
 
-import { BackgroundImage } from '../../../components/background';
-import { MainHeader } from '../../../components/header';
+import { BackgroundImage } from '../../../components/login-background';
 import { LoginDialog } from '../../../components/login-dialog';
+import { MainHeader } from '../../../components/login-header';
 
 export default function SigninPage() {
   return (

@@ -1,7 +1,7 @@
 'use client';
 
-import { AuthButtons } from './auth-buttons';
-import { DialogHeader } from './dialog-header';
+import { AuthButtons } from './login-auth-buttons';
+import { DialogHeader } from './login-dialog-header';
 
 interface LoginFormProps {
   onSendOTP?: (phoneNumber: string) => void;
