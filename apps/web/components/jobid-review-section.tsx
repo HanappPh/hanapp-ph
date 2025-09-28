@@ -215,11 +215,11 @@ export function ReviewsSection({ reviews }: ReviewsSectionProps) {
             <button
               key={star}
               onClick={() => handleRatingFilter(star)}
-              className={`flex items-center w-1/2 py-1.5 px-2 rounded-md transition-colors
+              className={`flex items-center w-full sm:w-1/2 py-1.5 px-2 rounded-md transition-colors
                 ${selectedRating === star ? 'bg-[#102E50]/5' : 'hover:bg-[#102E50]/5'}
               `}
             >
-              <span className="font-medium text-[#102E50] w-16 text-left mr-2">
+              <span className="font-medium text-[#102E50] w-16 text-left mr-2 text-sm sm:text-base">
                 {star} Stars
               </span>
               <div className="w-full bg-gray-200 rounded-full h-2.5">
