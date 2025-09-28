@@ -1,5 +1,6 @@
 'use client';
 
+import { Button } from '@hanapp-ph/commons';
 import React, { useState, useRef } from 'react';
 
 interface OtpVerificationButtonsProps {
@@ -96,15 +97,15 @@ export function OtpVerificationButtons({
         </div>
       </div>
 
-      <button
+      <Button
         onClick={handleVerifyOtp}
-        className="w-full sm:w-[320px] h-[48px] sm:h-[60px] bg-[#F5C45E] text-gray-900 text-base sm:text-[16px] font-semibold rounded-[18px] transition-colors disabled:opacity-80 disabled:cursor-not-allowed mx-auto block shadow-md flex items-center justify-center"
+        className="w-full sm:w-[320px] h-[48px] sm:h-[60px] bg-[#F5C45E] hover:bg-[#F5C45E]/90 text-gray-900 text-base sm:text-[16px] font-semibold rounded-[18px] transition-colors disabled:opacity-80 disabled:cursor-not-allowed mx-auto shadow-md flex items-center justify-center border-0"
         disabled={code.some(digit => !digit)}
       >
         <span className="font-bold text-black text-base sm:text-[16px]">
           Verify & Continue
         </span>
-      </button>
+      </Button>
 
       <div className="relative my-4">
         <div className="absolute inset-0 flex items-center">
@@ -115,14 +116,15 @@ export function OtpVerificationButtons({
         </div>
       </div>
 
-      <button
+      <Button
         onClick={handleBackToLogin}
-        className="w-full sm:w-[320px] h-[48px] sm:h-[60px] border border-gray-500 hover:bg-gray-50 rounded-[18px] transition-colors flex items-center justify-center mx-auto shadow-sm bg-transparent"
+        variant="outline"
+        className="w-full sm:w-[320px] h-[48px] sm:h-[60px] border border-gray-500 hover:bg-gray-50 bg-transparent rounded-[18px] transition-colors flex items-center justify-center mx-auto shadow-sm"
       >
         <span className="text-black text-base sm:text-[17px] font-normal">
           Back to Login
         </span>
-      </button>
+      </Button>
     </div>
   );
 }

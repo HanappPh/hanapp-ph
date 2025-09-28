@@ -6,3 +6,6 @@ export * from './dialog';
 export * from './input';
 export * from './select';
 export * from './textarea';
+export * from './tabs';
+export * from './avatar';
+export * from './badge';
