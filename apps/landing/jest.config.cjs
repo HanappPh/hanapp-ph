@@ -1,11 +1,10 @@
-import type { Config } from 'jest';
-import nextJest from 'next/jest.js';
+const nextJest = require('next/jest.js');
 
 const createJestConfig = nextJest({
   dir: __dirname,
 });
 
-const config: Config = {
+const config = {
   displayName: '@hanapp-ph/landing',
   preset: '../../jest.preset.js',
   transform: {
@@ -16,4 +15,4 @@ const config: Config = {
   testEnvironment: 'jsdom',
 };
 
-export default createJestConfig(config);
+module.exports = createJestConfig(config);
