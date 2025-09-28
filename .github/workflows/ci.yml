@@ -335,13 +335,14 @@ jobs:
           echo "Building affected libraries..."
 
           # Get affected library projects specifically - filter output to only get project names
-          AFFECTED_LIBS=$(./run-nx.sh "show projects --affected --type=lib" 2>/dev/null | grep -v "^Executing" | grep -v "^No Nx Cloud" | grep -v "^Disabling" | grep -v "^Successfully" | grep -v "^Local execution" | grep -E "^@[a-zA-Z0-9_-]+/[a-zA-Z0-9_-]+$|^[a-zA-Z0-9_-]+$" | tr '\n' ' ' || echo "")
+          AFFECTED_LIBS=$(./run-nx.sh "show projects --affected --type=lib" 2>/dev/null | grep -v "^Executing" | grep -v "^No Nx Cloud" | grep -v "^Disabling" | grep -v "^Successfully" | grep -v "^Local execution" | grep -E "^@[a-zA-Z0-9_-]+/[a-zA-Z0-9_-]+$|^[a-zA-Z0-9_-]+$" | tr '\n' ' ' | xargs || echo "")
 
           if [[ -z "$AFFECTED_LIBS" || "$AFFECTED_LIBS" == " " ]]; then
             echo "No affected libraries to build"
           else
             echo "Building affected libraries: $AFFECTED_LIBS"
-            ./run-nx.sh "affected -t build --parallel=3 --type=lib"
+            # Build only the affected library projects by name, not using --type flag in build command
+            ./run-nx.sh "run-many -t build --projects=$AFFECTED_LIBS --parallel=3"
           fi
 
           echo "Library build phase completed"
