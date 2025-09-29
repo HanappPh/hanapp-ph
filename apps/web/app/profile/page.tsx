@@ -22,11 +22,12 @@ export default function ProfilePage() {
       {/* Desktop layout */}
       <div className="hidden md:block">
         <Header
-          bellColor="text-gray-600"
-          badgeColor="bg-[#102E50]"
-          InitialsBgColor="bg-[#102E50]"
-          InitialsTextColor="text-white"
+          bellColor="#6b7280"
+          badgeColor="#102E50"
+          InitialsBgColor="#102E50"
+          InitialsTextColor="#ffffff"
           headerHoverColor="#102E50"
+          activePage="Home"
         />
         <div className="flex">
           <Sidebar

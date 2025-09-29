@@ -63,6 +63,7 @@ export function Sidebar({
 
       <div className="flex rounded-full bg-gray-100 p-1 my-4 transition-colors duration-300">
         <Button
+          variant="ghost"
           className={`flex-1 rounded-full transition-all duration-300 ${selected === 'Provider' ? 'bg-gradient-to-b text-white shadow' : 'bg-transparent text-gray-600'}`}
           style={
             selected === 'Provider'

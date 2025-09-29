@@ -37,7 +37,7 @@ export function MobileServicePreferences() {
         {['Cleaning', 'Tutor', 'Transport', 'Plumbing', 'Laundry'].map(pref => (
           <span
             key={pref}
-            className="flex items-center gap-1 bg-[#f3f5f9] border text-[#102E50] px-3 py-1 rounded-full text-xs font-semiboldw flex-shrink-0"
+            className="flex items-center gap-1 bg-[#f3f5f9] border text-[#102E50] px-3 py-1 rounded-full text-xs font-semibold flex-shrink-0"
           >
             <Image
               src="/placeholder-category-icon.png"
