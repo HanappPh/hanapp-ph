@@ -187,7 +187,7 @@ export function MainContent({
           </Card>
 
           {/* Favorite Providers Section (Web version) */}
-          {initialSelected !== 'Provider' && initialSelected === 'Client' && (
+          {initialSelected === 'Client' && (
             <Card className="p-6 bg-white border-none drop-shadow-md mt-4">
               <div className="flex justify-between items-center">
                 <span className="text-xl font-semibold text-gray-900 mb-6">
