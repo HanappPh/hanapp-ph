@@ -40,7 +40,7 @@ export const ChatInput = ({
           className="text-gray-500 hover:text-gray-700 flex-shrink-0 h-10 w-10"
           disabled={disabled}
         >
-          <Paperclip className="h-5 w-10" />
+          <Paperclip className="h-5 w-5" />
         </Button>
 
         <div className="flex-1 relative">
