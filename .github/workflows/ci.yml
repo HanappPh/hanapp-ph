@@ -126,7 +126,7 @@ jobs:
             echo "All installation strategies failed - terminating pipeline"
             exit 1
           fi
-        timeout-minutes: 15
+        timeout-minutes: 20
         env:
           NPM_CONFIG_PROGRESS: false
           NPM_CONFIG_LOGLEVEL: error
