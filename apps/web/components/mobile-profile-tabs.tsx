@@ -1,3 +1,5 @@
+import React from 'react';
+
 type MobileProfileTabsProps = {
   selectedTab: string;
   setSelectedTab: (tab: string) => void;
