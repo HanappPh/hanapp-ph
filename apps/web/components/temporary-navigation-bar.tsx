@@ -1,6 +1,5 @@
-import { Bell, ChevronDown } from 'lucide-react';
-
 import { Avatar, AvatarFallback } from '@hanapp-ph/commons';
+import { Bell, ChevronDown } from 'lucide-react';
 
 export function Header() {
   return (
