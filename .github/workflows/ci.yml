@@ -407,7 +407,18 @@ jobs:
       - name: Build affected applications
         run: |
           echo "Building affected applications for deployment..."
-          ./run-nx.sh "affected -t build --parallel=3 --type=app"
+
+          # Get affected application projects specifically - filter output to only get project names
+          AFFECTED_APPS=$(./run-nx.sh "show projects --affected --type=app" 2>/dev/null | grep -v "^Executing" | grep -v "^No Nx Cloud" | grep -v "^Disabling" | grep -v "^Successfully" | grep -v "^Local execution" | grep -E "^@[a-zA-Z0-9_-]+/[a-zA-Z0-9_-]+$|^[a-zA-Z0-9_-]+$" | tr '\n' ' ' | xargs || echo "")
+
+          if [[ -z "$AFFECTED_APPS" || "$AFFECTED_APPS" == " " ]]; then
+            echo "No affected applications to build"
+          else
+            echo "Building affected applications: $AFFECTED_APPS"
+            # Build only the affected application projects by name, not using --type flag in build command
+            ./run-nx.sh "run-many -t build --projects=$AFFECTED_APPS --parallel=3"
+          fi
+
           echo "Application build process completed successfully"
         env:
           NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
@@ -425,8 +436,8 @@ jobs:
             exit 0
           fi
 
-          # Identify affected E2E projects
-          AFFECTED_E2E=$(./run-nx.sh "show projects --affected --type=e2e" 2>/dev/null | tr '\n' ' ' || echo "")
+          # Identify affected E2E projects - filter output to only get project names
+          AFFECTED_E2E=$(./run-nx.sh "show projects --affected --type=e2e" 2>/dev/null | grep -v "^Executing" | grep -v "^No Nx Cloud" | grep -v "^Disabling" | grep -v "^Successfully" | grep -v "^Local execution" | grep -E "^@[a-zA-Z0-9_-]+/[a-zA-Z0-9_-]+$|^[a-zA-Z0-9_-]+$" | tr '\n' ' ' | xargs || echo "")
 
           if [[ -z "$AFFECTED_E2E" ]]; then
             echo "No affected E2E projects detected"
