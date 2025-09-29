@@ -45,7 +45,7 @@
     "out-tsc",
     "dist",
     "node_modules",
-    "jest.config.ts",
+    "jest.config.cjs",
     "app/**/*.spec.ts",
     "app/**/*.test.ts",
     ".next",

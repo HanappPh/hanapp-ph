@@ -1,6 +1,5 @@
-import type { Config } from 'jest';
-import nextJest from 'next/jest.js';
-import { join } from 'path';
+const nextJest = require('next/jest.js');
+const { join } = require('path');
 
 // Ensure we're pointing to the correct directory for Next.js configuration
 // In CI, the working directory is the workspace root, so we need to point to apps/web
@@ -11,7 +10,7 @@ const createJestConfig = nextJest({
   dir: webDir,
 });
 
-const config: Config = {
+const config = {
   displayName: '@hanapp-ph/web',
   preset: '../../jest.preset.js',
   transform: {
@@ -22,4 +21,4 @@ const config: Config = {
   testEnvironment: 'jsdom',
 };
 
-export default createJestConfig(config);
+module.exports = createJestConfig(config);

@@ -1,9 +1,10 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "moduleResolution": "node16",
+    "moduleResolution": "nodenext",
     "module": "commonjs",
-    "types": ["cypress", "node"]
+    "types": ["cypress", "node"],
+    "customConditions": []
   },
   "include": [
     "**/*.ts",
