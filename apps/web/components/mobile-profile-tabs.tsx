@@ -63,18 +63,14 @@ export function MobileProfileTabs({
                     key={tab}
                     className={baseClass}
                     style={style}
-                    onMouseEnter={e => {
+                    onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
                       if (!isSelected && tabHoverBg) {
-                        (
-                          e.currentTarget as HTMLButtonElement
-                        ).style.backgroundColor = tabHoverBg;
+                        e.currentTarget.style.backgroundColor = tabHoverBg;
                       }
                     }}
-                    onMouseLeave={e => {
+                    onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
                       if (!isSelected) {
-                        (
-                          e.currentTarget as HTMLButtonElement
-                        ).style.backgroundColor = '';
+                        e.currentTarget.style.backgroundColor = '';
                       }
                     }}
                     onClick={() => {
