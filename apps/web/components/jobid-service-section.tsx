@@ -37,18 +37,18 @@ function ServiceItem({ title, price, description, features }: Service) {
       <div className="space-y-6 sm:space-y-8 w-full">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 sm:gap-6 w-full">
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-xl sm:text-2xl lg:text-3xl text-[#102E50] break-words">
+            <h3 className="font-semibold text-base sm:text-xl lg:text-2xl text-[#102E50] break-words">
               {title}
             </h3>
           </div>
           <div className="text-left sm:text-right flex-shrink-0">
-            <div className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#102E50]">
+            <div className="text-xl sm:text-3xl lg:text-4xl font-bold text-[#102E50]">
               {price}
             </div>
           </div>
         </div>
 
-        <p className="text-[#102E50] text-lg sm:text-xl lg:text-2xl leading-relaxed">
+        <p className="text-[#102E50] text-md sm:text-base lg:text-xl leading-relaxed">
           {description}
         </p>
 
@@ -56,9 +56,9 @@ function ServiceItem({ title, price, description, features }: Service) {
           {features.map((feature, featureIndex) => (
             <li
               key={featureIndex}
-              className="text-lg sm:text-xl lg:text-2xl text-[#102E50] flex items-start gap-3 w-full"
+              className="text-sm sm:text-md lg:text-base text-[#102E50] flex items-start gap-2 w-full"
             >
-              <span className="w-2 h-2 sm:w-3 sm:h-3 bg-[#102E50] rounded-full mt-2 sm:mt-3 flex-shrink-0"></span>
+              <span className="w-1 h-1 sm:w-2 sm:h-2 bg-[#102E50] rounded-full mt-1 sm:mt-2 flex-shrink-0"></span>
               <span className="flex-1 break-words">{feature}</span>
             </li>
           ))}
@@ -75,13 +75,12 @@ export function ServicesSection({
 }: ServicesSectionProps) {
   return (
     <div className="w-full space-y-6 sm:space-y-8 lg:space-y-12">
-      {/* Removed Photos & Media section and Sidebar for new layout in page.tsx */}
       <div className="w-full flex flex-col items-center">
         <div className="w-full text-center mb-4 sm:mb-6">
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#102E50]">
+          <h2 className="text-base sm:text-2xl lg:text-3xl font-bold text-[#102E50]">
             Services & Packages
           </h2>
-          <p className="text-lg sm:text-xl lg:text-2xl text-[#102E50]">
+          <p className="text-md sm:text-lg lg:text-base text-[#102E50]">
             Transparent pricing. Materials not included unless stated.
           </p>
         </div>
