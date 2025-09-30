@@ -36,7 +36,6 @@ export default function ClientJobPage() {
       answer: 'We use AC-safe chemicals and rinse thoroughly.',
     },
   ];
-  // Sample data for the professionally refactored components
   const services = [
     {
       id: '1',
@@ -305,24 +304,24 @@ export default function ClientJobPage() {
     <JobIdBg>
       <div className="min-h-screen w-full overflow-x-hidden">
         <Navigation />
-        <div className="w-full max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12">
+        <div className="w-full max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-1 sm:py-3 lg:py-7">
           <div className="mb-6 sm:mb-8 lg:mb-12">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
-              <div className="lg:col-span-2">
+              <div className="lg:col-span-2 h-full">
                 <PhotosMedia />
               </div>
-              <div className="lg:col-span-1">
+              <div className="lg:col-span-1 h-full">
                 <Sidebar {...sidebarProps} />
               </div>
             </div>
           </div>
           <div>
             <ServicesSection services={services} expectations={expectations} />
-            <div className="w-full mt-8 sm:mt-10 lg:mt-12">
+            <div className="w-full mt-2 sm:mt-4 lg:mt-6">
               <ReviewsSection reviews={reviews} />
             </div>
-            <div className="w-full mt-8 sm:mt-10 lg:mt-12">
-              <h2 className="text-3xl sm:text-3xl lg:text-5xl font-bold text-[#102E50] text-center mb-10">
+            <div className="w-full mt-2 sm:mt-4 lg:mt-6">
+              <h2 className="text-base sm:text-lg lg:text-2xl font-bold text-[#102E50] text-center mb-4">
                 Frequently Asked Questions About Provider
               </h2>
               <JobIdFaq faqs={faqs} />
