@@ -29,18 +29,18 @@ export function PhotosMedia({ images: _images = [] }: PhotosMediaProps) {
   };
 
   return (
-    <Card className="w-full p-4 sm:p-6 lg:p-8 bg-white text-gray-900 shadow-lg">
-      <div className="mb-4 sm:mb-6 w-full">
-        <h2 className="text-3xl sm:text-3xl lg:text-4xl font-bold text-[#102E50] mb-2 sm:mb-3">
+    <Card className="w-full h-full p-4 sm:p-6 lg:p-8 bg-white text-gray-900 shadow-lg flex flex-col">
+      <div className="mb-2 sm:mb-3 w-full">
+        <h2 className="text-base sm:text-lg lg:text-xl font-bold text-[#102E50] mb-1 sm:mb-2">
           Photos & Media
         </h2>
-        <p className="text-xl sm:text-xl lg:text-2xl text-[#102E50]">
+        <p className="text-xs sm:text-sm lg:text-base text-[#102E50]">
           Professional work showcase
         </p>
       </div>
 
-      <div className="relative w-full overflow-hidden">
-        <div className="relative bg-gray-50 rounded-lg sm:rounded-xl overflow-hidden h-[250px] sm:h-[350px] md:h-[450px] lg:h-[678px] w-full">
+      <div className="relative w-full overflow-hidden flex-1">
+        <div className="relative bg-gray-50 rounded-lg sm:rounded-xl overflow-hidden h-full w-full">
           <Image
             src={imageFiles[currentImageIndex]}
             alt={`Service showcase ${currentImageIndex + 1}`}

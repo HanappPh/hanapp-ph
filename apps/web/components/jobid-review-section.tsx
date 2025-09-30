@@ -46,7 +46,7 @@ function ReviewItem({
     >
       <div className="flex flex-col gap-5 sm:gap-6 w-full h-full">
         <div className="flex items-start justify-between gap-3 w-full">
-          <h4 className="font-semibold text-[#102E50] text-2xl sm:text-4xl flex-1 break-words">
+          <h4 className="font-semibold text-[#102E50] text-base sm:text-2xl flex-1 break-words">
             {name}
           </h4>
           <div className="flex items-center flex-shrink-0">
@@ -60,11 +60,11 @@ function ReviewItem({
             ))}
           </div>
         </div>
-        <p className="text-[#102E50] text-xl sm:text-3xl leading-relaxed break-words w-full flex-1">
+        <p className="text-[#102E50] text-xs sm:text-base leading-relaxed break-words w-full flex-1">
           {comment}
         </p>
         {date && (
-          <div className="text-base text-gray-500 break-words mt-auto">
+          <div className="text-xs text-gray-500 break-words mt-auto">
             {date}
           </div>
         )}

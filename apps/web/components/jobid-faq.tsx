@@ -18,12 +18,12 @@ export function JobIdFaq({ faqs }: { faqs: FaqItem[] }) {
         {faqs.map(faq => (
           <AccordionItem key={faq.id} value={faq.id}>
             <AccordionTrigger>
-              <span className="text-2xl sm:text-2xl lg:text-4xl font-bold">
+              <span className="text-base sm:text-base lg:text-xl font-bold">
                 {faq.question}
               </span>
             </AccordionTrigger>
             <AccordionContent>
-              <span className="text-xl sm:text:xl lg:text-2xl">
+              <span className="text-sm sm:text-base lg:text-lg">
                 {faq.answer}
               </span>
             </AccordionContent>
