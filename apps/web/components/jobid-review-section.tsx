@@ -3,6 +3,8 @@ import { Star } from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
 
+const PLACEHOLDER_IMAGE_URL = '/img-carousel-placeholder_2.png'; // You might want to replace this with a real placeholder image path
+
 interface Review {
   id?: string;
   name: string;
@@ -40,11 +42,11 @@ function ReviewItem({
 
   return (
     <div
-      className={`bg-white p-6 sm:p-8 lg:p-10 rounded-lg shadow-sm border border-gray-100 w-full min-h-[140px] sm:min-h-[160px] ${className}`}
+      className={`bg-white p-6 sm:p-8 lg:p-10 rounded-lg shadow-sm border border-gray-100 w-full min-h-[120px] sm:min-h-[140px] ${className}`}
     >
       <div className="flex flex-col gap-5 sm:gap-6 w-full h-full">
         <div className="flex items-start justify-between gap-3 w-full">
-          <h4 className="font-semibold text-[#102E50] text-lg sm:text-xl flex-1 break-words">
+          <h4 className="font-semibold text-[#102E50] text-2xl sm:text-4xl flex-1 break-words">
             {name}
           </h4>
           <div className="flex items-center flex-shrink-0">
@@ -58,33 +60,35 @@ function ReviewItem({
             ))}
           </div>
         </div>
-        <p className="text-[#102E50] text-base sm:text-lg leading-relaxed break-words w-full flex-1">
+        <p className="text-[#102E50] text-xl sm:text-3xl leading-relaxed break-words w-full flex-1">
           {comment}
         </p>
-        {imageUrl && (
-          <div className="mt-4 w-full flex justify-center">
-            <Image
-              src={imageUrl}
-              alt="Review image"
-              width={150}
-              height={150}
-              className="rounded-lg object-cover cursor-pointer"
-              onClick={() => setShowImageModal(true)}
-            />
-          </div>
-        )}
         {date && (
           <div className="text-base text-gray-500 break-words mt-auto">
             {date}
           </div>
         )}
+        <div className="flex items-center justify-between w-full mt-4">
+          {(imageUrl || PLACEHOLDER_IMAGE_URL) && (
+            <div className="flex flex-wrap gap-2">
+              <Image
+                src={imageUrl || PLACEHOLDER_IMAGE_URL}
+                alt="Review image"
+                width={60}
+                height={60}
+                className="rounded-md object-cover cursor-pointer border border-gray-200"
+                onClick={() => setShowImageModal(true)}
+              />
+            </div>
+          )}
 
-        <Button
-          className="mt-4 text-sm bg-[#102E50] text-white rounded-md hover:bg-blue-700 self-end"
-          onClick={handleReplyClick}
-        >
-          Reply
-        </Button>
+          <Button
+            className="text-sm bg-[#102E50] text-white rounded-md hover:bg-blue-700 self-end"
+            onClick={handleReplyClick}
+          >
+            Reply
+          </Button>
+        </div>
       </div>
 
       {showImageModal && (
@@ -138,14 +142,8 @@ function ReviewItem({
 export function ReviewsSection({ reviews }: ReviewsSectionProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedRating, setSelectedRating] = useState(0);
-
-  let reviewsPerPage = 10;
-  let columns = 2;
-  if (typeof window !== 'undefined') {
-    const isMobile = window.matchMedia('(max-width: 639px)').matches;
-    reviewsPerPage = isMobile ? 5 : 10;
-    columns = isMobile ? 1 : 2;
-  }
+  const reviewsPerPage = 5;
+  const columns = 1;
 
   const filteredReviews = selectedRating
     ? reviews.filter(review => review.rating === selectedRating)
@@ -196,7 +194,7 @@ export function ReviewsSection({ reviews }: ReviewsSectionProps) {
   const ratingCounts = getRatingCounts();
 
   return (
-    <div className="w-full max-w-screen-xl mx-auto space-y-5 sm:space-y-6 pb-5 sm:pb-6 lg:pb-8 overflow-hidden flex flex-col items-start">
+    <div className="w-full xl:max-w-screen-xl 2xl:max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 space-y-5 sm:space-y-6 pb-5 sm:pb-6 lg:pb-8 overflow-hidden flex flex-col items-start">
       <div className="mb-5 sm:mb-6 w-full text-left">
         <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#102E50] break-words">
           Reviews
@@ -259,7 +257,7 @@ export function ReviewsSection({ reviews }: ReviewsSectionProps) {
 
       {filteredReviews.length > 0 ? (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 w-full">
+          <div className="grid grid-cols-1 w-full">
             {currentReviews.map((review, index) => (
               <ReviewItem
                 key={review.id || `${currentPage}-${index}`}
