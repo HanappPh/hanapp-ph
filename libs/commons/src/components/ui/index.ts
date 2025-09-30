@@ -9,3 +9,4 @@ export * from './textarea';
 export * from './tabs';
 export * from './avatar';
 export * from './badge';
+export * from './accordion';

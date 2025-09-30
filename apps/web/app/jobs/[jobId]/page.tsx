@@ -1,21 +1,41 @@
 'use client';
 import { JobIdBg } from '../../../components/jobid-bg';
+import { JobIdFaq } from '../../../components/jobid-faq';
 import { Navigation } from '../../../components/jobid-navigation';
+import { PhotosMedia } from '../../../components/jobid-photos-media';
 import { ReviewsSection } from '../../../components/jobid-review-section';
-import { ServiceHeader } from '../../../components/jobid-service-header';
 import { ServicesSection } from '../../../components/jobid-service-section';
+import { Sidebar } from '../../../components/jobid-sidebar';
 
-export default function Home() {
-  // Sample data for the professionally refactored components
-  const serviceHeaderData = {
-    title: 'AC Specialist',
-    rating: 4.8,
-    totalReviews: 128,
-    responseTime: 'Usually responds within 2 hours',
-    location: 'Tanza, Cavite',
-    isOwnerView: false,
-  };
-
+export default function ClientJobPage() {
+  // Random FAQ details for demo
+  const faqs = [
+    {
+      id: '1',
+      question: 'How long does a typical AC cleaning take?',
+      answer: 'Usually 1-2 hours depending on unit type and condition.',
+    },
+    {
+      id: '2',
+      question: 'Do I need to provide cleaning materials?',
+      answer: 'No, our technicians bring all necessary tools and solutions.',
+    },
+    {
+      id: '3',
+      question: 'Is there a warranty for the service?',
+      answer: 'Yes, we offer a 7-day workmanship warranty.',
+    },
+    {
+      id: '4',
+      question: 'Can I book same-day service?',
+      answer: 'Same-day slots are subject to availability and confirmation.',
+    },
+    {
+      id: '5',
+      question: 'Are chemical solutions safe for my AC?',
+      answer: 'We use AC-safe chemicals and rinse thoroughly.',
+    },
+  ];
   const services = [
     {
       id: '1',
@@ -263,19 +283,49 @@ export default function Home() {
     ],
   };
 
+  const serviceHeaderData = {
+    title: 'AC Cleaning Service',
+    rating: 4.8,
+    totalReviews: 120,
+    responseTime: '24 hours',
+    location: 'Tanza, Cavite',
+  };
+
+  const sidebarProps = {
+    ...serviceHeaderData,
+    pricing: sidebarData.pricing,
+    availability: sidebarData.availability,
+    serviceAreas: sidebarData.serviceAreas,
+    safetyFeatures: sidebarData.safetyFeatures,
+    schedule: sidebarData.availability.schedule,
+  };
+
   return (
     <JobIdBg>
       <div className="min-h-screen w-full overflow-x-hidden">
         <Navigation />
-        <ServiceHeader {...serviceHeaderData} />
-        <div className="w-full max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12">
-          <ServicesSection
-            services={services}
-            expectations={expectations}
-            sidebarData={sidebarData}
-          />
-          <div className="w-full mt-8 sm:mt-10 lg:mt-12">
-            <ReviewsSection reviews={reviews} />
+        <div className="w-full max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-1 sm:py-3 lg:py-7">
+          <div className="mb-6 sm:mb-8 lg:mb-12">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
+              <div className="lg:col-span-2 h-full">
+                <PhotosMedia />
+              </div>
+              <div className="lg:col-span-1 h-full">
+                <Sidebar {...sidebarProps} />
+              </div>
+            </div>
+          </div>
+          <div>
+            <ServicesSection services={services} expectations={expectations} />
+            <div className="w-full mt-2 sm:mt-4 lg:mt-6">
+              <ReviewsSection reviews={reviews} />
+            </div>
+            <div className="w-full mt-2 sm:mt-4 lg:mt-6">
+              <h2 className="text-base sm:text-lg lg:text-2xl font-bold text-[#102E50] text-center mb-4">
+                Frequently Asked Questions About Provider
+              </h2>
+              <JobIdFaq faqs={faqs} />
+            </div>
           </div>
         </div>
       </div>
