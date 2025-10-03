@@ -1,4 +1,3 @@
-import { BookingsSection } from '../../components/bookings-section';
 import { DashboardStats } from '../../components/dashboard-stats';
 import { Footer } from '../../components/footer';
 import { HeroSection } from '../../components/hero-section';
@@ -10,13 +9,19 @@ export default function ProviderPage() {
       <HeroSection />
       <section className="px-6 py-8">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-[#102E50] text-2xl font-balanced mb-6 text-center">
+          <h2 className="text-[#102E50] text-2xl font-balanced m-2 text-center">
             Welcome, <span className="font-bold">Andrew!</span>
           </h2>
-          <DashboardStats />
+          <DashboardStats
+            totalEarnings={12500}
+            rating={4.8}
+            responseRate={95}
+            searchVisibility={80}
+            profileViews={120}
+          />
         </div>
       </section>
-      <BookingsSection />
+      {/* <BookingsSection /> */}
       <ListingsSection />
       <OnboardingSection />
       <Footer />
