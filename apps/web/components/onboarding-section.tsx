@@ -5,9 +5,9 @@ export function OnboardingSection() {
   return (
     <section className="px-6 py-8">
       <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
           {/* Create Your First Listing */}
-          <Card className="p-8 bg-[#FFDD8E]/50 border-0 rounded-xl shadow-md flex flex-col">
+          <Card className="p-8 bg-[#F5C45E] border-0 rounded-xl shadow-md flex flex-col lg:col-span-2">
             <h3 className="text-2xl font-bold text-[#102E50] mb-3">
               Create Your First Listing
             </h3>
@@ -36,7 +36,7 @@ export function OnboardingSection() {
           </Card>
 
           {/* Elevate Your Profile */}
-          <div>
+          <div className="lg:col-span-3">
             <h3 className="text-2xl font-bold text-[#102E50] mb-3">
               Elevate Your Profile
             </h3>
