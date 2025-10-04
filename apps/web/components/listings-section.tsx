@@ -1,6 +1,6 @@
 'use client';
-import { Card, CardContent, Badge, Button } from '@hanapp-ph/commons';
-import { Star, MapPin, Edit } from 'lucide-react';
+import { Card, CardContent, Badge } from '@hanapp-ph/commons';
+import { Star, MapPin } from 'lucide-react';
 
 export function ListingsSection() {
   const listings = [
@@ -51,7 +51,7 @@ export function ListingsSection() {
   ];
 
   return (
-    <section className="bg-[#F5C45E] py-10">
+    <section className="bg-[#FFE8B9] py-10">
       <div className="max-w-7xl mx-auto px-4">
         <h2 className="text-2xl font-semibold text-[#102E50] mb-8">
           Your listings
@@ -76,18 +76,22 @@ export function ListingsSection() {
                   <div className="w-full h-48 bg-gray-400 flex items-center justify-center">
                     <span className="text-gray">Image</span>
                   </div>
-                  <Badge
-                    className={`absolute top-3 left-3 border-0 px-3 py-1 ${
-                      listing.status === 'Active'
-                        ? 'bg-green-500 '
-                        : 'bg-gray-500'
-                    }`}
-                  >
-                    {listing.status}
+
+                  <Badge className="absolute top-3 left-3 border-0 px-3 py-2 bg-white flex items-center gap-2 shadow hover:bg-white focus:bg-white">
+                    {/* circle */}
+                    <span
+                      className={`w-2 h-2 rounded-full ${
+                        listing.status === 'Active'
+                          ? 'bg-green-500'
+                          : 'bg-red-500'
+                      }`}
+                    />
+                    <span
+                      className={`text-sm font-medium leading-none ${listing.status === 'Active' ? 'text-green-600' : 'text-red-600'}`}
+                    >
+                      {listing.status === 'Active' ? 'Active' : 'Inactive'}
+                    </span>
                   </Badge>
-                  <div className="absolute top-3 right-3 bg-black/70 text-white px-2 py-1 rounded text-sm font-semibold">
-                    {listing.price}
-                  </div>
                 </div>
                 <CardContent className="p-4 bg-white">
                   <h3 className="font-semibold text-lg mb-1">
@@ -111,14 +115,9 @@ export function ListingsSection() {
                         />
                       ))}
                     </div>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="gap-1 bg-transparent flex items-center"
-                    >
-                      <Edit className="w-3 h-3" />
-                      Edit
-                    </Button>
+                    <div className=" bg-black text-white px-2 py-1 rounded text-sm font-semibold">
+                      {listing.price}
+                    </div>
                   </div>
                 </CardContent>
               </Card>
