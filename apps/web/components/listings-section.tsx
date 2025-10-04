@@ -78,7 +78,7 @@ export function ListingsSection() {
   const directionRef = useRef(1);
   const isPausedAtEndRef = useRef(false);
 
-  const pauseDuration = 1000; // ms to pause at ends
+  const pauseDuration = 1500; // ms to pause at ends
   const scrollSpeed = 0.5; // adjust for speed
   const timeoutIdRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -212,27 +212,41 @@ export function ListingsSection() {
               type="button"
               className="absolute top-1/2 -translate-y-1/2 -left-14 rounded-full p-2 z-10"
               onClick={() => {
-                const el = document.getElementById('listings-scroll');
-                if (el) {
-                  el.scrollBy({ left: -320, behavior: 'smooth' });
+                if (scrollRef.current) {
+                  scrollRef.current.scrollBy({
+                    left: -320,
+                    behavior: 'smooth',
+                  });
+                  directionRef.current = -1;
+                  isPausedAtEndRef.current = false;
+                  if (timeoutIdRef.current) {
+                    clearTimeout(timeoutIdRef.current);
+                    timeoutIdRef.current = null;
+                  }
                 }
               }}
+              onMouseEnter={() => setIsPaused(true)}
+              onMouseLeave={() => setIsPaused(false)}
               aria-label="Scroll left"
             >
               <ChevronLeft className="w-8 h-8 text-[#102E50]" />
             </button>
-          </div>
-          {/* Right arrow button */}
-          <div className="hidden md:block">
             <button
               type="button"
               className="absolute top-1/2 -translate-y-1/2 -right-14 rounded-full p-2 z-10"
               onClick={() => {
-                const el = document.getElementById('listings-scroll');
-                if (el) {
-                  el.scrollBy({ left: 320, behavior: 'smooth' });
+                if (scrollRef.current) {
+                  scrollRef.current.scrollBy({ left: 320, behavior: 'smooth' });
+                  directionRef.current = 1;
+                  isPausedAtEndRef.current = false;
+                  if (timeoutIdRef.current) {
+                    clearTimeout(timeoutIdRef.current);
+                    timeoutIdRef.current = null;
+                  }
                 }
               }}
+              onMouseEnter={() => setIsPaused(true)}
+              onMouseLeave={() => setIsPaused(false)}
               aria-label="Scroll right"
             >
               <ChevronRight className="w-8 h-8 text-[#102E50]" />
