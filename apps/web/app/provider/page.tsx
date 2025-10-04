@@ -2,12 +2,11 @@ import { DashboardStats } from '../../components/dashboard-stats';
 import { Footer } from '../../components/footer';
 import { HeroSection } from '../../components/hero-section';
 import { ListingsSection } from '../../components/listings-section';
-import { NavigationHeader } from '../../components/navigation/NavigationHeader';
 import { OnboardingSection } from '../../components/onboarding-section';
 export default function ProviderPage() {
   return (
     <div className="bg-[#F3F5F9]">
-      <NavigationHeader activeTab="providers" />
+      {/* <NavigationHeader activeTab="providers" /> */}
       <HeroSection />
       <section className="px-6 py-8">
         <div className="max-w-7xl mx-auto">
