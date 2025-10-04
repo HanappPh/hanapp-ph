@@ -1,8 +1,8 @@
-import { DashboardStats } from '../../components/dashboard-stats';
 import { Footer } from '../../components/footer';
-import { HeroSection } from '../../components/hero-section';
-import { ListingsSection } from '../../components/listings-section';
-import { OnboardingSection } from '../../components/onboarding-section';
+import { DashboardStats } from '../../components/provider/dashboard-stats';
+import { HeroSection } from '../../components/provider/hero-section';
+import { ListingsSection } from '../../components/provider/listings-section';
+import { OnboardingSection } from '../../components/provider/onboarding-section';
 export default function ProviderPage() {
   return (
     <div className="bg-[#F3F5F9]">

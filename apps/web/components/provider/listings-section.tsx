@@ -49,28 +49,28 @@ export function ListingsSection() {
       status: 'Inactive',
       //   image: "/auto-mechanic-with-tools.jpg",
     },
-    // {
-    //   id: 5,
-    //   title: 'Auto repair home service',
-    //   category: 'Auto Repair',
-    //   provider: "Mike's Auto Shop",
-    //   price: '₱850',
-    //   location: 'Batanay, Bulacan',
-    //   rating: 5,
-    //   status: 'Inactive',
-    //   //   image: "/auto-mechanic-with-tools.jpg",
-    // },
-    // {
-    //   id: 6,
-    //   title: 'Auto repair home service',
-    //   category: 'Auto Repair',
-    //   provider: "Mike's Auto Shop",
-    //   price: '₱850',
-    //   location: 'Batanay, Bulacan',
-    //   rating: 5,
-    //   status: 'Inactive',
-    //   //   image: "/auto-mechanic-with-tools.jpg",
-    // },
+    {
+      id: 5,
+      title: 'Auto repair home service',
+      category: 'Auto Repair',
+      provider: "Mike's Auto Shop",
+      price: '₱850',
+      location: 'Batanay, Bulacan',
+      rating: 5,
+      status: 'Inactive',
+      //   image: "/auto-mechanic-with-tools.jpg",
+    },
+    {
+      id: 6,
+      title: 'Auto repair home service',
+      category: 'Auto Repair',
+      provider: "Mike's Auto Shop",
+      price: '₱850',
+      location: 'Batanay, Bulacan',
+      rating: 5,
+      status: 'Inactive',
+      //   image: "/auto-mechanic-with-tools.jpg",
+    },
   ];
 
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -129,7 +129,7 @@ export function ListingsSection() {
 
   return (
     <section className="bg-[#FFE8B9] py-10">
-      <div className="max-w-7xl mx-auto px-8 md:px-14">
+      <div className="max-w-7xl mx-auto px-8 md:px-14 lg:px-0">
         <h2 className="text-2xl font-semibold text-[#102E50] mb-8">
           Your listings
         </h2>
