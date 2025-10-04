@@ -207,10 +207,10 @@ export function ListingsSection() {
             ))}
           </div>
           {/* Left arrow button */}
-          <div className="hidden md:block">
+          <div className="hidden sm:block">
             <button
               type="button"
-              className="absolute top-1/2 -translate-y-1/2 -left-14 rounded-full p-2 z-10"
+              className="absolute top-1/2 -translate-y-1/2 -left-11 lg:-left-14 rounded-full p-2 z-10"
               onClick={() => {
                 if (scrollRef.current) {
                   scrollRef.current.scrollBy({
@@ -233,7 +233,7 @@ export function ListingsSection() {
             </button>
             <button
               type="button"
-              className="absolute top-1/2 -translate-y-1/2 -right-14 rounded-full p-2 z-10"
+              className="absolute top-1/2 -translate-y-1/2 -right-11 lg:-right-14 rounded-full p-2 z-10"
               onClick={() => {
                 if (scrollRef.current) {
                   scrollRef.current.scrollBy({ left: 320, behavior: 'smooth' });

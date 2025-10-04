@@ -73,7 +73,7 @@ export function DashboardStats({
         </Card>
 
         {/* See more stats */}
-        <div className="flex items-center text-center">
+        <div className="flex items-center justify-end text-center">
           See more of your stats &gt;
         </div>
       </div>
