@@ -1,4 +1,5 @@
 import { Footer } from '../../components/footer';
+import JobListings from '../../components/job-listings';
 import { DashboardStats } from '../../components/provider/dashboard-stats';
 import { HeroSection } from '../../components/provider/hero-section';
 import { ListingsSection } from '../../components/provider/listings-section';
@@ -25,6 +26,7 @@ export default function ProviderPage() {
       {/* <BookingsSection /> */}
       <ListingsSection />
       <OnboardingSection />
+      <JobListings />
       <Footer />
     </div>
   );
