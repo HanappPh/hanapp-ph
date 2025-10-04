@@ -1,6 +1,5 @@
 import { Button, Badge } from '@hanapp-ph/commons';
 import { MapPin, Star, ChevronLeft, ChevronRight } from 'lucide-react';
-import React from 'react';
 type Job = {
   id: number;
   image: string;
@@ -77,7 +76,7 @@ const jobs: Job[] = [
 
 const filterButtons = ['Show all', 'Near Me', 'Top Picks', 'Book Again'];
 
-const JobListings: React.FC = () => {
+export function JobListings() {
   return (
     <section className="max-w-7xl mx-auto py-8 px-6">
       <div className="flex justify-between items-center mb-4">
@@ -174,6 +173,4 @@ const JobListings: React.FC = () => {
       </div>
     </section>
   );
-};
-
-export default JobListings;
+}
