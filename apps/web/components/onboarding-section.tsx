@@ -5,9 +5,9 @@ export function OnboardingSection() {
   return (
     <section className="px-6 py-8">
       <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-7 gap-8">
           {/* Create Your First Listing */}
-          <Card className="p-8 bg-[#F5C45E] border-0 rounded-xl shadow-md flex flex-col lg:col-span-2">
+          <Card className="p-8 bg-[#F5C45E] border-0 rounded-xl shadow-md flex flex-col lg:col-span-3">
             <h3 className="text-2xl font-bold text-[#102E50] mb-3">
               Create Your First Listing
             </h3>
@@ -36,7 +36,7 @@ export function OnboardingSection() {
           </Card>
 
           {/* Elevate Your Profile */}
-          <div className="lg:col-span-3">
+          <div className="lg:col-span-4">
             <h3 className="text-2xl font-bold text-[#102E50] mb-3">
               Elevate Your Profile
             </h3>
@@ -44,10 +44,10 @@ export function OnboardingSection() {
               <div className="flex items-center gap-3 p-4 rounded-xl shadow-sm bg-white">
                 <Camera className="h-6 w-6 text-[#102E50]" />
                 <div className="flex-1">
-                  <div className="font-semibold text-[#102E50]">
+                  <div className="font-semibold text-lg text-[#102E50]">
                     Use a clear photo
                   </div>
-                  <div className="text-sm text-[#102E50]">
+                  <div className="text-md text-[#102E50]">
                     Customers trust real faces. Smile, good lighting, no
                     filters.
                   </div>
@@ -57,10 +57,10 @@ export function OnboardingSection() {
               <div className="flex items-center gap-3 p-4 rounded-xl shadow-sm bg-white">
                 <NotebookPen className="h-6 w-6 text-[#102E50]" />
                 <div className="flex-1">
-                  <div className="font-semibold text-[#102E50]">
+                  <div className="font-semibold text-lg text-[#102E50]">
                     Describe your expertise
                   </div>
-                  <div className="text-sm text-[#102E50]">
+                  <div className="text-md text-[#102E50]">
                     Add relevant skills and years of experience.
                   </div>
                 </div>
@@ -69,10 +69,10 @@ export function OnboardingSection() {
               <div className="flex items-center gap-3 p-4 rounded-xl shadow-sm bg-white">
                 <BellRing className="h-6 w-6 text-[#102E50]" />
                 <div className="flex-1">
-                  <div className="font-semibold text-[#102E50]">
+                  <div className="font-semibold text-lg text-[#102E50]">
                     Reply fast to win bookings
                   </div>
-                  <div className="text-sm text-[#102E50]">
+                  <div className="text-md text-[#102E50]">
                     Get more gigs when you reply right away, clients love a
                     provider who is available when they need it!
                   </div>
@@ -82,8 +82,8 @@ export function OnboardingSection() {
               <div className="flex items-center gap-3 p-4 bg-[#102E50] text-white rounded-xl shadow-sm">
                 <Sparkles className="h-6 w-6" />
                 <div className="flex-1">
-                  <div className="font-semibold">Coming soon</div>
-                  <div className="text-sm">
+                  <div className="font-semibold text-lg">Coming soon</div>
+                  <div className="text-md">
                     Bidding System & Rewards: boost visibility, earn credits by
                     referring fellow providers.
                   </div>
