@@ -79,8 +79,8 @@ export function AvailabilityForm({
 
   return (
     <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-      <h3 className="text-xl font-semibold text-gray-800 mb-2">Availability</h3>
-      <p className="text-sm text-gray-500 mb-4">
+      <h3 className="text-3xl font-medium">Availability</h3>
+      <p className="text-sm text-gray-400 mb-4">
         Set your available days and hours
       </p>
 

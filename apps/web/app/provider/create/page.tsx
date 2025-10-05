@@ -1,5 +1,6 @@
 'use client';
 
+import { Button, Checkbox } from '@hanapp-ph/commons';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 
@@ -22,8 +23,6 @@ function App() {
   const [services, setServices] = useState<ServiceType[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
   const [listingData, setListingData] = useState<Record<string, unknown>>({});
 
   const handleAddService = (service: ServiceType) => {
@@ -81,43 +80,21 @@ function App() {
       return;
     }
 
-    setIsSubmitting(true);
-
-    // Simulate posting to backend with a delay
-    setTimeout(() => {
-      // Data would be sent to backend here: listingData, services
-
-      setSuccessMessage(
-        'Listing and services posted successfully! (Frontend simulation)'
-      );
-      setServices([]);
-      setListingData({});
-
-      setTimeout(() => {
-        setSuccessMessage('');
-      }, 5000);
-
-      setIsSubmitting(false);
-    }, 1500); // Simulate network delay
+    setServices([]);
+    setListingData({});
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">
+          <h1 className="text-5xl font-bold text-gray-800 mb-2">
             List Your Service
           </h1>
           <p className="text-gray-600">
             Create your service listing and add individual services
           </p>
         </div>
-
-        {successMessage && (
-          <div className="mb-6 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg text-center">
-            {successMessage}
-          </div>
-        )}
 
         <div className="flex justify-center mb-6">
           <div className="inline-flex rounded-full bg-gray-200 p-1">
@@ -135,7 +112,7 @@ function App() {
               onClick={() => setViewMode('services')}
               className={`px-6 py-2 rounded-full font-medium transition-colors ${
                 viewMode === 'services'
-                  ? 'bg-gray-600 text-white'
+                  ? 'bg-amber-400 text-gray-900'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -198,21 +175,33 @@ function App() {
         </div>
 
         <div className="max-w-4xl mx-auto mt-8 space-y-4">
-          <div className="text-xs text-gray-600 bg-gray-50 p-4 rounded-lg text-center">
-            By clicking &quot;Post&quot;, you agree to the{' '}
-            <a href="#" className="text-amber-600 hover:underline">
-              Terms and Conditions
-            </a>{' '}
-            of Hanapp and swear that all the info you filled up is true and
-            legitimate
+          <div className="flex items-start space-x-2 ">
+            <Checkbox
+              id="terms"
+              className="mt-1 border-yellow-500 data-[state=checked]:bg-yellow-500"
+            />
+            <label
+              htmlFor="terms"
+              className="text-sm text-gray-600 leading-relaxed"
+            >
+              By clicking Post, you agree to the{' '}
+              <a href="#" className="text-yellow-600 underline">
+                Terms and Conditions
+              </a>{' '}
+              of Hanapp and confirm that all information provided is true and
+              legitimate
+            </label>
           </div>
-          <button
+
+          <Button
             onClick={handlePostAll}
-            disabled={isSubmitting}
-            className="w-full bg-amber-400 hover:bg-amber-500 disabled:bg-amber-300 text-gray-900 font-bold py-4 rounded-lg transition-colors text-lg"
+            className="w-full text-white py-3 text-lg font-medium border-0"
+            style={{
+              background: 'linear-gradient(to bottom, #FFDD8E, #F5C45E)',
+            }}
           >
-            {isSubmitting ? 'Posting...' : 'Post'}
-          </button>
+            Post
+          </Button>
         </div>
       </div>
     </div>

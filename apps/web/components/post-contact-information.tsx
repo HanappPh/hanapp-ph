@@ -1,5 +1,6 @@
 'use client';
 
+import { Input } from '@hanapp-ph/commons';
 import React, { useState } from 'react';
 
 export function ContactInfoForm({
@@ -12,7 +13,7 @@ export function ContactInfoForm({
   onChange?: Function;
 }) {
   const [contactNumber, setContactNumber] = useState('');
-  const [countryCode, setCountryCode] = useState('+63');
+  const countryCode = '+63';
   const [otherContactLink, setOtherContactLink] = useState('');
 
   const notifyParent = (
@@ -52,34 +53,21 @@ export function ContactInfoForm({
 
   const content = (
     <>
-      <h3 className="text-xl font-semibold text-gray-800 mb-2">
-        Contact Information
-      </h3>
-      <p className="text-sm text-gray-500 mb-4">
+      <h2 className="text-3xl font-medium">Contact Information</h2>
+      <p className="text-sm text-gray-400 mb-6">
         Set up for more modes of communication
       </p>
 
-      <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-base font-medium text-gray-700 mb-3">
             Contact No.
           </label>
-          <div className="flex space-x-2">
-            <select
-              value={countryCode}
-              onChange={e => {
-                const newCountryCode = e.target.value;
-                setCountryCode(newCountryCode);
-                notifyParent(contactNumber, newCountryCode, otherContactLink);
-              }}
-              className="w-24 px-2 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-            >
-              <option value="+63">+63</option>
-              <option value="+1">+1</option>
-              <option value="+44">+44</option>
-              <option value="+86">+86</option>
-            </select>
-            <input
+          <div className="flex">
+            <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 text-gray-500 text-sm mb-3">
+              +63
+            </span>
+            <Input
               type="tel"
               value={contactNumber}
               onChange={e => {
@@ -87,17 +75,22 @@ export function ContactInfoForm({
                 setContactNumber(newContactNumber);
                 notifyParent(newContactNumber, countryCode, otherContactLink);
               }}
-              placeholder="999 *** ****"
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+              placeholder="*** *** ****"
+              className="rounded-l-none font-light text-sm mb-3"
+              style={
+                {
+                  backgroundColor: '#F3F5F9',
+                  '--tw-ring-color': 'rgb(245 158 11)',
+                } as React.CSSProperties
+              }
             />
           </div>
         </div>
-
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-base font-medium text-gray-700 mb-3">
             Other Contact Link
           </label>
-          <input
+          <Input
             type="text"
             value={otherContactLink}
             onChange={e => {
@@ -105,8 +98,14 @@ export function ContactInfoForm({
               setOtherContactLink(newOtherContactLink);
               notifyParent(contactNumber, countryCode, newOtherContactLink);
             }}
-            placeholder="Messenger / Telegram / WhatsApp"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+            placeholder="Messenger / Telegram /..."
+            className="w-full font-light text-sm"
+            style={
+              {
+                backgroundColor: '#F3F5F9',
+                '--tw-ring-color': 'rgb(245 158 11)',
+              } as React.CSSProperties
+            }
           />
         </div>
       </div>
@@ -117,7 +116,7 @@ export function ContactInfoForm({
     return (
       <form
         onSubmit={handleSubmit}
-        className="bg-white rounded-lg p-6 shadow-sm border border-gray-200"
+        className="bg-white rounded-lg p-6 shadow-sm"
       >
         {content}
       </form>
