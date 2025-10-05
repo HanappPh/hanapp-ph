@@ -8,17 +8,17 @@ interface DialogHeaderProps {
 }
 
 export function DialogHeader({ className = '' }: DialogHeaderProps) {
-  const mobileLogoWidth = 170;
+  const mobileLogoWidth = 140;
   const mobileLogoHeight = 0;
-  const smMobileLogoWidth = 250;
-  const desktopLogoWidth = 90;
-  const desktopLogoHeight = 90;
+  const smMobileLogoWidth = 180;
+  const desktopLogoWidth = 70;
+  const desktopLogoHeight = 70;
 
   return (
     <div
-      className={`text-center ml-4 sm:ml-0 pt-4 md:pt-6 lg:pt-8 xl:pt-12 sm:pt-6 ${className}`}
+      className={`text-center ml-4 sm:ml-0 pt-2 md:pt-3 lg:pt-4 xl:pt-6 sm:pt-3 ${className}`}
     >
-      <div className="mb-2 sm:mb-12 ml-4 sm:ml-0 flex justify-center">
+      <div className="mb-3 sm:mb-6 ml-4 sm:ml-0 flex justify-center">
         <Image
           src="/Hanapp-Logo-Registered.png"
           alt="Hanapp Logo Mobile"
@@ -38,7 +38,7 @@ export function DialogHeader({ className = '' }: DialogHeaderProps) {
         />
       </div>
 
-      <div className="flex flex-wrap items-center justify-center gap-1 text-xl xs:text-2xl sm:text-3xl leading-snug px-4">
+      <div className="flex flex-wrap items-center justify-center gap-1 text-lg xs:text-xl sm:text-2xl leading-snug px-4 mb-4">
         <span className="text-[#F5C45E] font-semibold">Big</span>
         <span className="text-[#102E50]">or</span>
         <span>

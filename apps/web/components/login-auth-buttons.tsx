@@ -40,7 +40,7 @@ export function AuthButtons({
 
   return (
     <div
-      className={`flex flex-col flex-1 min-h-0 overflow-y-auto gap-3 sm:gap-6 px-2 sm:px-6 ${className}`}
+      className={`flex flex-col flex-1 min-h-0 overflow-y-auto gap-2 sm:gap-4 px-2 sm:px-4 ${className}`}
     >
       {showOtpVerification ? (
         <OtpVerificationButtons
@@ -52,12 +52,12 @@ export function AuthButtons({
       ) : (
         <>
           <div className="text-center flex-shrink-0">
-            <label className="block text-[1rem] sm:text-[1.25rem] text-gray-700 mb-2 sm:mb-3 pt-2 sm:pt-4 font-medium">
+            <label className="block text-[0.9rem] sm:text-[1rem] text-gray-700 mb-3 sm:mb-4 pt-1 sm:pt-2 font-medium">
               Enter your Phone Number to Receive an OTP
             </label>
-            <div className="flex flex-row flex-nowrap justify-center gap-2 sm:gap-4 px-0 sm:px-2">
-              <div className="flex items-center justify-center bg-gray-50 border border-gray-200 rounded-[18px] px-3 py-2 sm:px-4 sm:py-3 min-w-[56px] max-w-[80px] flex-shrink-0">
-                <span className="text-gray-700 font-semibold text-lg sm:text-xl">
+            <div className="flex flex-row flex-nowrap justify-center gap-2 sm:gap-3 px-0 sm:px-2">
+              <div className="flex items-center justify-center bg-gray-50 border border-gray-200 rounded-[14px] px-2.5 py-2 sm:px-3 sm:py-2.5 min-w-[50px] max-w-[68px] flex-shrink-0">
+                <span className="text-gray-700 font-semibold text-base sm:text-lg">
                   +63
                 </span>
               </div>
@@ -65,39 +65,39 @@ export function AuthButtons({
                 type="tel"
                 value={phoneNumber}
                 onChange={e => setPhoneNumber(e.target.value)}
-                className="flex-1 w-[160px] sm:w-[260px] border border-gray-200 rounded-[18px] px-3 py-2 sm:px-4 sm:py-3 text-lg sm:text-xl focus:border-yellow-400 focus:ring-yellow-400 focus:outline-none"
+                className="flex-1 max-w-[220px] sm:max-w-[240px] border border-gray-200 rounded-[14px] px-3 py-2 sm:px-3.5 sm:py-2.5 text-base sm:text-lg focus:border-yellow-400 focus:ring-yellow-400 focus:outline-none"
               />
             </div>
           </div>
 
-          <div className="flex flex-col flex-1 min-h-0 justify-center pt-4 sm:pt-6">
+          <div className="flex flex-col flex-1 min-h-0 justify-center pt-3 sm:pt-4">
             <Button
               onClick={handleSendOTP}
-              className="w-full sm:mx-auto sm:w-[260px] h-[44px] sm:h-[54px] bg-[#F5C45E] hover:bg-[#F5C45E]/90 text-gray-900 text-[1rem] sm:text-lg font-semibold rounded-[18px] transition-colors disabled:opacity-80 disabled:cursor-not-allowed shadow-md flex items-center justify-center mb-3 sm:mb-4 border-0"
+              className="w-full sm:mx-auto sm:w-[240px] h-[42px] sm:h-[48px] bg-[#F5C45E] hover:bg-[#F5C45E]/90 text-gray-900 text-[0.95rem] sm:text-base font-semibold rounded-[14px] transition-colors disabled:opacity-80 disabled:cursor-not-allowed shadow-md flex items-center justify-center mb-3 sm:mb-3 border-0"
               style={{ backdropFilter: 'blur(2px)' }}
               disabled={!phoneNumber.trim()}
             >
-              <span className="font-bold text-black text-[1rem] sm:text-[1.1rem]">
+              <span className="font-bold text-black text-[0.95rem] sm:text-base">
                 Send OTP
               </span>
             </Button>
 
-            <div className="relative mb-3 sm:mb-4">
+            <div className="relative mb-3 sm:mb-3">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-200" />
               </div>
-              <div className="relative flex justify-center text-base">
-                <span className="bg-white px-4 text-gray-500">or</span>
+              <div className="relative flex justify-center text-sm">
+                <span className="bg-white px-3 text-gray-500">or</span>
               </div>
             </div>
 
             <Button
               onClick={handleGoogleLogin}
               variant="outline"
-              className="w-full sm:mx-auto sm:w-[260px] h-[44px] sm:h-[54px] border border-gray-500 hover:bg-gray-50 bg-white rounded-[18px] transition-colors flex items-center justify-center shadow-sm mb-6 sm:mb-8"
+              className="w-full sm:mx-auto sm:w-[240px] h-[42px] sm:h-[48px] border border-gray-500 hover:bg-gray-50 bg-white rounded-[14px] transition-colors flex items-center justify-center shadow-sm mb-4 sm:mb-6"
             >
               <svg
-                className="w-5 h-5 sm:w-6 sm:h-6 mr-2 sm:mr-3"
+                className="w-4 h-4 sm:w-5 sm:h-5 mr-2 sm:mr-2.5"
                 viewBox="0 0 24 24"
               >
                 <path
@@ -117,7 +117,7 @@ export function AuthButtons({
                   d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                 />
               </svg>
-              <span className="text-black text-[1rem] sm:text-[1.1rem] font-normal">
+              <span className="text-black text-[0.9rem] sm:text-[0.95rem] font-normal">
                 Continue with Google
               </span>
             </Button>
