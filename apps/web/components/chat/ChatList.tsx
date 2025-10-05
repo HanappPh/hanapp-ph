@@ -1,5 +1,8 @@
+'use client';
+
 import { Avatar, AvatarFallback, AvatarImage, Badge } from '@hanapp-ph/commons';
 import { formatDistanceToNow } from 'date-fns';
+import { useEffect, useState } from 'react';
 
 export interface ChatListItem {
   id: string;
@@ -17,15 +20,37 @@ interface ChatListProps {
   chats: ChatListItem[];
   selectedChatId?: string;
   onSelectChat: (chatId: string) => void;
+  fullWidth?: boolean;
 }
 
 export const ChatList = ({
   chats,
   selectedChatId,
   onSelectChat,
+  fullWidth = false,
 }: ChatListProps) => {
+  const TimeAgo = ({ date }: { date: Date }) => {
+    const [text, setText] = useState('');
+
+    useEffect(() => {
+      const update = () =>
+        setText(formatDistanceToNow(date, { addSuffix: false }));
+      update();
+      const id = setInterval(update, 60000);
+      return () => clearInterval(id);
+    }, [date]);
+
+    return <span className="text-xs text-gray-500 ml-2">{text}</span>;
+  };
+
   return (
-    <div className="w-80 bg-gray-50 p-4 flex flex-col">
+    <div
+      className={
+        fullWidth
+          ? 'w-full p-4 flex flex-col'
+          : 'w-80 bg-gray-50 p-4 flex flex-col'
+      }
+    >
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-4 flex-shrink-0">
         <h2 className="text-lg font-semibold text-gray-900">Messages</h2>
       </div>
@@ -62,9 +87,7 @@ export const ChatList = ({
                   <h3 className="text-sm font-semibold text-gray-900 truncate">
                     {chat.name}
                   </h3>
-                  <span className="text-xs text-gray-500 ml-2">
-                    {formatDistanceToNow(chat.timestamp, { addSuffix: false })}
-                  </span>
+                  <TimeAgo date={chat.timestamp} />
                 </div>
                 <div className="flex items-center justify-between">
                   <p className="text-sm text-gray-600 truncate flex-1">
