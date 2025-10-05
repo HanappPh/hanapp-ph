@@ -4,16 +4,14 @@ import * as http from 'http';
 
 // Register custom tsconfig for CI environments
 // This addresses the TS5098 error with customConditions
-process.env.TS_NODE_PROJECT = process.env.CI
-  ? './apps/web-e2e/tsconfig.cypress.json'
-  : './apps/web-e2e/tsconfig.json';
+process.env.TS_NODE_PROJECT = './apps/web-e2e/tsconfig.cypress.json';
 
 export default defineConfig({
   e2e: {
     ...nxE2EPreset(__filename, {
       cypressDir: 'src',
       webServerCommands: {
-        default: 'npx nx run web:serve',
+        default: 'npx nx run @hanapp-ph/web:serve',
       },
       // CI configuration - don't auto-start server, we handle it externally
       ciWebServerCommand: undefined,

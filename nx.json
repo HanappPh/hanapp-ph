@@ -92,6 +92,21 @@
   ],
   "targetDefaults": {
     "test": {
+      "dependsOn": ["^build"],
+      "options": {
+        "passWithNoTests": true
+      }
+    },
+    "typecheck": {
+      "dependsOn": [
+        {
+          "target": "build",
+          "projects": "dependencies",
+          "params": "forward"
+        }
+      ]
+    },
+    "build": {
       "dependsOn": ["^build"]
     }
   },
