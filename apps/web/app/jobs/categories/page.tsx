@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 
 import { jobs, categories } from '../../../components/categories-data';
 import { CategoriesHeader } from '../../../components/categories-header';
@@ -22,7 +22,25 @@ export default function CategoriesPage() {
     );
   };
 
-  const sortJobs = (jobs: Job[], sortOption: SortOption) => {
+  // Convert price strings to numeric values for sorting
+  const getPriceValue = (price: string) => {
+    const numStr = price.replace('₱', '').trim();
+    return numStr.toLowerCase().endsWith('k')
+      ? parseFloat(numStr.slice(0, -1)) * 1000
+      : parseFloat(numStr) || 0;
+  };
+
+  // Compare prices based on sort order
+  const comparePrices = (
+    priceA: number,
+    priceB: number,
+    isHighToLow: boolean
+  ) => {
+    return isHighToLow ? priceB - priceA : priceA - priceB;
+  };
+
+  // Memoized sorting function
+  const sortJobs = useCallback((jobs: Job[], sortOption: SortOption) => {
     return [...jobs].sort((a, b) => {
       switch (sortOption) {
         case 'location': {
@@ -31,36 +49,18 @@ export default function CategoriesPage() {
         case 'rating': {
           return b.rating - a.rating;
         }
-        case 'price-high-low': {
-          const getPriceValue = (price: string) => {
-            const numStr = price.replace('₱', '');
-            if (numStr.includes('k')) {
-              return parseFloat(numStr.replace('k', '')) * 1000;
-            }
-            return parseFloat(numStr);
-          };
-          const priceA = getPriceValue(a.price);
-          const priceB = getPriceValue(b.price);
-          return priceB - priceA;
-        }
+        case 'price-high-low':
         case 'price-low-high': {
-          const getPriceValue = (price: string) => {
-            const numStr = price.replace('₱', '');
-            if (numStr.includes('k')) {
-              return parseFloat(numStr.replace('k', '')) * 1000;
-            }
-            return parseFloat(numStr);
-          };
           const priceA = getPriceValue(a.price);
           const priceB = getPriceValue(b.price);
-          return priceA - priceB;
+          return comparePrices(priceA, priceB, sortOption === 'price-high-low');
         }
         default: {
           return 0;
         }
       }
     });
-  };
+  }, []); // Empty dependency array since helper functions are in scope
 
   const filteredJobs = useMemo(() => {
     const filtered = jobs.filter(job => {
@@ -72,7 +72,7 @@ export default function CategoriesPage() {
     });
 
     return sortJobs(filtered, sortBy);
-  }, [selectedCategories, sortBy]);
+  }, [selectedCategories, sortBy, sortJobs]);
 
   const categoryCounts = useMemo(() => {
     const counts: Record<string, number> = {};
