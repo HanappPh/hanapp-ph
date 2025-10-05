@@ -1,10 +1,8 @@
-// FILE: apps/web/app/auth/page.tsx
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 
-// Simple regular imports - no dynamic loading needed
 import { BackgroundImage } from '../../../components/login-background';
 import { LoginDialog } from '../../../components/login-dialog';
 import { MainHeader } from '../../../components/login-header';
@@ -14,7 +12,7 @@ import SignInServiceSelector from '../../../components/signin-service-selector';
 
 type ServiceOption = 'jobs' | 'services' | 'both';
 
-export default function AuthPage() {
+function AuthPageContent() {
   const searchParams = useSearchParams();
   const mode = searchParams.get('mode') || 'login';
 
@@ -101,5 +99,24 @@ export default function AuthPage() {
         </div>
       </div>
     </BackgroundImage>
+  );
+}
+
+function AuthPageFallback() {
+  return (
+    <div className="h-screen w-screen flex items-center justify-center bg-gradient-to-r from-[#102E50] to-[#014182]">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-4"></div>
+        <p className="text-white">Loading...</p>
+      </div>
+    </div>
+  );
+}
+
+export default function AuthPage() {
+  return (
+    <Suspense fallback={<AuthPageFallback />}>
+      <AuthPageContent />
+    </Suspense>
   );
 }
