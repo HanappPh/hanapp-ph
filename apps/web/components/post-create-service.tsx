@@ -1,51 +1,65 @@
 'use client';
 
-import { X, MapPin } from 'lucide-react';
+import {
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Textarea,
+} from '@hanapp-ph/commons';
+import { X, MapPin, Upload, ImageIcon } from 'lucide-react';
 import React, { useState, useRef, useCallback } from 'react';
 
 import { AvailabilityForm } from './post-availability';
 import { ContactInfoForm } from './post-contact-information';
-
-const CATEGORIES = [
-  'Cleaning',
-  'Installation',
-  'Repair',
-  'Maintenance',
-  'Construction',
-  'Landscaping',
-  'Plumbing',
-  'Electrical',
-  'Other',
-];
 
 export function CreateListingForm(props: { onListingChange?: Function }) {
   const { onListingChange } = props;
   const [serviceTitle, setServiceTitle] = useState<string>('');
   const [category, setCategory] = useState<string>('Transport');
   const [description, setDescription] = useState<string>('');
-  const [images, setImages] = useState<string[]>([]);
+  const [images, setImages] = useState<File[]>([]);
+  const [dragActive, setDragActive] = useState(false);
   const [locations, setLocations] = useState<string[]>([]);
   const [currentLocation, setCurrentLocation] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files) {
-      Array.from(files).forEach(file => {
-        if (file.size > 10 * 1024 * 1024) {
-          alert('File size must be less than 10MB');
-          return;
-        }
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === 'dragenter' || e.type === 'dragover') {
+      setDragActive(true);
+    } else if (e.type === 'dragleave') {
+      setDragActive(false);
+    }
+  };
 
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          const result = reader.result as string;
-          const newImages = [...images, result];
-          setImages(newImages);
-          updateParent({ images: newImages });
-        };
-        reader.readAsDataURL(file);
-      });
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const newFiles = Array.from(e.dataTransfer.files).filter(file =>
+        file.type.startsWith('image/')
+      );
+      const updatedImages = [...images, ...newFiles];
+      setImages(updatedImages);
+      updateParent({ images: updatedImages });
+    }
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    if (e.target.files && e.target.files[0]) {
+      const newFiles = Array.from(e.target.files).filter(file =>
+        file.type.startsWith('image/')
+      );
+      const updatedImages = [...images, ...newFiles];
+      setImages(updatedImages);
+      updateParent({ images: updatedImages });
     }
   };
 
@@ -53,6 +67,10 @@ export function CreateListingForm(props: { onListingChange?: Function }) {
     const newImages = images.filter((_, i) => i !== index);
     setImages(newImages);
     updateParent({ images: newImages });
+  };
+
+  const onButtonClick = () => {
+    fileInputRef.current?.click();
   };
 
   const handleAddLocation = () => {
@@ -84,21 +102,6 @@ export function CreateListingForm(props: { onListingChange?: Function }) {
     [serviceTitle, category, description, images, locations, onListingChange]
   );
 
-  const handleFieldChange = (field: string, value: string) => {
-    switch (field) {
-      case 'service_title':
-        setServiceTitle(value);
-        break;
-      case 'category':
-        setCategory(value);
-        break;
-      case 'description':
-        setDescription(value);
-        break;
-    }
-    updateParent({ [field]: value });
-  };
-
   const handleContactInfoChange = useCallback(
     (provider: { contact_number: string; other_contact_link: string }) => {
       updateParent({
@@ -119,63 +122,90 @@ export function CreateListingForm(props: { onListingChange?: Function }) {
   return (
     <div className="space-y-6">
       <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-800 mb-1">
-          Service Details
-        </h3>
-        <p className="text-sm text-gray-500 mb-4">
-          Job information and service type needed
+        <h3 className="text-3xl font-medium">Service Details</h3>
+        <p className="text-sm text-gray-400 mb-6">
+          Job information and service type you provide
         </p>
 
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-base font-medium text-gray-700">
                 Service Title
               </label>
-              <input
-                type="text"
+              <Input
                 value={serviceTitle}
-                onChange={e =>
-                  handleFieldChange('service_title', e.target.value)
+                onChange={e => {
+                  setServiceTitle(e.target.value);
+                  updateParent({ service_title: e.target.value });
+                }}
+                placeholder="e.g. Tutor for Integral Calculus"
+                className="w-full font-light text-base"
+                style={
+                  {
+                    backgroundColor: '#F3F5F9',
+                    '--tw-ring-color': 'rgb(245 158 11)',
+                  } as React.CSSProperties
                 }
-                placeholder="e.g. Calculus Tutor"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-base font-medium text-gray-700">
                 Service Category
               </label>
-              <select
+              <Select
                 value={category}
-                onChange={e => handleFieldChange('category', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                onValueChange={value => {
+                  setCategory(value);
+                  updateParent({ category: value });
+                }}
               >
-                {CATEGORIES.map(cat => (
-                  <option key={cat} value={cat}>
-                    {cat}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger
+                  className="font-light text-sm"
+                  style={
+                    {
+                      backgroundColor: '#F3F5F9',
+                      '--tw-ring-color': 'rgb(245 158 11)',
+                    } as React.CSSProperties
+                  }
+                >
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="cleaning">Cleaning</SelectItem>
+                  <SelectItem value="tutoring">Tutoring</SelectItem>
+                  <SelectItem value="repair">Repair</SelectItem>
+                  <SelectItem value="delivery">Delivery</SelectItem>
+                  <SelectItem value="transport">Transport</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-base font-medium text-gray-700">
               Service Description
             </label>
-            <textarea
+            <Textarea
               value={description}
-              onChange={e => handleFieldChange('description', e.target.value)}
-              placeholder="I can provide basic to advance tutoring lessons in mathematics in the different fields of Calculus."
-              rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent resize-none"
+              onChange={e => {
+                setDescription(e.target.value);
+                updateParent({ description: e.target.value });
+              }}
+              placeholder="Describe the service you need in detail"
+              className="w-full font-light resize-none text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+              style={
+                {
+                  backgroundColor: '#F3F5F9',
+                  '--tw-ring-color': 'rgb(245 158 11)',
+                } as React.CSSProperties
+              }
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-base font-medium text-gray-700">
               Accepted Areas
             </label>
             <div className="flex space-x-2 mb-2">
@@ -184,7 +214,7 @@ export function CreateListingForm(props: { onListingChange?: Function }) {
                   className="absolute left-3 top-2.5 text-gray-400"
                   size={18}
                 />
-                <input
+                <Input
                   type="text"
                   value={currentLocation}
                   onChange={e => setCurrentLocation(e.target.value)}
@@ -193,7 +223,13 @@ export function CreateListingForm(props: { onListingChange?: Function }) {
                     (e.preventDefault(), handleAddLocation())
                   }
                   placeholder="Enter location"
-                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  className="w-full font-light resize-none text-base pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  style={
+                    {
+                      backgroundColor: '#F3F5F9',
+                      '--tw-ring-color': 'rgb(245 158 11)',
+                    } as React.CSSProperties
+                  }
                 />
               </div>
               <button
@@ -229,65 +265,87 @@ export function CreateListingForm(props: { onListingChange?: Function }) {
       </div>
 
       <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-800 mb-1">
-          Upload Service Images
-        </h3>
-        <p className="text-sm text-gray-500 mb-4">
-          Up to 5 images to showcase your service
-        </p>
+        <div className="mb-4">
+          <h2 className="text-3xl font-medium">Images</h2>
+          <p className="text-sm text-gray-400">
+            Upload images related to your service request (Optional)
+          </p>
+        </div>
 
-        <div className="space-y-3">
-          {images.length > 0 && (
-            <div className="grid grid-cols-4 gap-3">
-              {images.map((image, index) => (
-                <div
-                  key={index}
-                  className="relative aspect-square rounded-lg overflow-hidden border-2 border-gray-200"
+        <div
+          className={`relative border-2 border-dashed rounded-lg p-4 text-center transition-colors ${
+            dragActive
+              ? 'border-blue-400 bg-blue-50'
+              : 'border-gray-300 hover:border-gray-400'
+          }`}
+          onDragEnter={handleDrag}
+          onDragLeave={handleDrag}
+          onDragOver={handleDrag}
+          onDrop={handleDrop}
+        >
+          <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            accept="image/*"
+            onChange={handleImageChange}
+            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+          />
+
+          <div className="space-y-4">
+            <div className="mx-auto w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+              <Upload className="w-6 h-6 text-gray-400" />
+            </div>
+
+            <div>
+              <p className="text-sm font-medium text-slate-600 mb-1">
+                Drop images here or{' '}
+                <button
+                  type="button"
+                  onClick={onButtonClick}
+                  className="text-yellow-600 hover:text-yellow-700 underline"
                 >
-                  <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                    {image ? (
-                      <img
-                        src={image}
-                        alt={`Service ${index + 1}`}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <span className="text-gray-400 text-sm">Loading...</span>
-                    )}
+                  browse files
+                </button>
+              </p>
+              <p className="text-xs text-slate-400">
+                PNG, JPG, GIF up to 5MB each
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {images.length > 0 && (
+          <div className="mt-4 space-y-2">
+            <p className="text-sm font-medium text-slate-600">
+              Uploaded Images:
+            </p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {images.map((file, index) => (
+                <div key={index} className="relative group">
+                  <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
+                    <div className="w-full h-full flex items-center justify-center">
+                      <ImageIcon className="w-8 h-8 text-gray-400" />
+                    </div>
                   </div>
                   <button
                     type="button"
                     onClick={() => handleRemoveImage(index)}
-                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                    className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                   >
-                    <X size={14} />
+                    <X className="w-4 h-4" />
                   </button>
+                  <p
+                    className="mt-1 text-xs text-slate-500 truncate"
+                    title={file.name}
+                  >
+                    {file.name}
+                  </p>
                 </div>
               ))}
             </div>
-          )}
-
-          {images.length < 5 && (
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className="w-full border-2 border-dashed border-gray-300 rounded-lg py-8 px-4 text-center hover:border-amber-400 hover:bg-amber-50 transition-colors"
-            >
-              <span className="text-sm font-medium text-amber-600">
-                + Add Image
-              </span>
-            </button>
-          )}
-        </div>
-
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/png,image/jpeg,image/jpg,image/gif"
-          multiple
-          onChange={handleImageChange}
-          className="hidden"
-        />
+          </div>
+        )}
       </div>
 
       <AvailabilityForm onAvailabilityChange={handleAvailabilityChange} />
