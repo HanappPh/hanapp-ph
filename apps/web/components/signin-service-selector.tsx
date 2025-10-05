@@ -6,8 +6,8 @@ import { useState } from 'react';
 type ServiceOption = 'jobs' | 'services';
 
 interface SignInServiceSelectorProps {
-  onSelectionChange?: (selection: ServiceOption | null) => void;
-  onCreateAccount?: (selection: ServiceOption | null) => void;
+  onSelectionChange: (selection: ServiceOption | null) => void;
+  onCreateAccount: (selection: ServiceOption | null) => void;
 }
 
 export default function ServiceSelector({
@@ -18,22 +18,18 @@ export default function ServiceSelector({
     null
   );
 
-  const handleSelectionChange = (option: ServiceOption) => {
+  const toggleSelection = (option: ServiceOption) => {
     const newSelection = selectedOption === option ? null : option;
     setSelectedOption(newSelection);
-    onSelectionChange?.(newSelection);
-  };
-
-  const handleCreateAccount = () => {
-    onCreateAccount?.(selectedOption);
+    onSelectionChange(newSelection);
   };
 
   const getButtonStyles = (option: ServiceOption) => {
     const isSelected = selectedOption === option;
     return `w-full py-6 px-6 text-base font-medium border-2 rounded-xl transition-all ${
       isSelected
-        ? 'bg-[#F5C45E] text-[#102E50] border-[#F5C45E] hover:bg-[#F5C45E]/90'
-        : 'bg-white text-[#102E50] border-white hover:bg-gray-50'
+        ? 'bg-white text-[#102E50] '
+        : 'bg-white text-[#102E50] border-white '
     }`;
   };
 
@@ -57,7 +53,7 @@ export default function ServiceSelector({
           <Button
             variant="outline"
             className={getButtonStyles('jobs')}
-            onClick={() => handleSelectionChange('jobs')}
+            onClick={() => toggleSelection('jobs')}
           >
             <div className="text-center">
               <div>I&apos;m here to</div>
@@ -68,7 +64,7 @@ export default function ServiceSelector({
           <Button
             variant="outline"
             className={getButtonStyles('services')}
-            onClick={() => handleSelectionChange('services')}
+            onClick={() => toggleSelection('services')}
           >
             <div className="text-center">
               <div>I&apos;m here to</div>
@@ -81,7 +77,7 @@ export default function ServiceSelector({
         <div className="px-2.5">
           <Button
             className="w-full py-4 px-6 text-base font-semibold bg-[#F5C45E] hover:bg-[#F5C45E]/90 text-[#102E50] rounded-xl shadow-lg transition-all border-0"
-            onClick={handleCreateAccount}
+            onClick={() => onCreateAccount(selectedOption)}
           >
             Create Account
           </Button>

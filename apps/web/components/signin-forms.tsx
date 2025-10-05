@@ -12,8 +12,8 @@ interface FormData {
 }
 
 interface SignUpFormProps {
-  onSubmit?: (data: FormData) => void;
-  validateTrigger?: boolean;
+  onSubmit: (data: FormData) => void;
+  validateTrigger: boolean;
 }
 
 export default function SignUpForm({
@@ -117,78 +117,47 @@ export default function SignUpForm({
     }
   }, [validateTrigger, validateForm]);
 
-  const handleInputChange = (field: keyof FormData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    // Clear error when user starts typing
+  const handleFieldChange = (field: keyof FormData, value: string) => {
+    let processedValue = value;
+
+    // Special processing for phone number
+    if (field === 'phoneNumber') {
+      processedValue = value.replace(/\D/g, '');
+      if (selectedCountryCode === '+63') {
+        processedValue = formatPhilippineNumber(processedValue);
+      }
+    }
+
+    setFormData(prev => ({ ...prev, [field]: processedValue }));
+
+    // Clear existing error
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: undefined }));
     }
-  };
 
-  const handleEmailChange = (value: string) => {
-    setFormData(prev => ({ ...prev, email: value }));
-    // Real-time email validation
-    if (value.trim() && !validateEmail(value)) {
+    // Real-time validation for email and phone
+    if (field === 'email' && value.trim() && !validateEmail(value)) {
       setErrors(prev => ({
         ...prev,
         email: 'Please enter a valid email address',
       }));
-    } else {
-      // Clear error if email is valid or empty
-      if (errors.email) {
-        setErrors(prev => ({ ...prev, email: undefined }));
-      }
-    }
-  };
-
-  const handlePhoneNumberChange = (value: string) => {
-    // Only allow numbers - remove any non-numeric characters
-    let numericValue = value.replace(/\D/g, '');
-
-    // Apply Philippine number formatting if country code is +63
-    if (selectedCountryCode === '+63') {
-      numericValue = formatPhilippineNumber(numericValue);
     }
 
-    setFormData(prev => ({ ...prev, phoneNumber: numericValue }));
-
-    // Real-time phone number validation
     if (
-      numericValue.trim() &&
-      !validatePhoneNumber(numericValue, selectedCountryCode)
+      field === 'phoneNumber' &&
+      processedValue.trim() &&
+      !validatePhoneNumber(processedValue, selectedCountryCode)
     ) {
-      switch (selectedCountryCode) {
-        case '+63':
-          setErrors(prev => ({
-            ...prev,
-            phoneNumber:
-              'Please enter a valid Philippine mobile number (9XX XXX XXXX)',
-          }));
-          break;
-        case '+1':
-          setErrors(prev => ({
-            ...prev,
-            phoneNumber:
-              'Please enter a valid US/Canadian phone number (10 digits)',
-          }));
-          break;
-        case '+44':
-          setErrors(prev => ({
-            ...prev,
-            phoneNumber: 'Please enter a valid UK phone number (10-11 digits)',
-          }));
-          break;
-        default:
-          setErrors(prev => ({
-            ...prev,
-            phoneNumber: 'Please enter a valid phone number',
-          }));
-      }
-    } else {
-      // Clear error if phone number is valid or empty
-      if (errors.phoneNumber) {
-        setErrors(prev => ({ ...prev, phoneNumber: undefined }));
-      }
+      const errorMessage =
+        selectedCountryCode === '+63'
+          ? 'Please enter a valid Philippine mobile number (9XX XXX XXXX)'
+          : selectedCountryCode === '+1'
+            ? 'Please enter a valid US/Canadian phone number (10 digits)'
+            : selectedCountryCode === '+44'
+              ? 'Please enter a valid UK phone number (10-11 digits)'
+              : 'Please enter a valid phone number';
+
+      setErrors(prev => ({ ...prev, phoneNumber: errorMessage }));
     }
   };
 
@@ -234,7 +203,9 @@ export default function SignUpForm({
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    onSubmit?.(formData);
+    if (validateForm()) {
+      onSubmit(formData);
+    }
   };
 
   return (
@@ -249,8 +220,9 @@ export default function SignUpForm({
         <Input
           id="firstName"
           value={formData.firstName}
-          // @ts-ignore
-          onChange={e => handleInputChange('firstName', e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            handleFieldChange('firstName', e.target.value)
+          }
           className={`mt-1 bg-gray-50/70 border-gray-300 focus:border-[#102E50] focus:ring-[#102E50]/20 ${
             errors.firstName ? 'border-red-500 focus:border-red-500' : ''
           }`}
@@ -271,8 +243,9 @@ export default function SignUpForm({
         <Input
           id="lastName"
           value={formData.lastName}
-          // @ts-ignore
-          onChange={e => handleInputChange('lastName', e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            handleFieldChange('lastName', e.target.value)
+          }
           className={`mt-1 bg-gray-50/70 border-gray-300 focus:border-[#102E50] focus:ring-[#102E50]/20 ${
             errors.lastName ? 'border-red-500 focus:border-red-500' : ''
           }`}
@@ -293,8 +266,9 @@ export default function SignUpForm({
         <Input
           id="displayName"
           value={formData.displayName}
-          // @ts-ignore
-          onChange={e => handleInputChange('displayName', e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            handleFieldChange('displayName', e.target.value)
+          }
           className={`mt-1 bg-gray-50/70 border-gray-300 focus:border-[#102E50] focus:ring-[#102E50]/20 ${
             errors.displayName ? 'border-red-500 focus:border-red-500' : ''
           }`}
@@ -313,8 +287,9 @@ export default function SignUpForm({
           id="email"
           type="email"
           value={formData.email}
-          // @ts-ignore
-          onChange={e => handleEmailChange(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            handleFieldChange('email', e.target.value)
+          }
           className={`mt-1 bg-gray-50/70 border-gray-300 focus:border-[#102E50] focus:ring-[#102E50]/20 ${
             errors.email ? 'border-red-500 focus:border-red-500' : ''
           }`}
@@ -337,8 +312,9 @@ export default function SignUpForm({
           <select
             className="w-24 bg-gray-50/70 border-gray-300 rounded-r-none border border-r-0 px-3 py-2 focus:border-[#102E50] focus:ring-[#102E50]/20"
             value={selectedCountryCode}
-            // @ts-ignore
-            onChange={e => handleCountryCodeChange(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+              handleCountryCodeChange(e.target.value)
+            }
             aria-label="Country code selection"
           >
             <option value="+63">🇵🇭 +63</option>
@@ -351,8 +327,9 @@ export default function SignUpForm({
             inputMode="numeric"
             pattern="[0-9]*"
             value={formData.phoneNumber}
-            // @ts-ignore
-            onChange={e => handlePhoneNumberChange(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              handleFieldChange('phoneNumber', e.target.value)
+            }
             className={`flex-1 bg-gray-50/70 border-gray-300 rounded-l-none border-l-0 focus:border-[#102E50] focus:ring-[#102E50]/20 ${
               errors.phoneNumber ? 'border-red-500 focus:border-red-500' : ''
             }`}
