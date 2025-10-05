@@ -243,16 +243,10 @@ jobs:
 
           # Test Nx Cloud availability if token is provided
           if [[ -n "${NX_CLOUD_ACCESS_TOKEN:-}" ]]; then
-            echo "Testing Nx Cloud connectivity..."
-            if timeout 15s npx nx-cloud print-run-url >/dev/null 2>&1; then
-              echo "Nx Cloud connectivity confirmed"
-              CLOUD_AVAILABLE=true
-            else
-              echo "Nx Cloud unavailable - quota exceeded or connection failed"
-              CLOUD_AVAILABLE=false
-            fi
+            echo "Nx Cloud token detected — attempting cloud execution..."
+            CLOUD_AVAILABLE=true
           else
-            echo "No Nx Cloud token provided - using local execution"
+            echo "No Nx Cloud token provided — running locally."
             CLOUD_AVAILABLE=false
           fi
 
