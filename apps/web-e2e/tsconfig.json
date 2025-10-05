@@ -1,5 +1,4 @@
 {
-  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "out-tsc/cypress",
     "allowJs": true,
@@ -8,7 +7,20 @@
     "composite": false,
     "emitDeclarationOnly": false,
     "declarationMap": false,
-    "noEmit": true
+    "noEmit": true,
+    "moduleResolution": "nodenext",
+    "module": "nodenext",
+    "lib": ["es2022"],
+    "target": "es2022",
+    "strict": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@hanapp-ph/commons": ["../../libs/commons/src/index.ts"],
+      "@hanapp-ph/commons/*": ["../../libs/commons/src/*"],
+      "@hanapp-ph/components/*": ["../../libs/commons/src/components/*"],
+      "@hanapp-ph/utils": ["../../libs/commons/src/libs/utils.ts"]
+    }
   },
   "include": [
     "**/*.ts",
