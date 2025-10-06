@@ -2,7 +2,6 @@
 
 import { Avatar, AvatarFallback, AvatarImage, Badge } from '@hanapp-ph/commons';
 import { formatDistanceToNow } from 'date-fns';
-import { useEffect, useState } from 'react';
 
 export interface ChatListItem {
   id: string;
@@ -28,17 +27,11 @@ export const ChatList = ({
   onSelectChat,
 }: ChatListProps) => {
   const TimeAgo = ({ date }: { date: Date }) => {
-    const [text, setText] = useState('');
-
-    useEffect(() => {
-      const update = () =>
-        setText(formatDistanceToNow(date, { addSuffix: false }));
-      update();
-      const id = setInterval(update, 60000);
-      return () => clearInterval(id);
-    }, [date]);
-
-    return <span className="text-xs text-gray-500 ml-2">{text}</span>;
+    return (
+      <span className="text-xs text-gray-500 ml-2">
+        {formatDistanceToNow(date, { addSuffix: false })}
+      </span>
+    );
   };
 
   return (
