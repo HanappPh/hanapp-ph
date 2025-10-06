@@ -1,7 +1,7 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { useRef } from 'react';
+import { Suspense, useRef } from 'react';
 
 import { BackgroundImage } from '../../../components/login-background';
 import { LoginDialog } from '../../../components/login-dialog';
@@ -13,7 +13,7 @@ import { FormData, SignUpFormRef } from '../../../types/signupinterface';
 
 type ServiceOption = 'jobs' | 'services' | 'both';
 
-export default function AuthPageContent() {
+function AuthPageContent() {
   const searchParams = useSearchParams();
   const mode = searchParams.get('mode') || 'login';
 
@@ -91,5 +91,13 @@ export default function AuthPageContent() {
         </div>
       </div>
     </BackgroundImage>
+  );
+}
+
+export default function SigninPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <AuthPageContent />
+    </Suspense>
   );
 }
