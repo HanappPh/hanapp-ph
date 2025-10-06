@@ -1,6 +1,7 @@
 'use client';
 
 import { Button } from '@hanapp-ph/commons';
+import { useRouter } from 'next/navigation';
 import React, { useState, useRef } from 'react';
 
 interface OtpVerificationButtonsProps {
@@ -17,6 +18,7 @@ export function OtpVerificationButtons({
   className = '',
   phoneNumber = '09xx xxx xxxx',
 }: OtpVerificationButtonsProps) {
+  const router = useRouter();
   const [code, setCode] = useState<string[]>(new Array(6).fill(''));
   const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
 
@@ -44,6 +46,7 @@ export function OtpVerificationButtons({
   };
 
   const handleVerifyOtp = () => {
+    router.push('/auth/signin?mode=signup');
     // const fullOtp = code.join('');
     // if (onVerifyOtp) {
     //   onVerifyOtp(fullOtp);
