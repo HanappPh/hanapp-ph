@@ -39,7 +39,8 @@
     "app/**/*.ts",
     "app/**/*.tsx",
     ".next/types/**/*.ts",
-    "components/**/*"
+    "components/**/*",
+    "types/**/*"
   ],
   "exclude": [
     "out-tsc",
