@@ -167,12 +167,11 @@ const ThreadPage = () => {
   return (
     <div className="h-screen bg-gray-50 flex">
       {/* Chat List Sidebar */}
-      <div className="w-80 bg-white border-r border-gray-200 flex flex-col">
+      <div className="w-80 bg-white border-r border-gray-200 flex flex-col p-4">
         <ChatList
           chats={mockChats}
           selectedChatId={selectedChatId}
           onSelectChat={handleSelectChat}
-          fullWidth={false}
         />
       </div>
 
