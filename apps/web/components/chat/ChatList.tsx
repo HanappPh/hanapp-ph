@@ -20,14 +20,12 @@ interface ChatListProps {
   chats: ChatListItem[];
   selectedChatId?: string;
   onSelectChat: (chatId: string) => void;
-  fullWidth?: boolean;
 }
 
 export const ChatList = ({
   chats,
   selectedChatId,
   onSelectChat,
-  fullWidth = false,
 }: ChatListProps) => {
   const TimeAgo = ({ date }: { date: Date }) => {
     const [text, setText] = useState('');
@@ -44,18 +42,12 @@ export const ChatList = ({
   };
 
   return (
-    <div
-      className={
-        fullWidth
-          ? 'w-full p-4 flex flex-col'
-          : 'w-80 bg-gray-50 p-4 flex flex-col'
-      }
-    >
+    <div className="flex flex-col h-full">
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-4 flex-shrink-0">
         <h2 className="text-lg font-semibold text-gray-900">Messages</h2>
       </div>
 
-      <div className="flex-1 overflow-y-auto space-y-2">
+      <div className="flex-1 overflow-y-auto space-y-2 p-2">
         {chats.map(chat => (
           <div
             key={chat.id}
