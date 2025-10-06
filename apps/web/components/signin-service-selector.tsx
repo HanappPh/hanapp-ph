@@ -1,22 +1,24 @@
 'use client';
 
 import { Button } from '@hanapp-ph/commons';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 type ServiceOption = 'jobs' | 'services';
 
 interface SignInServiceSelectorProps {
   onSelectionChange: (selection: ServiceOption | null) => void;
-  onCreateAccount: (selection: ServiceOption | null) => void;
+  //onCreateAccount: (selection: ServiceOption | null) => void;
 }
 
 export default function ServiceSelector({
   onSelectionChange,
-  onCreateAccount,
+  //onCreateAccount,
 }: SignInServiceSelectorProps) {
   const [selectedOption, setSelectedOption] = useState<ServiceOption | null>(
     null
   );
+  const router = useRouter();
 
   const toggleSelection = (option: ServiceOption) => {
     const newSelection = selectedOption === option ? null : option;
@@ -77,7 +79,8 @@ export default function ServiceSelector({
         <div className="px-2.5">
           <Button
             className="w-full py-4 px-6 text-base font-semibold bg-[#F5C45E] hover:bg-[#F5C45E]/90 text-[#102E50] rounded-xl shadow-lg transition-all border-0"
-            onClick={() => onCreateAccount(selectedOption)}
+            //onClick={() => onCreateAccount(selectedOption)}
+            onClick={() => router.push('/')}
           >
             Create Account
           </Button>
