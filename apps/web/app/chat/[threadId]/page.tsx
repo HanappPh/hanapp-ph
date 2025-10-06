@@ -166,7 +166,6 @@ const ThreadPage = () => {
 
   return (
     <div className="h-screen bg-gray-50 flex">
-      {/* Chat List Sidebar */}
       <div className="w-80 bg-white border-r border-gray-200 flex flex-col p-4">
         <ChatList
           chats={mockChats}
@@ -175,7 +174,6 @@ const ThreadPage = () => {
         />
       </div>
 
-      {/* Main Chat Area */}
       <div className="flex-1 flex flex-col">
         <ChatWindow
           messages={messages}
