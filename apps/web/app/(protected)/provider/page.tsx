@@ -1,11 +1,12 @@
-import { Footer } from '../../components/footer';
-import { JobListings } from '../../components/job-listings';
-import { Banner } from '../../components/provider/banner';
-import { DashboardStats } from '../../components/provider/dashboard-stats';
-import { HeroSection } from '../../components/provider/hero-section';
-import { ListingsSection } from '../../components/provider/listings-section';
-import { LowerHeroSection } from '../../components/provider/lower-hero-section';
-import { OnboardingSection } from '../../components/provider/onboarding-section';
+import { Footer } from '../../../components/footer';
+import { JobListings } from '../../../components/job-listings';
+import { Banner } from '../../../components/provider/banner';
+import { DashboardStats } from '../../../components/provider/dashboard-stats';
+import { HeroSection } from '../../../components/provider/hero-section';
+import { ListingsSection } from '../../../components/provider/listings-section';
+import { LowerHeroSection } from '../../../components/provider/lower-hero-section';
+import { OnboardingSection } from '../../../components/provider/onboarding-section';
+
 export default function ProviderPage() {
   return (
     <div className="bg-[#F3F5F9]">

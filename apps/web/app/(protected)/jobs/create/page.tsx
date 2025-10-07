@@ -1,10 +1,10 @@
-import { ContactInformationSection } from '../../../components/request-contact-information';
-import { JobDetailsSection } from '../../../components/request-job-details';
-import { LocationAvailabilitySection } from '../../../components/request-location-availability';
-import { ImageUploadSection } from '../../../components/request-media-upload';
-import { PricingInformationSection } from '../../../components/request-pricing-information';
-import { TermsSubmitSection } from '../../../components/request-terms-submit';
-import { Header } from '../../../components/temporary-navigation-bar';
+import { ContactInformationSection } from '../../../../components/request-contact-information';
+import { JobDetailsSection } from '../../../../components/request-job-details';
+import { LocationAvailabilitySection } from '../../../../components/request-location-availability';
+import { ImageUploadSection } from '../../../../components/request-media-upload';
+import { PricingInformationSection } from '../../../../components/request-pricing-information';
+import { TermsSubmitSection } from '../../../../components/request-terms-submit';
+import { Header } from '../../../../components/temporary-navigation-bar';
 
 export default function RequestServicePage() {
   return (

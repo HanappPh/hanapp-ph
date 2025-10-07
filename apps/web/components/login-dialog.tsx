@@ -18,20 +18,13 @@ export function LoginDialog({
 }: LoginFormProps) {
   return (
     <div
-      className={`fixed inset-0 flex items-center justify-center lg:justify-end z-[100] ${className}`}
+      className={`fixed inset-1 flex items-center justify-center lg:justify-end z-[100] ${className}`}
     >
-      <Card className="w-full h-full rounded-none mx-0 bg-white shadow-2xl border-0 lg:max-w-[550px] xl:max-w-[650px] 2xl:max-w-[650px] lg:rounded-3xl lg:min-h-[min(850px,85vh)] lg:max-h-[min(900px,90vh)] lg:h-auto lg:mx-auto lg:mr-[10%]">
-        <div className="flex flex-col h-full p-4 sm:p-12 justify-center items-center">
-          <div className="flex flex-col space-y-8 lg:pt-0 xl:pt-8 2xl:pt-12">
-            <div className="flex flex-col justify-center">
-              <DialogHeader />
-            </div>
-            <div className="px-4 pb-4 sm:px-8 sm:pb-8">
-              <AuthButtons
-                onSendOTP={onSendOTP}
-                onGoogleLogin={onGoogleLogin}
-              />
-            </div>
+      <Card className="w-full h-full rounded-none mx-0 bg-white shadow-2xl border-0 lg:max-w-[420px] xl:max-w-[480px] 2xl:max-w-[500px] lg:rounded-3xl lg:min-h-[min(750px,82vh)] lg:max-h-[min(800px,88vh)] lg:h-auto lg:mx-auto lg:mr-[10%]">
+        <div className="flex flex-col flex-1 min-h-0 h-full p-4 sm:p-8 items-center justify-center">
+          <div className="flex flex-col flex-1 min-h-0 w-full max-w-md items-center justify-center">
+            <DialogHeader />
+            <AuthButtons onSendOTP={onSendOTP} onGoogleLogin={onGoogleLogin} />
           </div>
         </div>
       </Card>

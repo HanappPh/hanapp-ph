@@ -1,17 +1,17 @@
 'use client';
 import * as React from 'react';
 
-import { MobileProfileBottom } from '../../../components/mobile-profile-bottom';
-import { MobileProfileDivider } from '../../../components/mobile-profile-divider';
-import { MobileProfileHeader } from '../../../components/mobile-profile-header';
-import { MobileProfileImage } from '../../../components/mobile-profile-image';
-import { MobileProfileInfo } from '../../../components/mobile-profile-info';
-import { MobileProfileStats } from '../../../components/mobile-profile-stats';
-import { MobileProfileTabs } from '../../../components/mobile-profile-tabs';
-import { MobileServicePreferences } from '../../../components/mobile-service-preferences';
-import { Header } from '../../../components/provider-profile-header';
-import { MainContent } from '../../../components/provider-profile-main-content';
-import { Sidebar } from '../../../components/provider-profile-sidebar';
+import { MobileProfileBottom } from '../../../../components/mobile-profile-bottom';
+import { MobileProfileDivider } from '../../../../components/mobile-profile-divider';
+import { MobileProfileHeader } from '../../../../components/mobile-profile-header';
+import { MobileProfileImage } from '../../../../components/mobile-profile-image';
+import { MobileProfileInfo } from '../../../../components/mobile-profile-info';
+import { MobileProfileStats } from '../../../../components/mobile-profile-stats';
+import { MobileProfileTabs } from '../../../../components/mobile-profile-tabs';
+import { MobileServicePreferences } from '../../../../components/mobile-service-preferences';
+import { Header } from '../../../../components/provider-profile-header';
+import { MainContent } from '../../../../components/provider-profile-main-content';
+import { Sidebar } from '../../../../components/provider-profile-sidebar';
 
 export default function ProfilePage() {
   const [showDropdown, setShowDropdown] = React.useState(false);
