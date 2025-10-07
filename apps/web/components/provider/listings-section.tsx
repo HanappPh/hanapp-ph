@@ -11,7 +11,7 @@ export function ListingsSection() {
       category: 'Construction',
       provider: 'Andrew Cruz',
       price: '₱700',
-      location: 'Batanay, Bulacan',
+      location: 'Baliuag, Bulacan',
       rating: 5,
       status: 'Active',
       image: '/img-carousel-placeholder_1.png',
@@ -22,7 +22,7 @@ export function ListingsSection() {
       category: 'Plumbing',
       provider: 'Jose Plumbing',
       price: '₱350',
-      location: 'Batanay, Bulacan',
+      location: 'Baliuag, Bulacan',
       rating: 4,
       status: 'Active',
       image: '/img-carousel-placeholder_2.png',
@@ -33,7 +33,7 @@ export function ListingsSection() {
       category: 'Auto Repair',
       provider: "Mike's Auto Shop",
       price: '₱850',
-      location: 'Batanay, Bulacan',
+      location: 'Baliuag, Bulacan',
       rating: 5,
       status: 'Inactive',
       image: '/home-repair-tools.jpg',
@@ -44,7 +44,7 @@ export function ListingsSection() {
       category: 'Auto Repair',
       provider: "Mike's Auto Shop",
       price: '₱850',
-      location: 'Batanay, Bulacan',
+      location: 'Baliuag, Bulacan',
       rating: 5,
       status: 'Inactive',
       image: '/img-carousel-placeholder_1.png',
@@ -55,7 +55,7 @@ export function ListingsSection() {
       category: 'Auto Repair',
       provider: "Mike's Auto Shop",
       price: '₱850',
-      location: 'Batanay, Bulacan',
+      location: 'Baliuag, Bulacan',
       rating: 5,
       status: 'Inactive',
       image: '/img-carousel-placeholder_1.png',
@@ -66,7 +66,7 @@ export function ListingsSection() {
       category: 'Auto Repair',
       provider: "Mike's Auto Shop",
       price: '₱850',
-      location: 'Batanay, Bulacan',
+      location: 'Baliuag, Bulacan',
       rating: 5,
       status: 'Inactive',
       image: '/img-carousel-placeholder_1.png',
@@ -130,13 +130,13 @@ export function ListingsSection() {
   return (
     <section className="bg-[#FFE8B9] py-10">
       <div className="max-w-7xl mx-auto px-8 md:px-14">
-        <h2 className="text-2xl font-semibold text-[#102E50] mb-8">
+        <h2 className="text-2xl md:text-3xl font-semibold text-[#102E50] mb-4">
           Your listings
         </h2>
         <div className="relative">
           <div
             ref={scrollRef}
-            className="flex gap-6 overflow-x-auto pb-2 scrollbar-hide scroll-smooth"
+            className="flex gap-6 overflow-x-auto pb-2 pt-2 scrollbar-hide scroll-smooth"
             id="listings-scroll"
             onMouseEnter={() => setIsPaused(true)}
             onMouseLeave={() => setIsPaused(false)}
@@ -144,7 +144,7 @@ export function ListingsSection() {
             {listings.map(listing => (
               <Card
                 key={listing.id}
-                className="w-[300px] flex-shrink-0 overflow-hidden"
+                className="w-[300px] flex-shrink-0 rounded-lg overflow-hidden shadow-sm transition-all duration-200 ease-in-out hover:shadow-lg hover:-translate-y-1 hover:scale-[1.01]"
               >
                 <div className="relative">
                   <Image
@@ -154,9 +154,6 @@ export function ListingsSection() {
                     height={300}
                     className="w-full h-48 object-cover"
                   />
-                  {/* <div className="w-full h-48 bg-gray-400 flex items-center justify-center">
-                    <span className="text-gray">Image</span>
-                  </div> */}
 
                   <Badge className="absolute top-3 left-3 border-0 px-3 py-2 bg-white flex items-center gap-2 shadow hover:bg-white focus:bg-white">
                     {/* circle */}

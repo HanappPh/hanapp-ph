@@ -30,7 +30,7 @@ const jobs: Job[] = [
     image: '/img-carousel-placeholder_2.png',
     title: 'Lipat bahay Luzon area only',
     provider: 'Daboy Movers',
-    location: 'Baliuag, Bulacan',
+    location: 'Malolos, Bulacan',
     rating: 4.9,
     category: 'Transport',
     price: '₱2.5K',
@@ -60,7 +60,7 @@ const jobs: Job[] = [
     image: '/pet-grooming-dog.jpg',
     title: 'Home service dog grooming',
     provider: 'Chonky Boi Pet Services',
-    location: 'Baliuag, Bulacan',
+    location: 'Quezon City, Metro Manila',
     rating: 4.5,
     category: 'Pet care',
     price: '₱2.5K',
@@ -70,7 +70,7 @@ const jobs: Job[] = [
     image: '/img-carousel-placeholder_1.png',
     title: 'Catering services for events',
     provider: 'Oca Catering',
-    location: 'Baliuag, Bulacan',
+    location: 'San Fernando, Pampanga',
     rating: 4.6,
     category: 'Catering',
     price: '₱50K',
@@ -164,7 +164,7 @@ export function JobListings() {
         {paginatedJobs.map(job => (
           <div
             key={job.id}
-            className="flex gap-4 rounded-lg bg-white shadow-sm transition-shadow hover:shadow-md"
+            className="flex gap-4 rounded-lg bg-white shadow-sm transition-all duration-200 ease-in-out hover:shadow-md hover:-translate-y-1 hover:scale-[1.01]"
           >
             <div className="hidden md:block relative h-[155px] w-[155px] rounded-l-lg overflow-hidden">
               <Image
