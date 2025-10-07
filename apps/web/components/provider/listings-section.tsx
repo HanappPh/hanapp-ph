@@ -1,8 +1,8 @@
 'use client';
 import { Card, CardContent, Badge } from '@hanapp-ph/commons';
 import { Star, MapPin, ChevronRight, ChevronLeft } from 'lucide-react';
+import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
-
 export function ListingsSection() {
   const listings = [
     {
@@ -14,7 +14,7 @@ export function ListingsSection() {
       location: 'Batanay, Bulacan',
       rating: 5,
       status: 'Active',
-      //   image: "/construction-worker-tools.png",
+      image: '/img-carousel-placeholder_1.png',
     },
     {
       id: 2,
@@ -25,7 +25,7 @@ export function ListingsSection() {
       location: 'Batanay, Bulacan',
       rating: 4,
       status: 'Active',
-      //   image: "/plumber-fixing-drain.png",
+      image: '/img-carousel-placeholder_2.png',
     },
     {
       id: 3,
@@ -36,7 +36,7 @@ export function ListingsSection() {
       location: 'Batanay, Bulacan',
       rating: 5,
       status: 'Inactive',
-      //   image: "/mechanic-repairing-car.png",
+      image: '/home-repair-tools.jpg',
     },
     {
       id: 4,
@@ -47,7 +47,7 @@ export function ListingsSection() {
       location: 'Batanay, Bulacan',
       rating: 5,
       status: 'Inactive',
-      //   image: "/auto-mechanic-with-tools.jpg",
+      image: '/img-carousel-placeholder_1.png',
     },
     {
       id: 5,
@@ -58,7 +58,7 @@ export function ListingsSection() {
       location: 'Batanay, Bulacan',
       rating: 5,
       status: 'Inactive',
-      //   image: "/auto-mechanic-with-tools.jpg",
+      image: '/img-carousel-placeholder_1.png',
     },
     {
       id: 6,
@@ -69,7 +69,7 @@ export function ListingsSection() {
       location: 'Batanay, Bulacan',
       rating: 5,
       status: 'Inactive',
-      //   image: "/auto-mechanic-with-tools.jpg",
+      image: '/img-carousel-placeholder_1.png',
     },
   ];
 
@@ -129,7 +129,7 @@ export function ListingsSection() {
 
   return (
     <section className="bg-[#FFE8B9] py-10">
-      <div className="max-w-7xl mx-auto px-8 md:px-14 lg:px-0">
+      <div className="max-w-7xl mx-auto px-8 md:px-14">
         <h2 className="text-2xl font-semibold text-[#102E50] mb-8">
           Your listings
         </h2>
@@ -147,14 +147,16 @@ export function ListingsSection() {
                 className="w-[300px] flex-shrink-0 overflow-hidden"
               >
                 <div className="relative">
-                  {/* <img
-                src={listing.image || "/placeholder.svg"}
-                alt={listing.title}
-                className="w-full h-48 object-cover"
-              /> */}
-                  <div className="w-full h-48 bg-gray-400 flex items-center justify-center">
+                  <Image
+                    src={listing.image || '/placeholder.svg'}
+                    alt={listing.title}
+                    width={500}
+                    height={300}
+                    className="w-full h-48 object-cover"
+                  />
+                  {/* <div className="w-full h-48 bg-gray-400 flex items-center justify-center">
                     <span className="text-gray">Image</span>
-                  </div>
+                  </div> */}
 
                   <Badge className="absolute top-3 left-3 border-0 px-3 py-2 bg-white flex items-center gap-2 shadow hover:bg-white focus:bg-white">
                     {/* circle */}

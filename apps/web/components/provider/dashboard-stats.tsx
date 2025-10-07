@@ -18,9 +18,9 @@ export function DashboardStats({
 }: statsProps) {
   return (
     <section className="max-w-7xl mx-auto px-4 py-8">
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {/* Total Earnings */}
-        <Card className="bg-[#F5C45E] border-0 col-span-1 md:col-span-5 shadow-md">
+        <Card className="bg-[#F5C45E] border-0 col-span-1 md:col-span-2 shadow-md">
           <CardContent className="p-6 flex flex-col md:flex-row items-start md:items-center h-full">
             <div>
               <div className="text-lg text-[#102E50] mb-2">Total Earnings</div>
@@ -37,7 +37,7 @@ export function DashboardStats({
         </Card>
 
         {/* Rating and Response Rate */}
-        <Card className="bg-white border-0 shadow-md md:col-span-3">
+        <Card className="bg-white border-0 shadow-md md:col-span-1">
           <CardContent className="p-6 text-[#102E50]">
             <div className="mb-4">
               <div className="sm:text-sm lg:text-md mb-2">Rating</div>
@@ -57,7 +57,7 @@ export function DashboardStats({
         </Card>
 
         {/* Search Visibility and Profile Views*/}
-        <Card className="bg-white border-0 shadow-md md:col-span-3">
+        <Card className="bg-white border-0 shadow-md md:col-span-1">
           <CardContent className="p-6 text-[#102E50]">
             <div className="mb-4">
               <div className="sm:text-sm lg:text-md mb-2">
@@ -71,11 +71,6 @@ export function DashboardStats({
             </div>
           </CardContent>
         </Card>
-
-        {/* See more stats */}
-        <div className="flex items-center justify-end text-center">
-          See more of your stats &gt;
-        </div>
       </div>
     </section>
   );

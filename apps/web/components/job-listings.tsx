@@ -1,5 +1,6 @@
 import { Button, Badge } from '@hanapp-ph/commons';
 import { MapPin, Star, ChevronLeft, ChevronRight } from 'lucide-react';
+import Image from 'next/image';
 type Job = {
   id: number;
   image: string;
@@ -14,7 +15,7 @@ type Job = {
 const jobs: Job[] = [
   {
     id: 1,
-    image: '/images/laundry.jpg',
+    image: '/laundry-service.png',
     title: 'Labada per kilo',
     provider: 'jinkee',
     location: 'Baliuag, Bulacan',
@@ -24,7 +25,7 @@ const jobs: Job[] = [
   },
   {
     id: 2,
-    image: '/images/truck.jpg',
+    image: '/img-carousel-placeholder_2.png',
     title: 'Lipat bahay Luzon area only',
     provider: 'Daboy Movers',
     location: 'Baliuag, Bulacan',
@@ -34,7 +35,7 @@ const jobs: Job[] = [
   },
   {
     id: 3,
-    image: '/images/yaya.jpg',
+    image: '/house-cleaning-service.png',
     title: 'Stay out yaya daily rate',
     provider: 'abby',
     location: 'Baliuag, Bulacan',
@@ -44,7 +45,7 @@ const jobs: Job[] = [
   },
   {
     id: 4,
-    image: '/images/rider.jpg',
+    image: '/delivery-person-parcel.jpg',
     title: 'Delivery rider baliuag area',
     provider: 'Virgilio Muit',
     location: 'Baliuag, Bulacan',
@@ -54,7 +55,7 @@ const jobs: Job[] = [
   },
   {
     id: 5,
-    image: '/images/dog-grooming.jpg',
+    image: '/pet-grooming-dog.jpg',
     title: 'Home service dog grooming',
     provider: 'Chonky Boi Pet Services',
     location: 'Baliuag, Bulacan',
@@ -64,7 +65,7 @@ const jobs: Job[] = [
   },
   {
     id: 6,
-    image: '/images/catering.jpg',
+    image: '/img-carousel-placeholder_1.png',
     title: 'Catering services for events',
     provider: 'Oca Catering',
     location: 'Baliuag, Bulacan',
@@ -96,18 +97,26 @@ export function JobListings() {
             size="sm"
             className={
               (filter === 'Show all'
-                ? 'bg-[#102e50] text-white hover:bg-[#0a1c30]'
-                : 'border-gray-300 bg-white text-[#102e50] hover:bg-gray-200') +
+                ? 'bg-hanapp-secondary text-white hover:bg-hanapp-primary'
+                : 'border-hanapp-secondary bg-white text-hanapp-secondary hover:bg-hanapp-secondary hover:border-hanapp-secondary hover:text-white') +
               ' rounded-xl px-4 text-md'
             }
           >
             {filter}
           </Button>
         ))}
-        <Button variant="ghost" size="icon" className="h-8 w-8">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 hover:bg-gray-200"
+        >
           <ChevronLeft className="h-4 w-4" />
         </Button>
-        <Button variant="ghost" size="icon" className="h-8 w-8">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 hover:bg-gray-200"
+        >
           <ChevronRight className="h-4 w-4" />
         </Button>
       </div>
@@ -116,19 +125,19 @@ export function JobListings() {
         {jobs.map(job => (
           <div
             key={job.id}
-            className="flex gap-4 rounded-lg bg-white p-4 shadow-sm transition-shadow hover:shadow-md m-2"
+            className="flex gap-4 rounded-lg bg-white shadow-sm transition-shadow hover:shadow-md"
           >
-            {/* Image placeholder */}
-            <div className="flex-shrink-0">
-              <div
-                // src={job.image || '/placeholder.svg'}
-                // alt={job.title}
-                className="sm:h-[100px] sm:w-[120px] rounded-lg object-cover"
+            <div className="hidden md:block relative h-[155px] w-[155px] rounded-l-lg overflow-hidden">
+              <Image
+                src={job.image || '/placeholder.svg'}
+                alt={job.title}
+                fill
+                className="object-cover"
               />
             </div>
 
             {/* Content */}
-            <div className="flex flex-1 flex-col justify-between">
+            <div className="flex flex-1 flex-col justify-between p-4">
               <div>
                 <div className="mb-1 flex items-start justify-between">
                   <h3 className="text-xl sm:text-2xl font-semibold text-[#102e50]">

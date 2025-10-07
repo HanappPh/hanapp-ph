@@ -13,14 +13,14 @@ export function HeroSection() {
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Button
             size="lg"
-            className="bg-gradient-to-b from-[#014182] to-[#102E50] hover:from-[#014c6d] hover:to-[#0a233a] font-semibold px-8 py-3 rounded-xl text-white text-md"
+            className="bg-hanapp-primary hover:bg-hanapp-secondary font-semibold px-8 py-3 rounded-xl text-white text-md"
           >
             + List My Service
           </Button>
           <Button
             size="lg"
             variant="outline"
-            className="font-semibold px-8 py-3 rounded-xl text-md bg-white text-[#102E50] hover:bg-gray-100"
+            className="border-2 border-[#014182] bg-trasnparent font-semibold px-8 py-3 rounded-xl text-base text-hanapp-primary hover:bg-hanapp-secondary hover:border-[#102e50] hover:text-white"
           >
             Preview My Listings
           </Button>
