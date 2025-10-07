@@ -1,3 +1,5 @@
+'use client';
+
 import { Avatar, AvatarFallback, AvatarImage, Badge } from '@hanapp-ph/commons';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -24,13 +26,21 @@ export const ChatList = ({
   selectedChatId,
   onSelectChat,
 }: ChatListProps) => {
+  const TimeAgo = ({ date }: { date: Date }) => {
+    return (
+      <span className="text-xs text-gray-500 ml-2">
+        {formatDistanceToNow(date, { addSuffix: false })}
+      </span>
+    );
+  };
+
   return (
-    <div className="w-80 bg-gray-50 p-4 flex flex-col">
+    <div className="flex flex-col h-full">
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-4 flex-shrink-0">
         <h2 className="text-lg font-semibold text-gray-900">Messages</h2>
       </div>
 
-      <div className="flex-1 overflow-y-auto space-y-2">
+      <div className="flex-1 overflow-y-auto space-y-2 p-2">
         {chats.map(chat => (
           <div
             key={chat.id}
@@ -62,9 +72,7 @@ export const ChatList = ({
                   <h3 className="text-sm font-semibold text-gray-900 truncate">
                     {chat.name}
                   </h3>
-                  <span className="text-xs text-gray-500 ml-2">
-                    {formatDistanceToNow(chat.timestamp, { addSuffix: false })}
-                  </span>
+                  <TimeAgo date={chat.timestamp} />
                 </div>
                 <div className="flex items-center justify-between">
                   <p className="text-sm text-gray-600 truncate flex-1">
