@@ -1,6 +1,8 @@
+'use client';
 import { Button, Badge } from '@hanapp-ph/commons';
 import { MapPin, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
+import { useState } from 'react';
 type Job = {
   id: number;
   image: string;
@@ -39,7 +41,7 @@ const jobs: Job[] = [
     title: 'Stay out yaya daily rate',
     provider: 'abby',
     location: 'Baliuag, Bulacan',
-    rating: 4.9,
+    rating: 4.8,
     category: 'Babysitting',
     price: '₱650',
   },
@@ -49,7 +51,7 @@ const jobs: Job[] = [
     title: 'Delivery rider baliuag area',
     provider: 'Virgilio Muit',
     location: 'Baliuag, Bulacan',
-    rating: 4.9,
+    rating: 4.2,
     category: 'Errands',
     price: '₱300',
   },
@@ -59,7 +61,7 @@ const jobs: Job[] = [
     title: 'Home service dog grooming',
     provider: 'Chonky Boi Pet Services',
     location: 'Baliuag, Bulacan',
-    rating: 4.9,
+    rating: 4.5,
     category: 'Pet care',
     price: '₱2.5K',
   },
@@ -69,7 +71,7 @@ const jobs: Job[] = [
     title: 'Catering services for events',
     provider: 'Oca Catering',
     location: 'Baliuag, Bulacan',
-    rating: 4.9,
+    rating: 4.6,
     category: 'Catering',
     price: '₱50K',
   },
@@ -78,6 +80,22 @@ const jobs: Job[] = [
 const filterButtons = ['Show all', 'Near Me', 'Top Picks', 'Book Again'];
 
 export function JobListings() {
+  const [activeFilter, setActiveFilter] = useState<string>('Show all');
+
+  const filteredJobs = (() => {
+    switch (activeFilter) {
+      case 'Near Me':
+        return jobs.filter(job => job.location === 'Baliuag, Bulacan');
+      case 'Top Picks':
+        return jobs.filter(job => job.rating >= 4.9);
+      case 'Book Again':
+        // For now, just return 2 fixed jobs as "booked before"
+        return jobs.filter(job => [1, 4].includes(job.id));
+      default:
+        return jobs;
+    }
+  })();
+
   return (
     <section className="max-w-7xl mx-auto py-8 px-6">
       <div className="flex justify-between items-center mb-4">
@@ -93,10 +111,11 @@ export function JobListings() {
         {filterButtons.map(filter => (
           <Button
             key={filter}
-            variant={filter === 'Show all' ? 'default' : 'outline'}
+            variant={filter === activeFilter ? 'default' : 'outline'}
             size="sm"
+            onClick={() => setActiveFilter(filter)}
             className={
-              (filter === 'Show all'
+              (filter === activeFilter
                 ? 'bg-hanapp-secondary text-white hover:bg-hanapp-primary'
                 : 'border-hanapp-secondary bg-white text-hanapp-secondary hover:bg-hanapp-secondary hover:border-hanapp-secondary hover:text-white') +
               ' rounded-xl px-4 text-md'
@@ -122,7 +141,7 @@ export function JobListings() {
       </div>
 
       <div className="space-y-5">
-        {jobs.map(job => (
+        {filteredJobs.map(job => (
           <div
             key={job.id}
             className="flex gap-4 rounded-lg bg-white shadow-sm transition-shadow hover:shadow-md"
@@ -179,6 +198,10 @@ export function JobListings() {
             </div>
           </div>
         ))}
+
+        {filteredJobs.length === 0 && (
+          <p className="text-center text-gray-500 mt-10">No jobs found.</p>
+        )}
       </div>
     </section>
   );
