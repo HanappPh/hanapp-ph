@@ -137,7 +137,7 @@ export function ListingsSection() {
           {/* Left arrow button */}
           <button
             type="button"
-            className="hidden sm:block absolute top-1/2 -translate-y-1/2 left-4 bg-white rounded-lg shadow-md p-3 z-20 hover:shadow-lg hover:bg-gray-50 transition-all duration-200"
+            className="hidden sm:block absolute top-1/2 -translate-y-1/2 left-4 bg-white rounded-lg shadow-md p-3 z-20 hover:shadow-lg hover:bg-gray-100 transition-all duration-200"
             onClick={() => {
               if (scrollRef.current) {
                 scrollRef.current.scrollBy({
@@ -162,7 +162,7 @@ export function ListingsSection() {
           {/* Right arrow button */}
           <button
             type="button"
-            className="hidden sm:block absolute top-1/2 -translate-y-1/2 right-4 bg-white rounded-lg shadow-md p-3 z-20 hover:shadow-lg hover:bg-gray-50 transition-all duration-200"
+            className="hidden sm:block absolute top-1/2 -translate-y-1/2 right-4 bg-white rounded-lg shadow-md p-3 z-20 hover:shadow-lg hover:bg-gray-100 transition-all duration-200"
             onClick={() => {
               if (scrollRef.current) {
                 scrollRef.current.scrollBy({ left: 320, behavior: 'smooth' });
