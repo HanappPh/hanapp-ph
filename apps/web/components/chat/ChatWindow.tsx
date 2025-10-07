@@ -4,7 +4,7 @@ import {
   AvatarImage,
   Button,
 } from '@hanapp-ph/commons';
-import { MoreVertical } from 'lucide-react';
+import { ChevronLeft, MoreVertical } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 
 import { ChatInput } from './ChatInput';
@@ -19,6 +19,7 @@ interface ChatWindowProps {
   recipientInitials: string;
   isOnline?: boolean;
   isTyping?: boolean;
+  onBack?: () => void;
 }
 
 export const ChatWindow = ({
@@ -29,6 +30,7 @@ export const ChatWindow = ({
   recipientInitials,
   isOnline = false,
   isTyping = false,
+  onBack,
 }: ChatWindowProps) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -46,6 +48,17 @@ export const ChatWindow = ({
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-4 flex-shrink-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
+            {/* Back button - only visible on mobile */}
+            {onBack && (
+              <Button
+                onClick={onBack}
+                variant="ghost"
+                size="icon"
+                className="md:hidden text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg flex-shrink-0"
+              >
+                <ChevronLeft className="h-6 w-6" />
+              </Button>
+            )}
             <div className="relative">
               <Avatar className="h-12 w-12">
                 <AvatarImage src={recipientAvatar} alt={recipientName} />

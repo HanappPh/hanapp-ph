@@ -40,17 +40,23 @@ const mockChats: ChatListItem[] = [
 const ChatPage = () => {
   const router = useRouter();
 
+  const handleSelectChat = (chatId: string) => {
+    router.push(`/chat/${chatId}`);
+  };
+
   return (
     <div className="h-screen bg-gray-50 flex">
-      <div className="w-80 bg-white border-r border-gray-200 flex flex-col p-4">
+      {/* Chat list - full width on mobile, fixed width on desktop */}
+      <div className="w-full md:w-80 bg-white md:border-r border-gray-200 flex flex-col p-4">
         <ChatList
           chats={mockChats}
           selectedChatId={undefined}
-          onSelectChat={() => router.push('/chat/[threadId]')}
+          onSelectChat={handleSelectChat}
         />
       </div>
 
-      <div className="flex-1 flex flex-col">
+      {/* Empty state - hidden on mobile, visible on desktop */}
+      <div className="hidden md:flex flex-1 flex-col">
         <div className="flex-1 flex items-center justify-center bg-white">
           <div className="text-center">
             <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
