@@ -78,9 +78,11 @@ const jobs: Job[] = [
 ];
 
 const filterButtons = ['Show all', 'Near Me', 'Top Picks', 'Book Again'];
+const JOBS_PER_PAGE = 5;
 
 export function JobListings() {
   const [activeFilter, setActiveFilter] = useState<string>('Show all');
+  const [currentPage, setCurrentPage] = useState<number>(1);
 
   const filteredJobs = (() => {
     switch (activeFilter) {
@@ -95,6 +97,24 @@ export function JobListings() {
         return jobs;
     }
   })();
+
+  const totalPages = Math.ceil(filteredJobs.length / JOBS_PER_PAGE);
+
+  const paginatedJobs = filteredJobs.slice(
+    (currentPage - 1) * JOBS_PER_PAGE,
+    currentPage * JOBS_PER_PAGE
+  );
+
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
+  const handleFilterClick = (filter: string) => {
+    setActiveFilter(filter);
+    setCurrentPage(1); // reset when filter changes
+  };
 
   return (
     <section className="max-w-7xl mx-auto py-8 px-6">
@@ -113,7 +133,7 @@ export function JobListings() {
             key={filter}
             variant={filter === activeFilter ? 'default' : 'outline'}
             size="sm"
-            onClick={() => setActiveFilter(filter)}
+            onClick={() => handleFilterClick(filter)}
             className={
               (filter === activeFilter
                 ? 'bg-hanapp-secondary text-white hover:bg-hanapp-primary'
@@ -124,7 +144,7 @@ export function JobListings() {
             {filter}
           </Button>
         ))}
-        <Button
+        {/* <Button
           variant="ghost"
           size="icon"
           className="h-8 w-8 hover:bg-gray-200"
@@ -137,11 +157,11 @@ export function JobListings() {
           className="h-8 w-8 hover:bg-gray-200"
         >
           <ChevronRight className="h-4 w-4" />
-        </Button>
+        </Button> */}
       </div>
 
       <div className="space-y-5">
-        {filteredJobs.map(job => (
+        {paginatedJobs.map(job => (
           <div
             key={job.id}
             className="flex gap-4 rounded-lg bg-white shadow-sm transition-shadow hover:shadow-md"
@@ -199,8 +219,50 @@ export function JobListings() {
           </div>
         ))}
 
-        {filteredJobs.length === 0 && (
+        {paginatedJobs.length === 0 && (
           <p className="text-center text-gray-500 mt-10">No jobs found.</p>
+        )}
+
+        {/* Pagination Controls at the bottom */}
+        {totalPages > 1 && (
+          <div className="flex justify-center items-center gap-2 mt-4">
+            {/* Left arrow */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => goToPage(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="h-8 w-8 text-hanapp-primary hover:bg-gray-200 disabled:opacity-50 hover:text-hanapp-primary"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+
+            {/* Page numbers */}
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+              <Button
+                key={page}
+                onClick={() => goToPage(page)}
+                className={`h-8 w-8 text-sm font-semibold ${
+                  currentPage === page
+                    ? 'bg-hanapp-primary hover:bg-hanapp-secondary text-white'
+                    : 'bg-transparent text-hanapp-primary hover:bg-gray-200'
+                }`}
+              >
+                {page}
+              </Button>
+            ))}
+
+            {/* Right arrow */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => goToPage(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="h-8 w-8 text-hanapp-primary hover:bg-gray-200 disabled:opacity-50 hover:text-hanapp-primary"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
         )}
       </div>
     </section>
