@@ -1,5 +1,5 @@
 'use client';
-import { Card, CardContent, Badge } from '@hanapp-ph/commons';
+import { Card, CardContent } from '@hanapp-ph/commons';
 import { Star, MapPin, ChevronRight, ChevronLeft } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
@@ -13,7 +13,6 @@ export function ListingsSection() {
       price: '₱700',
       location: 'Baliuag, Bulacan',
       rating: 5,
-      status: 'Active',
       image: '/img-carousel-placeholder_1.png',
     },
     {
@@ -24,7 +23,6 @@ export function ListingsSection() {
       price: '₱350',
       location: 'Baliuag, Bulacan',
       rating: 4,
-      status: 'Active',
       image: '/img-carousel-placeholder_2.png',
     },
     {
@@ -35,7 +33,6 @@ export function ListingsSection() {
       price: '₱850',
       location: 'Baliuag, Bulacan',
       rating: 5,
-      status: 'Inactive',
       image: '/home-repair-tools.jpg',
     },
     {
@@ -46,7 +43,6 @@ export function ListingsSection() {
       price: '₱850',
       location: 'Baliuag, Bulacan',
       rating: 5,
-      status: 'Inactive',
       image: '/img-carousel-placeholder_1.png',
     },
     {
@@ -57,7 +53,6 @@ export function ListingsSection() {
       price: '₱850',
       location: 'Baliuag, Bulacan',
       rating: 5,
-      status: 'Inactive',
       image: '/img-carousel-placeholder_1.png',
     },
     {
@@ -68,7 +63,6 @@ export function ListingsSection() {
       price: '₱850',
       location: 'Baliuag, Bulacan',
       rating: 5,
-      status: 'Inactive',
       image: '/img-carousel-placeholder_1.png',
     },
   ];
@@ -79,7 +73,7 @@ export function ListingsSection() {
   const isPausedAtEndRef = useRef(false);
 
   const pauseDuration = 1500; // ms to pause at ends
-  const scrollSpeed = 0.5; // adjust for speed
+  const scrollSpeed = 5; // adjust for speed (increased from 0.5 to 1.5)
   const timeoutIdRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -129,14 +123,67 @@ export function ListingsSection() {
 
   return (
     <section className="bg-[#FFE8B9] py-10">
-      <div className="max-w-7xl mx-auto px-8 md:px-14">
-        <h2 className="text-2xl md:text-3xl font-semibold text-[#102E50] mb-4">
+      <div className="max-w-7xl mx-auto">
+        <h2 className="text-2xl md:text-3xl font-semibold text-[#102E50] mb-4 px-8 md:px-14">
           Your listings
         </h2>
         <div className="relative">
+          {/* Left fade gradient overlay */}
+          <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-[#FFE8B9] to-transparent z-10 pointer-events-none" />
+
+          {/* Right fade gradient overlay */}
+          <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-[#FFE8B9] to-transparent z-10 pointer-events-none" />
+
+          {/* Left arrow button */}
+          <button
+            type="button"
+            className="hidden sm:block absolute top-1/2 -translate-y-1/2 left-4 bg-white rounded-lg shadow-md p-3 z-20 hover:shadow-lg hover:bg-gray-50 transition-all duration-200"
+            onClick={() => {
+              if (scrollRef.current) {
+                scrollRef.current.scrollBy({
+                  left: -320,
+                  behavior: 'smooth',
+                });
+                directionRef.current = -1;
+                isPausedAtEndRef.current = false;
+                if (timeoutIdRef.current) {
+                  clearTimeout(timeoutIdRef.current);
+                  timeoutIdRef.current = null;
+                }
+              }
+            }}
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
+            aria-label="Scroll left"
+          >
+            <ChevronLeft className="w-6 h-6 text-[#102E50]" />
+          </button>
+
+          {/* Right arrow button */}
+          <button
+            type="button"
+            className="hidden sm:block absolute top-1/2 -translate-y-1/2 right-4 bg-white rounded-lg shadow-md p-3 z-20 hover:shadow-lg hover:bg-gray-50 transition-all duration-200"
+            onClick={() => {
+              if (scrollRef.current) {
+                scrollRef.current.scrollBy({ left: 320, behavior: 'smooth' });
+                directionRef.current = 1;
+                isPausedAtEndRef.current = false;
+                if (timeoutIdRef.current) {
+                  clearTimeout(timeoutIdRef.current);
+                  timeoutIdRef.current = null;
+                }
+              }
+            }}
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
+            aria-label="Scroll right"
+          >
+            <ChevronRight className="w-6 h-6 text-[#102E50]" />
+          </button>
+
           <div
             ref={scrollRef}
-            className="flex gap-6 overflow-x-auto pb-2 pt-2 scrollbar-hide scroll-smooth"
+            className="flex gap-6 overflow-x-auto pb-2 pt-2 scrollbar-hide scroll-smooth pl-8 md:pl-14"
             id="listings-scroll"
             onMouseEnter={() => setIsPaused(true)}
             onMouseLeave={() => setIsPaused(false)}
@@ -154,22 +201,6 @@ export function ListingsSection() {
                     height={300}
                     className="w-full h-48 object-cover"
                   />
-
-                  <Badge className="absolute top-3 left-3 border-0 px-3 py-2 bg-white flex items-center gap-2 shadow hover:bg-white focus:bg-white">
-                    {/* circle */}
-                    <span
-                      className={`w-2 h-2 rounded-full ${
-                        listing.status === 'Active'
-                          ? 'bg-green-500'
-                          : 'bg-red-500'
-                      }`}
-                    />
-                    <span
-                      className={`text-sm font-medium leading-none ${listing.status === 'Active' ? 'text-green-600' : 'text-red-600'}`}
-                    >
-                      {listing.status === 'Active' ? 'Active' : 'Inactive'}
-                    </span>
-                  </Badge>
                 </div>
                 <CardContent className="p-4 bg-white">
                   {/* title */}
@@ -204,52 +235,6 @@ export function ListingsSection() {
                 </CardContent>
               </Card>
             ))}
-          </div>
-          {/* Left arrow button */}
-          <div className="hidden sm:block">
-            <button
-              type="button"
-              className="absolute top-1/2 -translate-y-1/2 -left-11 lg:-left-14 rounded-full p-2 z-10"
-              onClick={() => {
-                if (scrollRef.current) {
-                  scrollRef.current.scrollBy({
-                    left: -320,
-                    behavior: 'smooth',
-                  });
-                  directionRef.current = -1;
-                  isPausedAtEndRef.current = false;
-                  if (timeoutIdRef.current) {
-                    clearTimeout(timeoutIdRef.current);
-                    timeoutIdRef.current = null;
-                  }
-                }
-              }}
-              onMouseEnter={() => setIsPaused(true)}
-              onMouseLeave={() => setIsPaused(false)}
-              aria-label="Scroll left"
-            >
-              <ChevronLeft className="w-8 h-8 text-[#102E50]" />
-            </button>
-            <button
-              type="button"
-              className="absolute top-1/2 -translate-y-1/2 -right-11 lg:-right-14 rounded-full p-2 z-10"
-              onClick={() => {
-                if (scrollRef.current) {
-                  scrollRef.current.scrollBy({ left: 320, behavior: 'smooth' });
-                  directionRef.current = 1;
-                  isPausedAtEndRef.current = false;
-                  if (timeoutIdRef.current) {
-                    clearTimeout(timeoutIdRef.current);
-                    timeoutIdRef.current = null;
-                  }
-                }
-              }}
-              onMouseEnter={() => setIsPaused(true)}
-              onMouseLeave={() => setIsPaused(false)}
-              aria-label="Scroll right"
-            >
-              <ChevronRight className="w-8 h-8 text-[#102E50]" />
-            </button>
           </div>
 
           <style jsx global>{`

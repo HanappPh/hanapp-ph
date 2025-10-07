@@ -37,7 +37,7 @@ export const ChatInput = ({
           type="button"
           variant="ghost"
           size="icon"
-          className="text-gray-500 hover:text-gray-700 flex-shrink-0 h-10 w-10"
+          className="text-gray-500 hover:text-gray-700 flex-shrink-0 h-10 w-10 focus:outline-none focus:ring-0"
           disabled={disabled}
         >
           <Paperclip className="h-5 w-5" />
@@ -50,25 +50,13 @@ export const ChatInput = ({
             onKeyPress={handleKeyPress}
             placeholder={placeholder}
             disabled={disabled}
-            className="pr-12 pl-4 py-3 border-gray-300 focus:ring-2 focus:ring-opacity-20 rounded-full h-12 text-sm w-full"
-            style={
-              {
-                '--tw-ring-color': '#064283',
-                '--tw-border-color': '#064283',
-              } as React.CSSProperties
-            }
-            onFocus={e => {
-              e.target.style.borderColor = '#064283';
-            }}
-            onBlur={e => {
-              e.target.style.borderColor = '#d1d5db';
-            }}
+            className="pr-12 pl-4 py-3 border border-gray-300 rounded-full h-12 text-sm w-full focus:outline-none focus:ring-1 focus:ring-[#064283]/30 focus:border-[#064283]"
           />
           <Button
             type="button"
             variant="ghost"
             size="icon"
-            className="absolute right-1 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 h-8 w-8"
+            className="absolute right-1 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 h-8 w-8 focus:outline-none focus:ring-0"
             disabled={disabled}
           >
             <Smile className="h-4 w-4" />
@@ -80,7 +68,7 @@ export const ChatInput = ({
           variant="default"
           size="icon"
           disabled={!message.trim() || disabled}
-          className="text-white rounded-full flex-shrink-0 h-10 w-10 flex items-center justify-center hover:opacity-90"
+          className="text-white rounded-full flex-shrink-0 h-10 w-10 flex items-center justify-center hover:opacity-90 focus:outline-none focus:ring-0"
           style={{ backgroundColor: '#064283' }}
         >
           <Send className="h-4 w-4" />
