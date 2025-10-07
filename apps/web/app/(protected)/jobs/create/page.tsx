@@ -1,16 +1,13 @@
-import { ContactInformationSection } from '../../../../components/request-contact-information';
-import { JobDetailsSection } from '../../../../components/request-job-details';
-import { LocationAvailabilitySection } from '../../../../components/request-location-availability';
-import { ImageUploadSection } from '../../../../components/request-media-upload';
-import { PricingInformationSection } from '../../../../components/request-pricing-information';
-import { TermsSubmitSection } from '../../../../components/request-terms-submit';
-import { Header } from '../../../../components/temporary-navigation-bar';
+import { ContactInformationSection } from '../../../../components/request-job-listing/RequestContact';
+import { JobDetailsSection } from '../../../../components/request-job-listing/RequestJobDetails';
+import { LocationAvailabilitySection } from '../../../../components/request-job-listing/RequestLocation';
+import { ImageUploadSection } from '../../../../components/request-job-listing/RequestMedia';
+import { PricingInformationSection } from '../../../../components/request-job-listing/RequestPricing';
+import { TermsSubmitSection } from '../../../../components/request-job-listing/RequestTerms';
 
 export default function RequestServicePage() {
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
-
       <div className="w-full py-12 px-6">
         <div className="max-w-6xl mx-auto text-center">
           <h1

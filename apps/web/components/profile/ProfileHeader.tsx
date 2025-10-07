@@ -1,5 +1,6 @@
 'use client';
 
+import { Badge, Button } from '@hanapp-ph/commons';
 import {
   Bell,
   ChevronDown,
@@ -10,9 +11,6 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-
-import { Badge } from '../../../libs/commons/src/components/ui/badge';
-import { Button } from '../../../libs/commons/src/components/ui/button';
 
 export function Header({
   bellColor,

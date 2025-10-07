@@ -1,18 +1,17 @@
 'use client';
 import * as React from 'react';
 
-import { MobileProfileBottom } from '../../../components/mobile-profile-bottom';
-import { MobileProfileDivider } from '../../../components/mobile-profile-divider';
-import { MobileProfileFavoriteProviders } from '../../../components/mobile-profile-favorite-providers';
-import { MobileProfileHeader } from '../../../components/mobile-profile-header';
-import { MobileProfileImage } from '../../../components/mobile-profile-image';
-import { MobileProfileInfo } from '../../../components/mobile-profile-info';
-import { MobileProfileStats } from '../../../components/mobile-profile-stats';
-import { MobileProfileTabs } from '../../../components/mobile-profile-tabs';
-import { MobileServicePreferences } from '../../../components/mobile-service-preferences';
-import { Header } from '../../../components/provider-profile-header';
-import { MainContent } from '../../../components/provider-profile-main-content';
-import { Sidebar } from '../../../components/provider-profile-sidebar';
+import { MainContent } from '../../../components/profile/ProfileContent';
+import { Sidebar } from '../../../components/profile/ProfileSidebar';
+import { MobileProfileBottom } from '../../../components/profile-mobile/MobileBottom';
+import { MobileProfileDivider } from '../../../components/profile-mobile/MobileDivider';
+import { MobileProfileFavoriteProviders } from '../../../components/profile-mobile/MobileFavoriteProviders';
+import { MobileProfileHeader } from '../../../components/profile-mobile/MobileHeader';
+import { MobileProfileImage } from '../../../components/profile-mobile/MobileImage';
+import { MobileProfileInfo } from '../../../components/profile-mobile/MobileInfo';
+import { MobileServicePreferences } from '../../../components/profile-mobile/MobileServicePreference';
+import { MobileProfileStats } from '../../../components/profile-mobile/MobileStats';
+import { MobileProfileTabs } from '../../../components/profile-mobile/MobileTabs';
 
 export default function ProfilePage() {
   const [showDropdown, setShowDropdown] = React.useState(false);
@@ -21,14 +20,14 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-[#F3F5F9] flex flex-col">
       {/* Desktop layout */}
       <div className="hidden md:block">
-        <Header
+        {/* <Header
           bellColor="#6b7280"
           badgeColor="#102E50"
           InitialsBgColor="#102E50"
           InitialsTextColor="#ffffff"
           headerHoverColor="#102E50"
           activePage="Home"
-        />
+        /> */}
         <div className="flex">
           <Sidebar
             initialSelected="Client"

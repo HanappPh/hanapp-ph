@@ -1,3 +1,4 @@
+import { Badge, Button, Card } from '@hanapp-ph/commons';
 import {
   Edit,
   Calendar,
@@ -36,10 +37,6 @@ const providers = [
     img: '/profile-pic.png',
   },
 ];
-
-import { Badge } from '../../../libs/commons/src/components/ui/badge';
-import { Button } from '../../../libs/commons/src/components/ui/button';
-import { Card } from '../../../libs/commons/src/components/ui/card';
 
 export function MainContent({
   initialSelected,
