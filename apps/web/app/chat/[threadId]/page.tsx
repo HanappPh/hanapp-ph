@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 import { ChatList, type ChatListItem } from '../../../components/chat/ChatList';
@@ -139,6 +140,7 @@ const mockMessagesByThreadId: Record<string, ChatMessageData[]> = {
 };
 
 const ThreadPage = () => {
+  const router = useRouter();
   const [selectedChatId, setSelectedChatId] = useState<string>('1');
 
   const selectedChat =
@@ -164,9 +166,14 @@ const ThreadPage = () => {
     setMessages(mockMessagesByThreadId[chatId] || []);
   };
 
+  const handleBack = () => {
+    router.push('/chat');
+  };
+
   return (
     <div className="h-screen bg-gray-50 flex">
-      <div className="w-80 bg-white border-r border-gray-200 flex flex-col p-4">
+      {/* Chat list - hidden on mobile, visible on desktop */}
+      <div className="hidden md:flex md:w-80 bg-white border-r border-gray-200 flex-col p-4">
         <ChatList
           chats={mockChats}
           selectedChatId={selectedChatId}
@@ -174,6 +181,7 @@ const ThreadPage = () => {
         />
       </div>
 
+      {/* Chat window - full width on mobile, flex-1 on desktop */}
       <div className="flex-1 flex flex-col">
         <ChatWindow
           messages={messages}
@@ -183,6 +191,7 @@ const ThreadPage = () => {
           recipientInitials={selectedChat.initials}
           isOnline={selectedChat.isOnline}
           isTyping={false}
+          onBack={handleBack}
         />
       </div>
     </div>
