@@ -1,9 +1,9 @@
-import { BookingsSection } from '../../components/bookings-section';
-import { DashboardStats } from '../../components/dashboard-stats';
-import { Footer } from '../../components/footer';
-import { HeroSection } from '../../components/hero-section';
-import { ListingsSection } from '../../components/listings-section';
-import { OnboardingSection } from '../../components/onboarding-section';
+import { BookingsSection } from '../../../components/bookings-section';
+import { DashboardStats } from '../../../components/dashboard-stats';
+import { Footer } from '../../../components/footer';
+import { HeroSection } from '../../../components/hero-section';
+import { ListingsSection } from '../../../components/listings-section';
+import { OnboardingSection } from '../../../components/onboarding-section';
 export default function ProviderPage() {
   return (
     <div className="bg-[#F3F5F9]">
