@@ -4,9 +4,9 @@ import { Button, Checkbox } from '@hanapp-ph/commons';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 
-import { CreateListingForm } from '../../../components/post-create-service';
-import { ServiceCard } from '../../../components/post-service-card';
-import { ServiceForm } from '../../../components/post-service-form';
+import { ServiceCard } from '../../../components/post-job-listing/PostServiceCard';
+import { CreateListingForm } from '../../../components/post-job-listing/PostServiceCreate';
+import { ServiceForm } from '../../../components/post-job-listing/PostServiceForm';
 
 interface ServiceType {
   service_name: string;

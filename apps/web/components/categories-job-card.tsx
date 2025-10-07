@@ -2,7 +2,16 @@ import { Badge } from '@hanapp-ph/commons';
 import { MapPin, Star } from 'lucide-react';
 import Image from 'next/image';
 
-import { Job } from './categories-types';
+type Job = {
+  id: string;
+  title: string;
+  category: string;
+  location: string;
+  price: string;
+  rating: number;
+  image: string;
+  categories: string[];
+};
 
 interface JobCardProps {
   job: Job;
@@ -28,25 +37,52 @@ export default function CategoriesJobCard({ job }: JobCardProps) {
       <div className="p-3 sm:p-4 space-y-2 sm:space-y-3">
         <div>
           <div className="flex items-start sm:items-center justify-between gap-2 mb-2">
-            <h3 className="font-semibold text-gray-900 text-sm sm:text-base flex-1 line-clamp-2">
+            <h3
+              className="font-semibold text-sm sm:text-base flex-1 line-clamp-2"
+              style={{ color: '#014182FC' }}
+            >
               {job.title}
             </h3>
-            <span className="text-gray-900 font-semibold whitespace-nowrap text-sm sm:text-base">
+            <span
+              className="text-white font-semibold whitespace-nowrap text-sm sm:text-base px-2 py-1 rounded-md"
+              style={{ backgroundColor: 'black' }}
+            >
               {job.price}
             </span>
           </div>
-          <Badge
-            variant="outline"
-            className="text-xs border-gray-300 text-gray-700"
-          >
-            {job.category}
-          </Badge>
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-xs sm:text-sm" style={{ color: '#014182FC' }}>
+              by{' '}
+              {
+                [
+                  'Maria Santos',
+                  'Juan Dela Cruz',
+                  'Ana Rodriguez',
+                  'Carlos Mendoza',
+                  'Sofia Reyes',
+                ][Math.floor(Math.random() * 5)]
+              }
+            </p>
+            <Badge
+              variant="outline"
+              className="text-xs border-gray-300"
+              style={{ color: '#014182FC' }}
+            >
+              {job.category}
+            </Badge>
+          </div>
         </div>
 
         <div className="flex items-center justify-between text-sm">
-          <div className="flex items-center gap-1 sm:gap-1.5 text-gray-600">
-            <MapPin className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0" />
-            <span className="text-xs truncate max-w-[120px] sm:max-w-[160px]">
+          <div className="flex items-center gap-1 sm:gap-1.5">
+            <MapPin
+              className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0"
+              style={{ color: '#014182FC' }}
+            />
+            <span
+              className="text-xs truncate max-w-[120px] sm:max-w-[160px]"
+              style={{ color: '#014182FC' }}
+            >
               {job.location}
             </span>
           </div>
