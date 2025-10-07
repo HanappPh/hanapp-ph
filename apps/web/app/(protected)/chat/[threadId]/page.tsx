@@ -3,9 +3,12 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
-import { ChatList, type ChatListItem } from '../../../components/chat/ChatList';
-import { ChatMessageData } from '../../../components/chat/ChatMessage';
-import { ChatWindow } from '../../../components/chat/ChatWindow';
+import {
+  ChatList,
+  type ChatListItem,
+} from '../../../../components/chat/ChatList';
+import { ChatMessageData } from '../../../../components/chat/ChatMessage';
+import { ChatWindow } from '../../../../components/chat/ChatWindow';
 
 const mockChats: ChatListItem[] = [
   {
