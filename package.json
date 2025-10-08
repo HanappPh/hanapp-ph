@@ -126,6 +126,7 @@
     "libs/*"
   ],
   "dependencies": {
+    "@gsap/react": "^2.1.2",
     "@nestjs/common": "^11.0.0",
     "@nestjs/core": "^11.0.0",
     "@nestjs/platform-express": "^11.0.0",
@@ -143,6 +144,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
+    "gsap": "^3.13.0",
     "lucide-react": "^0.544.0",
     "next": "~15.2.4",
     "react": "19.0.0",
