@@ -275,6 +275,13 @@ const LandingPage = () => {
           <p className="text-lg md:text-xl text-gray-600 leading-relaxed max-w-3xl mx-auto">
             on-demand services app Philippines
           </p>
+          <button className="mt-12 mb-10 w-[200px] border-2 border-black bg-[#FFDD8E] text-black px-5 py-5 rounded-lg text-lg font-semibold hover:bg-[#FFDD8E]/70 hover:text-black transition-colors backdrop-blur-sm relative overflow-hidden group cursor-pointer">
+            {/* Shine effect */}
+            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out w-1/2"></div>
+            </div>
+            <span className="relative z-10">Try our Demo</span>
+          </button>
         </div>
       </section>
 
