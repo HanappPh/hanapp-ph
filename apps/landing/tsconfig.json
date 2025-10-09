@@ -31,14 +31,11 @@
     "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
   },
   "include": [
-    "../../apps/landing/.next/types/**/*.ts",
-    "../../dist/apps/landing/.next/types/**/*.ts",
     "next-env.d.ts",
     "app/**/*.js",
     "app/**/*.jsx",
     "app/**/*.ts",
-    "app/**/*.tsx",
-    ".next/types/**/*.ts"
+    "app/**/*.tsx"
   ],
   "exclude": [
     "out-tsc",
