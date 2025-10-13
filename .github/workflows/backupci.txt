@@ -173,27 +173,8 @@ jobs:
           fi
         timeout-minutes: 10
 
-      # Check Nx Cloud availability (NEW STEP)
-      - name: Check Nx Cloud Status
-        id: nx-cloud-status
-        run: |
-          echo "Checking Nx Cloud availability..."
-
-          if [[ -z "${{ secrets.NX_CLOUD_ACCESS_TOKEN }}" ]]; then
-            echo "No Nx Cloud token configured"
-            echo "enabled=false" >> $GITHUB_OUTPUT
-            exit 0
-          fi
-
-          # Try a simple Nx Cloud operation to check if we have credits
-          # This will succeed even without credits for most operations
-          echo "Nx Cloud token found - will attempt to use remote caching"
-          echo "enabled=true" >> $GITHUB_OUTPUT
-        continue-on-error: true
-
-      # Setup Nx Cloud with access token (now optional)
+      # Setup Nx Cloud with access token
       - name: Setup Nx Cloud
-        if: steps.nx-cloud-status.outputs.enabled == 'true'
         uses: nrwl/nx-set-shas@v4
         with:
           main-branch-name: 'main'
@@ -265,7 +246,6 @@ jobs:
         env:
           NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
         timeout-minutes: 15
-        continue-on-error: false
 
       - name: Lint affected projects with self-healing
         run: |
@@ -387,9 +367,6 @@ jobs:
           else
             echo "No affected projects to test"
           fi
-        env:
-          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
-        timeout-minutes: 20
 
       - name: Build affected applications with self-healing
         run: |
@@ -438,9 +415,6 @@ jobs:
 
           echo "All build strategies failed"
           exit 1
-        env:
-          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
-        timeout-minutes: 15
 
       - name: E2E test affected projects (if any)
         run: |
@@ -508,7 +482,7 @@ jobs:
         run: |
           echo "Running final self-healing checks..."
 
-          # Run Nx Cloud fix (will work without credits too)
+          # Run Nx Cloud fix
           npx nx-cloud fix-ci || echo "Nx Cloud fix completed with warnings"
 
           # Check for any remaining issues
@@ -522,28 +496,17 @@ jobs:
           fi
 
           echo "Self-healing CI pipeline completed!"
-          echo "=== Summary of CI Run ==="
-          if [[ "${{ steps.nx-cloud-status.outputs.enabled }}" == "true" ]]; then
-            echo "✓ Nx Cloud: Enabled (attempted remote caching)"
-          else
-            echo "○ Nx Cloud: Disabled (using local cache only)"
-          fi
-          echo "✓ GitHub Actions Cache: Active"
-          echo "✓ Self-healing strategies applied:"
-          echo "  - Dependency installation with fallbacks"
-          echo "  - Cypress verification and repair"
-          echo "  - Library build with individual fallbacks"
-          echo "  - Linting with auto-fix capabilities"
-          echo "  - Type checking with dependency rebuilds"
-          echo "  - Testing with coverage fallbacks"
-          echo "  - Application builds with sequential fallbacks"
-          echo "  - E2E testing with graceful degradation"
+          echo "Summary of applied strategies:"
+          echo "Dependency installation with fallbacks"
+          echo "Cypress verification and repair"
+          echo "Library build with individual fallbacks"
+          echo "Linting with auto-fix capabilities"
+          echo "Type checking with dependency rebuilds"
+          echo "Testing with coverage fallbacks"
+          echo "Application builds with sequential fallbacks"
+          echo "E2E testing with graceful degradation"
         timeout-minutes: 5
 
-      # Optional: Enable task distribution (uncomment when ready and credits available)
+      # Optional: Enable task distribution (uncomment when ready)
       # - name: Start CI run with distribution
-      #   if: steps.nx-cloud-status.outputs.enabled == 'true'
       #   run: npx nx-cloud start-ci-run --distribute-on="3 linux-medium-js" --stop-agents-after="build"
-      #   env:
-      #     NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
-      #   continue-on-error: true
