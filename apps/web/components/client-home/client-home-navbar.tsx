@@ -2,11 +2,13 @@ import { Bell } from 'lucide-react';
 
 interface ClientHomeNavbarProps {
   onNotificationClick?: () => void;
+  onProfileClick?: () => void;
   notificationCount?: number;
 }
 
 export function ClientHomeNavbar({
   onNotificationClick,
+  onProfileClick,
   notificationCount = 3,
 }: ClientHomeNavbarProps) {
   return (
@@ -24,7 +26,7 @@ export function ClientHomeNavbar({
           {/* Navigation Items */}
           <div className="hidden md:flex items-center gap-8">
             <a
-              href="#"
+              href="/"
               className="flex flex-col items-center gap-1 text-blue-900"
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -33,7 +35,7 @@ export function ClientHomeNavbar({
               <span className="text-xs font-medium">Home</span>
             </a>
             <a
-              href="#"
+              href="/bookings"
               className="flex flex-col items-center gap-1 text-gray-500 hover:text-blue-900"
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -47,16 +49,7 @@ export function ClientHomeNavbar({
               <span className="text-xs font-medium">Bookings</span>
             </a>
             <a
-              href="#"
-              className="flex flex-col items-center gap-1 text-gray-500 hover:text-blue-900"
-            >
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
-              </svg>
-              <span className="text-xs font-medium">Providers</span>
-            </a>
-            <a
-              href="#"
+              href="/chat"
               className="flex flex-col items-center gap-1 text-gray-500 hover:text-blue-900"
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -86,9 +79,13 @@ export function ClientHomeNavbar({
             </button>
 
             {/* Profile Avatar */}
-            <div className="w-8 h-8 bg-blue-900 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+            <button
+              onClick={onProfileClick}
+              className="w-8 h-8 bg-blue-900 rounded-full flex items-center justify-center text-white font-semibold text-sm hover:bg-blue-800 transition-colors cursor-pointer"
+              aria-label="Profile"
+            >
               MG
-            </div>
+            </button>
           </div>
         </div>
       </div>
