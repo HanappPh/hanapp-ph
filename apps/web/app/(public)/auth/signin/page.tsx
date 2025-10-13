@@ -6,9 +6,9 @@ import { Suspense, useRef } from 'react';
 import { BackgroundImage } from '../../../../components/background';
 import { LoginDialog } from '../../../../components/login/login-dialog';
 import { MainHeader } from '../../../../components/login/login-header';
-import SignInBrandHeader from '../../../../components/signup/SignupBrandHeader';
-import SignUpForm from '../../../../components/signup/SignupForms';
-import SignInServiceSelector from '../../../../components/signup/SignupService';
+import SignUpForm from '../../../../components/signup/signup-forms';
+import SignInBrandHeader from '../../../../components/signup/signup-header';
+import SignInServiceSelector from '../../../../components/signup/signup-service';
 import { FormData, SignUpFormRef } from '../../../../types/signupinterface';
 
 type ServiceOption = 'jobs' | 'services' | 'both';
