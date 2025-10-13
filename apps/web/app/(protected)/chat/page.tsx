@@ -48,39 +48,45 @@ const ChatPage = () => {
   };
 
   return (
-    <div className="h-screen bg-gray-50 flex">
-      {/* Chat list - full width on mobile, fixed width on desktop */}
-      <div className="w-full md:w-80 bg-white md:border-r border-gray-200 flex flex-col p-4">
-        <ChatList
-          chats={mockChats}
-          selectedChatId={undefined}
-          onSelectChat={handleSelectChat}
-        />
-      </div>
-
-      {/* Empty state - hidden on mobile, visible on desktop */}
-      <div className="hidden md:flex flex-1 flex-col">
-        <div className="flex-1 flex items-center justify-center bg-white">
-          <div className="text-center">
-            <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-              <svg
-                className="w-8 h-8 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                />
-              </svg>
+    <div className="bg-gray-50 overflow-hidden">
+      <div className="container mx-auto max-w-7xl py-4">
+        <div className="flex overflow-hidden" style={{ height: '600px' }}>
+          {/* Chat list - full width on mobile, fixed width on desktop */}
+          <div className="w-full md:w-80 bg-white md:border-r border-gray-200 flex flex-col overflow-hidden">
+            <div className="p-4 overflow-y-auto flex-1">
+              <ChatList
+                chats={mockChats}
+                selectedChatId={undefined}
+                onSelectChat={handleSelectChat}
+              />
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              Your messages
-            </h3>
-            <p className="text-gray-500">Send a message to start a chat</p>
+          </div>
+
+          {/* Empty state - hidden on mobile, visible on desktop */}
+          <div className="hidden md:flex flex-1 overflow-hidden">
+            <div className="flex-1 flex items-center justify-center bg-white">
+              <div className="text-center">
+                <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+                  <svg
+                    className="w-8 h-8 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  Your messages
+                </h3>
+                <p className="text-gray-500">Send a message to start a chat</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>

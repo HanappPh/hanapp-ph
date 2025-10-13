@@ -161,8 +161,8 @@ export default function BookingsPage() {
       </div>
 
       {/* Content */}
-      <div className="flex flex-col h-screen">
-        <div className="max-w-lg min-w-sm mx-auto p-4">
+      <div>
+        <div className="max-w-lg min-w-sm mx-auto p-4 pb-8">
           <Tabs
             value={activeTab}
             onValueChange={setActiveTab}
@@ -263,8 +263,12 @@ export default function BookingsPage() {
             </TabsContent>
           </Tabs>
         </div>
-        <div className="bg-hanapp-light w-full flex align-center mt-auto">
-          <RecommendedServices className="mx-auto" />
+
+        {/* Recommended Services Section - Above Footer */}
+        <div className="w-full bg-hanapp-light py-8">
+          <div className="max-w-7xl mx-auto px-4">
+            <RecommendedServices />
+          </div>
         </div>
       </div>
     </div>
