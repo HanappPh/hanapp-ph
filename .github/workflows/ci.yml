@@ -263,7 +263,7 @@ jobs:
             echo "All libraries built successfully via individual builds"
           fi
         env:
-          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
+          NX_CLOUD_ACCESS_TOKEN: ${{ steps.nx-cloud-status.outputs.enabled == 'true' && secrets.NX_CLOUD_ACCESS_TOKEN || '' }}
         timeout-minutes: 15
         continue-on-error: false
 
@@ -305,7 +305,7 @@ jobs:
           echo "All linting strategies failed - there may be unfixable lint errors"
           exit 1
         env:
-          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
+          NX_CLOUD_ACCESS_TOKEN: ${{ steps.nx-cloud-status.outputs.enabled == 'true' && secrets.NX_CLOUD_ACCESS_TOKEN || '' }}
         timeout-minutes: 15
 
       - name: Type check affected projects with self-healing
@@ -340,7 +340,7 @@ jobs:
           echo "Type checking failed - there may be actual TypeScript errors"
           exit 1
         env:
-          NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
+          NX_CLOUD_ACCESS_TOKEN: ${{ steps.nx-cloud-status.outputs.enabled == 'true' && secrets.NX_CLOUD_ACCESS_TOKEN || '' }}
         timeout-minutes: 20
 
       - name: Run affected tests with self-healing
