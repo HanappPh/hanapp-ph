@@ -17,6 +17,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     router.push('/notifications');
   };
 
+  const handleProfileClick = () => {
+    router.push('/profile');
+  };
+
   const handleNavigate = (path: string) => {
     router.push(path);
   };
@@ -37,6 +41,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen flex flex-col">
       <ClientHomeNavbar
         onNotificationClick={handleNotificationClick}
+        onProfileClick={handleProfileClick}
         notificationCount={3}
       />
       <main className="flex-1">{children}</main>
