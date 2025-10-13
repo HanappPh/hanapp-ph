@@ -71,6 +71,8 @@ export function ClientHomeProviders({
                       <Image
                         src={provider.avatar}
                         alt={provider.name}
+                        width={80}
+                        height={80}
                         className="w-full h-full object-cover"
                       />
                     ) : (
