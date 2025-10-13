@@ -10,7 +10,6 @@ import { MobileProfileInfo } from '../../../components/mobile-profile-info';
 import { MobileProfileStats } from '../../../components/mobile-profile-stats';
 import { MobileProfileTabs } from '../../../components/mobile-profile-tabs';
 import { MobileServicePreferences } from '../../../components/mobile-service-preferences';
-import { Header } from '../../../components/provider-profile-header';
 import { MainContent } from '../../../components/provider-profile-main-content';
 import { Sidebar } from '../../../components/provider-profile-sidebar';
 
@@ -21,14 +20,6 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-[#F3F5F9] flex flex-col">
       {/* Desktop layout */}
       <div className="hidden md:block">
-        <Header
-          bellColor="#6b7280"
-          badgeColor="#102E50"
-          InitialsBgColor="#102E50"
-          InitialsTextColor="#ffffff"
-          headerHoverColor="#102E50"
-          activePage="Home"
-        />
         <div className="flex">
           <Sidebar
             initialSelected="Client"
