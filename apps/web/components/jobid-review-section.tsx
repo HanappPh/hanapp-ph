@@ -294,9 +294,9 @@ export function ReviewsSection({
     <div className="w-full xl:max-w-screen-xl 2xl:max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 pb-5 sm:pb-6 lg:pb-8 overflow-hidden">
       {/* Two Column Layout - Profile + Review Filters */}
       <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 mb-6">
-        {/* Left Column - Seller Profile (Hidden on mobile, shown on lg+) */}
+        {/* Left Column - Seller Profile */}
         {sellerProfile && (
-          <div className="hidden lg:block lg:w-[350px] flex-shrink-0">
+          <div className="w-full lg:w-[350px] flex-shrink-0">
             <SellerProfileCard profile={sellerProfile} />
           </div>
         )}
