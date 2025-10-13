@@ -3,7 +3,7 @@
 import { Button } from '@hanapp-ph/commons';
 import { useState } from 'react';
 
-import { OtpVerificationButtons } from './LoginOtpVerification';
+import { OtpVerificationButtons } from './login-otp-verification';
 
 interface AuthButtonsProps {
   onSendOTP?: (phoneNumber: string) => void;

@@ -11,7 +11,7 @@ import {
 import { Clock, Calendar } from 'lucide-react';
 import { useState } from 'react';
 
-import BookingCard from '../../../components/booking/BookingCards';
+import BookingCard from '../../../components/booking/booking-cards';
 import { RecommendedServices } from '../../../components/recommendations';
 interface BookingDetails {
   id: number;

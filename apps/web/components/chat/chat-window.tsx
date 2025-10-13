@@ -7,8 +7,8 @@ import {
 import { ChevronLeft, MoreVertical } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 
-import { ChatInput } from './ChatInput';
-import { ChatMessage, ChatMessageData } from './ChatMessage';
+import { ChatInput } from './chat-input';
+import { ChatMessage, ChatMessageData } from './chat-message';
 // import { Phone, Video, MoreVertical } from 'lucide-react';
 
 interface ChatWindowProps {

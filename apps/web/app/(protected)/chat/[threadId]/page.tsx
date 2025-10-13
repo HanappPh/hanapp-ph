@@ -6,9 +6,9 @@ import { useState } from 'react';
 import {
   ChatList,
   type ChatListItem,
-} from '../../../../components/chat/ChatList';
-import { ChatMessageData } from '../../../../components/chat/ChatMessage';
-import { ChatWindow } from '../../../../components/chat/ChatWindow';
+} from '../../../../components/chat/chat-list';
+import { ChatMessageData } from '../../../../components/chat/chat-message';
+import { ChatWindow } from '../../../../components/chat/chat-window';
 
 const mockChats: ChatListItem[] = [
   {
