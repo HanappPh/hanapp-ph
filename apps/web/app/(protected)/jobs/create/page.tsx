@@ -4,13 +4,10 @@ import { LocationAvailabilitySection } from '../../../../components/request-loca
 import { ImageUploadSection } from '../../../../components/request-media-upload';
 import { PricingInformationSection } from '../../../../components/request-pricing-information';
 import { TermsSubmitSection } from '../../../../components/request-terms-submit';
-import { Header } from '../../../../components/temporary-navigation-bar';
 
 export default function RequestServicePage() {
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
-
       <div className="w-full py-12 px-6">
         <div className="max-w-6xl mx-auto text-center">
           <h1
