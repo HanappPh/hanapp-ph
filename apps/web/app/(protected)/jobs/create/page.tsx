@@ -1,9 +1,9 @@
-import { ContactInformationSection } from '../../../../components/request-job-listing/RequestContact';
-import { JobDetailsSection } from '../../../../components/request-job-listing/RequestJobDetails';
-import { LocationAvailabilitySection } from '../../../../components/request-job-listing/RequestLocation';
-import { ImageUploadSection } from '../../../../components/request-job-listing/RequestMedia';
-import { PricingInformationSection } from '../../../../components/request-job-listing/RequestPricing';
-import { TermsSubmitSection } from '../../../../components/request-job-listing/RequestTerms';
+import { ContactInformationSection } from '../../../../components/request-job-listing/request-contact';
+import { JobDetailsSection } from '../../../../components/request-job-listing/request-job-details';
+import { LocationAvailabilitySection } from '../../../../components/request-job-listing/request-locations';
+import { ImageUploadSection } from '../../../../components/request-job-listing/request-media';
+import { PricingInformationSection } from '../../../../components/request-job-listing/request-pricing';
+import { TermsSubmitSection } from '../../../../components/request-job-listing/request-terms';
 
 export default function RequestServicePage() {
   return (

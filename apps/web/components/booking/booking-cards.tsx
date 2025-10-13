@@ -8,8 +8,8 @@ import {
 import { Star, MapPin, Calendar, Clock } from 'lucide-react';
 import Image from 'next/image';
 
-import BookingActionButton from './BookingButtons';
-import BookingStatusBadge from './BookingStatus';
+import BookingActionButton from './booking-button';
+import BookingStatusBadge from './booking-status';
 
 interface BookingCardProps {
   id: number;

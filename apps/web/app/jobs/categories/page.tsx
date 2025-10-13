@@ -2,8 +2,8 @@
 
 import { useState, useMemo, useCallback } from 'react';
 
-import { CategoriesHeader } from '../../../components/categories/CategoriesHeader';
-import { CategoriesSidebar } from '../../../components/categories/CategoriesSideBar';
+import { CategoriesHeader } from '../../../components/categories/categories-header';
+import { CategoriesSidebar } from '../../../components/categories/categories-sidebar';
 import CategoriesJobCard from '../../../components/categories-job-card';
 
 // Type definition

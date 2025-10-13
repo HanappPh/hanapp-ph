@@ -1,17 +1,17 @@
 'use client';
 import * as React from 'react';
 
-import { MainContent } from '../../../components/profile/ProfileContent';
-import { Sidebar } from '../../../components/profile/ProfileSidebar';
-import { MobileProfileBottom } from '../../../components/profile-mobile/MobileBottom';
-import { MobileProfileDivider } from '../../../components/profile-mobile/MobileDivider';
-import { MobileProfileFavoriteProviders } from '../../../components/profile-mobile/MobileFavoriteProviders';
-import { MobileProfileHeader } from '../../../components/profile-mobile/MobileHeader';
-import { MobileProfileImage } from '../../../components/profile-mobile/MobileImage';
-import { MobileProfileInfo } from '../../../components/profile-mobile/MobileInfo';
-import { MobileServicePreferences } from '../../../components/profile-mobile/MobileServicePreference';
-import { MobileProfileStats } from '../../../components/profile-mobile/MobileStats';
-import { MobileProfileTabs } from '../../../components/profile-mobile/MobileTabs';
+import { MainContent } from '../../../components/profile/profile-content';
+import { Sidebar } from '../../../components/profile/profile-sidebar';
+import { MobileProfileBottom } from '../../../components/profile-mobile/mobile-bottom';
+import { MobileProfileDivider } from '../../../components/profile-mobile/mobile-divider';
+import { MobileProfileFavoriteProviders } from '../../../components/profile-mobile/mobile-fav-providers';
+import { MobileProfileHeader } from '../../../components/profile-mobile/mobile-header';
+import { MobileProfileImage } from '../../../components/profile-mobile/mobile-images';
+import { MobileProfileInfo } from '../../../components/profile-mobile/mobile-info';
+import { MobileServicePreferences } from '../../../components/profile-mobile/mobile-service-preference';
+import { MobileProfileStats } from '../../../components/profile-mobile/mobile-stats';
+import { MobileProfileTabs } from '../../../components/profile-mobile/mobile-tabs';
 
 export default function ProfilePage() {
   const [showDropdown, setShowDropdown] = React.useState(false);

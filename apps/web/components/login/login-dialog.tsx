@@ -2,8 +2,8 @@
 
 import { Card } from '@hanapp-ph/commons';
 
-import { AuthButtons } from './LoginAuthButtons';
-import { DialogHeader } from './LoginDialogHeader';
+import { AuthButtons } from './login-auth-buttons';
+import { DialogHeader } from './login-dialog-header';
 
 interface LoginFormProps {
   onSendOTP?: (phoneNumber: string) => void;
