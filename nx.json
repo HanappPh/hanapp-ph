@@ -19,25 +19,6 @@
     "sharedGlobals": ["{workspaceRoot}/.github/workflows/ci.yml"]
   },
   "nxCloudId": "68c72ce6c719da16ec2128ae",
-  "tasksRunnerOptions": {
-    "default": {
-      "runner": "nx-cloud",
-      "options": {
-        "cacheableOperations": [
-          "build",
-          "test",
-          "lint",
-          "typecheck",
-          "e2e",
-          "eslint:lint"
-        ],
-        "parallel": 3,
-        "cacheDirectory": ".nx/cache",
-        "useDaemonProcess": false,
-        "accessToken": ""
-      }
-    }
-  },
   "plugins": [
     {
       "plugin": "@nx/js/typescript",
@@ -114,8 +95,7 @@
       "dependsOn": ["^build"],
       "options": {
         "passWithNoTests": true
-      },
-      "cache": true
+      }
     },
     "typecheck": {
       "dependsOn": [
@@ -124,21 +104,10 @@
           "projects": "dependencies",
           "params": "forward"
         }
-      ],
-      "cache": true
+      ]
     },
     "build": {
-      "dependsOn": ["^build"],
-      "cache": true
-    },
-    "lint": {
-      "cache": true
-    },
-    "eslint:lint": {
-      "cache": true
-    },
-    "e2e": {
-      "cache": true
+      "dependsOn": ["^build"]
     }
   },
   "generators": {
