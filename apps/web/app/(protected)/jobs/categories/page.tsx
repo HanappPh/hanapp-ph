@@ -2,9 +2,9 @@
 
 import { useState, useMemo, useCallback } from 'react';
 
-import { CategoriesHeader } from '../../../components/categories/categories-header';
-import { CategoriesSidebar } from '../../../components/categories/categories-sidebar';
-import CategoriesJobCard from '../../../components/categories-job-card';
+// import { CategoriesHeader } from '../../../../components/categories/categories-header';
+import { CategoriesSidebar } from '../../../../components/categories/categories-sidebar';
+import CategoriesJobCard from '../../../../components/categories-job-card';
 
 // Type definition
 type Job = {
@@ -239,8 +239,6 @@ export default function CategoriesPage() {
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
-      <CategoriesHeader />
-
       <div className="flex-1 lg:overflow-hidden">
         <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 lg:py-8">
           {/* Mobile filter button */}
