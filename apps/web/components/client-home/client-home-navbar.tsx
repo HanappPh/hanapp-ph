@@ -1,4 +1,5 @@
 import { Bell } from 'lucide-react';
+import Link from 'next/link';
 
 interface ClientHomeNavbarProps {
   onNotificationClick?: () => void;
@@ -25,7 +26,7 @@ export function ClientHomeNavbar({
 
           {/* Navigation Items */}
           <div className="hidden md:flex items-center gap-8">
-            <a
+            <Link
               href="/"
               className="flex flex-col items-center gap-1 text-blue-900"
             >
@@ -33,8 +34,8 @@ export function ClientHomeNavbar({
                 <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
               </svg>
               <span className="text-xs font-medium">Home</span>
-            </a>
-            <a
+            </Link>
+            <Link
               href="/bookings"
               className="flex flex-col items-center gap-1 text-gray-500 hover:text-blue-900"
             >
@@ -47,8 +48,8 @@ export function ClientHomeNavbar({
                 />
               </svg>
               <span className="text-xs font-medium">Bookings</span>
-            </a>
-            <a
+            </Link>
+            <Link
               href="/chat"
               className="flex flex-col items-center gap-1 text-gray-500 hover:text-blue-900"
             >
@@ -60,7 +61,7 @@ export function ClientHomeNavbar({
                 />
               </svg>
               <span className="text-xs font-medium">Chat</span>
-            </a>
+            </Link>
           </div>
 
           {/* Right side - Notification and Profile */}
