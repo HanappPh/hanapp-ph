@@ -1,7 +1,6 @@
 'use client';
 import { JobIdBg } from '../../../../components/jobid-bg';
 import { JobIdFaq } from '../../../../components/jobid-faq';
-import { Navigation } from '../../../../components/jobid-navigation';
 import { PhotosMedia } from '../../../../components/jobid-photos-media';
 import { ReviewsSection } from '../../../../components/jobid-review-section';
 import { ServicesSection } from '../../../../components/jobid-service-section';
@@ -303,7 +302,6 @@ export default function ClientJobPage() {
   return (
     <JobIdBg>
       <div className="min-h-screen w-full overflow-x-hidden">
-        <Navigation />
         <div className="w-full max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-1 sm:py-3 lg:py-7">
           <div className="mb-6 sm:mb-8 lg:mb-12">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
