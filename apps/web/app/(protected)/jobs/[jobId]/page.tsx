@@ -1,10 +1,10 @@
 'use client';
-import { JobIdBg } from '../../../../components/jobid-bg';
-import { JobIdFaq } from '../../../../components/jobid-faq';
-import { PhotosMedia } from '../../../../components/jobid-photos-media';
-import { ReviewsSection } from '../../../../components/jobid-review-section';
-import { ServicesSection } from '../../../../components/jobid-service-section';
-import { Sidebar } from '../../../../components/jobid-sidebar';
+import { JobIdBg } from '../../../../components/jobid/jobid-bg';
+import { Sidebar } from '../../../../components/jobid/jobid-cards';
+import { JobIdFaq } from '../../../../components/jobid/jobid-faq';
+import { PhotosMedia } from '../../../../components/jobid/jobid-media';
+import { ReviewsSection } from '../../../../components/jobid/jobid-reviews';
+import { ServicesSection } from '../../../../components/jobid/jobid-service';
 
 export default function ClientJobPage() {
   // Random FAQ details for demo
