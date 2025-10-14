@@ -3,7 +3,7 @@ import { Instagram, Facebook } from 'lucide-react';
 
 export function Footer() {
   return (
-    <footer className="bg-gradient-to-b from-[#FFDD8E] to-[#F5C45E] text-[#102E50] py-12">
+    <footer className="text-[#102E50] py-12">
       <div className="max-w-7xl mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
           {/* Logo column */}
@@ -75,7 +75,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-[#102E50]/40 mt-8 pt-8 text-center text-sm">
+        <div className="mt-8 pt-8 text-center text-sm">
           © Hanapp Technologies
         </div>
       </div>

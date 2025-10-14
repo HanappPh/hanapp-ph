@@ -146,4 +146,12 @@
   .border-hanapp-accent {
     border-color: #f5c45e;
   }
+
+  .border-hanapp-primary {
+    border-color: #014182;
+  }
+
+  .border-hanapp-secondary {
+    border-color: #102e50;
+  }
 }
