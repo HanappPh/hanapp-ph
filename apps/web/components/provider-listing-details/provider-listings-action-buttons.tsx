@@ -5,13 +5,11 @@ import React from 'react';
 interface ActionButtonsProps {
   status: 'pending' | 'accepted' | 'declined';
   onAccept: () => void;
-  onDecline: () => void;
 }
 
 export const ProviderListingsActionButtons: React.FC<ActionButtonsProps> = ({
   status,
   onAccept,
-  onDecline: _onDecline,
 }) => {
   if (status === 'pending') {
     return (
