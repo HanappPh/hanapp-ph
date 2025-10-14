@@ -248,6 +248,17 @@ export default function ClientJobPage() {
     },
   ];
 
+  const sellerProfile = {
+    name: 'MEL Supply',
+    phone: '417.622.4224',
+    email: 'mel.supply@example.com',
+    positiveRating: '100% positive feedback',
+    joinedDate: 'Joined Feb 2005',
+    jobPreferences:
+      'AC Installation, Maintenance, Repair Services, Emergency Calls',
+    profileImage: '/house-cleaning-service.png',
+  };
+
   const sidebarData = {
     pricing: {
       startingPrice: '499',
@@ -316,7 +327,7 @@ export default function ClientJobPage() {
           <div>
             <ServicesSection services={services} expectations={expectations} />
             <div className="w-full mt-2 sm:mt-4 lg:mt-6">
-              <ReviewsSection reviews={reviews} />
+              <ReviewsSection reviews={reviews} sellerProfile={sellerProfile} />
             </div>
             <div className="w-full mt-2 sm:mt-4 lg:mt-6">
               <h2 className="text-base sm:text-lg lg:text-2xl font-bold text-[#102E50] text-center mb-4">
