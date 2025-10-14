@@ -2,7 +2,10 @@
 
 import { useRouter } from 'next/navigation';
 
-import { ChatList, type ChatListItem } from '../../../components/chat/ChatList';
+import {
+  ChatList,
+  type ChatListItem,
+} from '../../../components/chat/chat-list';
 
 const mockChats: ChatListItem[] = [
   {

@@ -2,10 +2,162 @@
 
 import { useState, useMemo, useCallback } from 'react';
 
-import { jobs, categories } from '../../../../components/categories-data';
+// import { CategoriesHeader } from '../../../../components/categories/categories-header';
+import { CategoriesSidebar } from '../../../../components/categories/categories-sidebar';
 import CategoriesJobCard from '../../../../components/categories-job-card';
-import { CategoriesSidebar } from '../../../../components/categories-sidebar';
-import { Job } from '../../../../components/categories-types';
+
+// Type definition
+type Job = {
+  id: string;
+  title: string;
+  category: string;
+  location: string;
+  price: string;
+  rating: number;
+  image: string;
+  categories: string[];
+};
+
+// Data
+const categories = [
+  'Laundry',
+  'Transportation',
+  'Babysitting',
+  'Errands',
+  'Pet Care',
+  'Catering',
+  'Construction',
+  'Plumbing',
+  'Auto Repair',
+  'Tech Support',
+  'Gardening',
+  'Legal',
+  'Home Services',
+  'Professional Services',
+];
+
+const jobs: Job[] = [
+  {
+    id: '1',
+    title: 'Labada per kilo',
+    category: 'Laundry',
+    location: 'Baluag, Bulacan',
+    price: '₱2.6k',
+    rating: 3,
+    image: '/woman-doing-laundry-service.jpg',
+    categories: ['Laundry', 'Home Services'],
+  },
+  {
+    id: '2',
+    title: 'Lipat bahay Luzon area only',
+    category: 'Transportation',
+    location: 'Baluag, Bulacan',
+    price: '₱2.6k',
+    rating: 4,
+    image: '/moving-truck-and-movers.jpg',
+    categories: ['Transportation', 'Moving'],
+  },
+  {
+    id: '3',
+    title: 'Stay out yaya daily rate',
+    category: 'Babysitting',
+    location: 'Baluag, Bulacan',
+    price: '₱650',
+    rating: 5,
+    image: '/nanny-with-child.jpg',
+    categories: ['Babysitting', 'Childcare'],
+  },
+  {
+    id: '4',
+    title: 'Delivery rider baliwag area',
+    category: 'Errands',
+    location: 'Baluag, Bulacan',
+    price: '₱300',
+    rating: 5,
+    image: '/delivery-rider-on-motorcycle.jpg',
+    categories: ['Errands', 'Delivery'],
+  },
+  {
+    id: '5',
+    title: 'Home service dog grooming',
+    category: 'Pet Care',
+    location: 'Baluag, Bulacan',
+    price: '₱2.6k',
+    rating: 3,
+    image: '/dog-groomer-with-pet.jpg',
+    categories: ['Pet Care', 'Grooming'],
+  },
+  {
+    id: '6',
+    title: 'Catering services for events',
+    category: 'Catering',
+    location: 'Baluag, Bulacan',
+    price: '₱50k',
+    rating: 5,
+    image: '/catering-buffet-food-service.jpg',
+    categories: ['Catering', 'Events'],
+  },
+  {
+    id: '7',
+    title: 'Panday with own tools',
+    category: 'Construction',
+    location: 'Baluag, Bulacan',
+    price: '₱700',
+    rating: 2,
+    image: '/construction-worker-tools.jpg',
+    categories: ['Construction', 'Handyman'],
+  },
+  {
+    id: '8',
+    title: 'Declogging drain home service',
+    category: 'Plumbing',
+    location: 'Baluag, Bulacan',
+    price: '₱3k',
+    rating: 4,
+    image: '/plumber-fixing-drain.png',
+    categories: ['Plumbing', 'Home Services'],
+  },
+  {
+    id: '9',
+    title: 'Auto repair home service',
+    category: 'Auto Repair',
+    location: 'Baluag, Bulacan',
+    price: '₱650',
+    rating: 5,
+    image: '/mechanic-repairing-car.jpg',
+    categories: ['Auto Repair', 'Automotive'],
+  },
+  {
+    id: '10',
+    title: 'Unlock iphone ipad',
+    category: 'Tech Support',
+    location: 'Baluag, Bulacan',
+    price: '₱800',
+    rating: 5,
+    image: '/phone-and-tablet-repair.png',
+    categories: ['Tech Support', 'Electronics'],
+  },
+  {
+    id: '11',
+    title: 'Grass cutting landscaping',
+    category: 'Gardening',
+    location: 'Baluag, Bulacan',
+    price: '₱1.8k',
+    rating: 5,
+    image: '/landscaper-cutting-grass.jpg',
+    categories: ['Gardening', 'Landscaping'],
+  },
+  {
+    id: '12',
+    title: 'Notary Public 24/7 legal services',
+    category: 'Legal',
+    location: 'Baluag, Bulacan',
+    price: '₱800',
+    rating: 5,
+    image: '/notary-public-professional.jpg',
+    categories: ['Legal', 'Professional Services'],
+  },
+];
 
 type SortOption = 'location' | 'rating' | 'price-high-low' | 'price-low-high';
 
