@@ -253,10 +253,9 @@ export default function ClientJobPage() {
     phone: '417.622.4224',
     email: 'mel.supply@example.com',
     positiveRating: '100% positive feedback',
-    itemsSold: '11K items sold',
     joinedDate: 'Joined Feb 2005',
-    responseTime: 'Usually responds within 24 hours',
-    jobPreferences: 'AC installation, maintenance, and repair services.',
+    jobPreferences:
+      'AC Installation, Maintenance, Repair Services, Emergency Calls',
     profileImage: '/house-cleaning-service.png',
   };
 

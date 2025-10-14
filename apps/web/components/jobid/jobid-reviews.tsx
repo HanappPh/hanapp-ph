@@ -1,5 +1,5 @@
-import { Button, Card, CardContent } from '@hanapp-ph/commons';
-import { Star, Calendar, Clock } from 'lucide-react';
+import { Button, Card, CardContent, Badge } from '@hanapp-ph/commons';
+import { Star, Calendar } from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
 
@@ -20,9 +20,7 @@ interface SellerProfile {
   phone: string;
   email: string;
   positiveRating: string;
-  itemsSold: string;
   joinedDate: string;
-  responseTime: string;
   jobPreferences: string;
   profileImage?: string;
 }
@@ -156,7 +154,9 @@ function SellerProfileCard({ profile }: { profile: SellerProfile }) {
   return (
     <Card className="p-5 sticky top-4">
       <CardContent className="p-0 space-y-4">
-        <h3 className="text-xl font-bold text-[#102E50]">About this seller</h3>
+        <h3 className="text-xl font-bold text-[#102E50]">
+          About this provider
+        </h3>
 
         {/* Profile Image and Name */}
         <div className="flex items-center gap-3 mb-4">
@@ -191,9 +191,6 @@ function SellerProfileCard({ profile }: { profile: SellerProfile }) {
               {profile.positiveRating}
             </span>
           </div>
-          <div className="flex items-center gap-2 text-base text-gray-600">
-            <span>{profile.itemsSold}</span>
-          </div>
         </div>
 
         {/* Additional Info */}
@@ -201,10 +198,6 @@ function SellerProfileCard({ profile }: { profile: SellerProfile }) {
           <div className="flex items-start gap-2">
             <Calendar className="w-5 h-5 text-gray-600 mt-0.5 flex-shrink-0" />
             <span className="text-gray-600">{profile.joinedDate}</span>
-          </div>
-          <div className="flex items-start gap-2">
-            <Clock className="w-5 h-5 text-gray-600 mt-0.5 flex-shrink-0" />
-            <span className="text-gray-600">{profile.responseTime}</span>
           </div>
         </div>
 
@@ -216,12 +209,20 @@ function SellerProfileCard({ profile }: { profile: SellerProfile }) {
 
         {/* Job Preferences */}
         <div className="mb-4">
-          <h5 className="font-semibold text-[#102E50] text-base mb-1">
+          <h5 className="font-semibold text-[#102E50] text-base mb-2">
             Job Preferences
           </h5>
-          <p className="text-base text-gray-700 leading-relaxed">
-            {profile.jobPreferences}
-          </p>
+          <div className="flex flex-wrap gap-2">
+            {profile.jobPreferences.split(',').map((preference, index) => (
+              <Badge
+                key={index}
+                variant="outline"
+                className="border-[#102E50] text-[#102E50] hover:bg-[#102E50] hover:text-white transition-colors text-sm"
+              >
+                {preference.trim()}
+              </Badge>
+            ))}
+          </div>
         </div>
 
         {/* Visit Profile Button */}
@@ -291,18 +292,18 @@ export function ReviewsSection({
   const ratingCounts = getRatingCounts();
 
   return (
-    <div className="w-full xl:max-w-screen-xl 2xl:max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 pb-5 sm:pb-6 lg:pb-8 overflow-hidden">
+    <div className="w-full xl:max-w-screen-xl 2xl:max-w-screen-2xl mx-auto pr-4 sm:pr-6 lg:pr-8 pb-5 sm:pb-6 lg:pb-8 overflow-hidden">
       {/* Two Column Layout - Profile + Review Filters */}
-      <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 mb-6">
+      <div className="flex flex-col lg:flex-row lg:items-center gap-6 lg:gap-8 mb-6 px-4 sm:px-0">
         {/* Left Column - Seller Profile */}
         {sellerProfile && (
-          <div className="w-full lg:w-[350px] flex-shrink-0">
+          <div className="w-full lg:w-[400px] xl:w-[450px] flex-shrink-0">
             <SellerProfileCard profile={sellerProfile} />
           </div>
         )}
 
         {/* Right Column - Review Header and Filters */}
-        <div className="flex-1 min-w-0 space-y-4 sm:space-y-4 mt-auto">
+        <div className="flex-1 min-w-0 space-y-4 sm:space-y-4">
           <div className="mb-5 sm:mb-6 w-full text-left">
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#102E50] break-words">
               Reviews
@@ -360,7 +361,7 @@ export function ReviewsSection({
       </div>
 
       {/* Full Width Comments Section */}
-      <div className="w-full space-y-5 sm:space-y-6">
+      <div className="w-full space-y-5 sm:space-y-6 px-4 sm:px-0">
         <div className="mb-5 sm:mb-6 w-full text-left">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#102E50] break-words">
             All Reviews
