@@ -13,7 +13,7 @@ import { X, MapPin, Upload, ImageIcon } from 'lucide-react';
 import React, { useState, useRef, useCallback } from 'react';
 
 import { AvailabilityForm } from './post-availability';
-import { ContactInfoForm } from './post-contact-information';
+import { ContactInfoForm } from './post-contact';
 
 export function CreateListingForm(props: { onListingChange?: Function }) {
   const { onListingChange } = props;

@@ -1,16 +1,16 @@
 'use client';
 import * as React from 'react';
 
-import { MobileProfileBottom } from '../../../../components/mobile-profile-bottom';
-import { MobileProfileDivider } from '../../../../components/mobile-profile-divider';
-import { MobileProfileHeader } from '../../../../components/mobile-profile-header';
-import { MobileProfileImage } from '../../../../components/mobile-profile-image';
-import { MobileProfileInfo } from '../../../../components/mobile-profile-info';
-import { MobileProfileStats } from '../../../../components/mobile-profile-stats';
-import { MobileProfileTabs } from '../../../../components/mobile-profile-tabs';
-import { MobileServicePreferences } from '../../../../components/mobile-service-preferences';
-import { MainContent } from '../../../../components/provider-profile-main-content';
-import { Sidebar } from '../../../../components/provider-profile-sidebar';
+import { MainContent } from '../../../../components/profile/profile-content';
+import { Sidebar } from '../../../../components/profile/profile-sidebar';
+import { MobileProfileBottom } from '../../../../components/profile-mobile/mobile-bottom';
+import { MobileProfileDivider } from '../../../../components/profile-mobile/mobile-divider';
+import { MobileProfileHeader } from '../../../../components/profile-mobile/mobile-header';
+import { MobileProfileImage } from '../../../../components/profile-mobile/mobile-images';
+import { MobileProfileInfo } from '../../../../components/profile-mobile/mobile-info';
+import { MobileServicePreferences } from '../../../../components/profile-mobile/mobile-service-preference';
+import { MobileProfileStats } from '../../../../components/profile-mobile/mobile-stats';
+import { MobileProfileTabs } from '../../../../components/profile-mobile/mobile-tabs';
 
 export default function ProfilePage() {
   const [showDropdown, setShowDropdown] = React.useState(false);
@@ -19,6 +19,14 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-[#F3F5F9] flex flex-col">
       {/* Desktop layout */}
       <div className="hidden md:block">
+        {/* <Header
+          bellColor="#6b7280"
+          badgeColor="#f5c45e"
+          InitialsBgColor="#f5c45e"
+          InitialsTextColor="#ffffff"
+          headerHoverColor="#F5C45E"
+          activePage="Home"
+        /> */}
         <div className="flex">
           <Sidebar
             initialSelected="Provider"

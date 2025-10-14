@@ -3,12 +3,12 @@
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useRef } from 'react';
 
-import { BackgroundImage } from '../../../../components/login-background';
-import { LoginDialog } from '../../../../components/login-dialog';
-import { MainHeader } from '../../../../components/login-header';
-import SignInBrandHeader from '../../../../components/signin-brand-header';
-import SignUpForm from '../../../../components/signin-forms';
-import SignInServiceSelector from '../../../../components/signin-service-selector';
+import { BackgroundImage } from '../../../../components/background';
+import { LoginDialog } from '../../../../components/login/login-dialog';
+import { MainHeader } from '../../../../components/login/login-header';
+import SignUpForm from '../../../../components/signup/signup-forms';
+import SignInBrandHeader from '../../../../components/signup/signup-header';
+import SignInServiceSelector from '../../../../components/signup/signup-service';
 import { FormData, SignUpFormRef } from '../../../../types/signupinterface';
 
 type ServiceOption = 'jobs' | 'services' | 'both';
