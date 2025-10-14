@@ -1,4 +1,3 @@
-import { Footer } from '../../../components/footer';
 import { JobListings } from '../../../components/job-listings';
 import { Banner } from '../../../components/provider/banner';
 import { DashboardStats } from '../../../components/provider/dashboard-stats';
@@ -32,7 +31,6 @@ export default function ProviderPage() {
       <OnboardingSection />
       <JobListings />
       <LowerHeroSection />
-      <Footer />
     </div>
   );
 }

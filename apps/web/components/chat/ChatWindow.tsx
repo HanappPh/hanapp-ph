@@ -33,9 +33,13 @@ export const ChatWindow = ({
   onBack,
 }: ChatWindowProps) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop =
+        messagesContainerRef.current.scrollHeight;
+    }
   };
 
   useEffect(() => {
@@ -43,7 +47,7 @@ export const ChatWindow = ({
   }, [messages]);
 
   return (
-    <div className="flex-1 flex flex-col bg-gray-50 p-4">
+    <div className="flex flex-col bg-gray-50 p-4 h-full overflow-hidden">
       {/* Modern Card Header */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-4 flex-shrink-0">
         <div className="flex items-center justify-between">
@@ -100,7 +104,10 @@ export const ChatWindow = ({
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div
+        ref={messagesContainerRef}
+        className="flex-1 overflow-y-auto bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-4 min-h-0"
+      >
         <div className="space-y-4">
           {messages.map(message => (
             <ChatMessage key={message.id} message={message} />
@@ -140,7 +147,9 @@ export const ChatWindow = ({
         <div ref={messagesEndRef} />
       </div>
 
-      <ChatInput onSendMessage={onSendMessage} />
+      <div className="flex-shrink-0">
+        <ChatInput onSendMessage={onSendMessage} />
+      </div>
     </div>
   );
 };

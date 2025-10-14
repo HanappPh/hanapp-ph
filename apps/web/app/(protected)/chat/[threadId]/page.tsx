@@ -174,28 +174,34 @@ const ThreadPage = () => {
   };
 
   return (
-    <div className="h-screen bg-gray-50 flex">
-      {/* Chat list - hidden on mobile, visible on desktop */}
-      <div className="hidden md:flex md:w-80 bg-white border-r border-gray-200 flex-col p-4">
-        <ChatList
-          chats={mockChats}
-          selectedChatId={selectedChatId}
-          onSelectChat={handleSelectChat}
-        />
-      </div>
+    <div className="bg-gray-50 overflow-hidden">
+      <div className="container mx-auto max-w-7xl py-4">
+        <div className="flex overflow-hidden" style={{ height: '600px' }}>
+          {/* Chat list - hidden on mobile, visible on desktop */}
+          <div className="hidden md:flex md:w-80 bg-white border-r border-gray-200 flex-col overflow-hidden">
+            <div className="p-4 overflow-y-auto flex-1">
+              <ChatList
+                chats={mockChats}
+                selectedChatId={selectedChatId}
+                onSelectChat={handleSelectChat}
+              />
+            </div>
+          </div>
 
-      {/* Chat window - full width on mobile, flex-1 on desktop */}
-      <div className="flex-1 flex flex-col">
-        <ChatWindow
-          messages={messages}
-          onSendMessage={handleSendMessage}
-          recipientName={selectedChat.name}
-          recipientAvatar={selectedChat.avatar}
-          recipientInitials={selectedChat.initials}
-          isOnline={selectedChat.isOnline}
-          isTyping={false}
-          onBack={handleBack}
-        />
+          {/* Chat window - full width on mobile, flex-1 on desktop */}
+          <div className="flex-1 overflow-hidden">
+            <ChatWindow
+              messages={messages}
+              onSendMessage={handleSendMessage}
+              recipientName={selectedChat.name}
+              recipientAvatar={selectedChat.avatar}
+              recipientInitials={selectedChat.initials}
+              isOnline={selectedChat.isOnline}
+              isTyping={false}
+              onBack={handleBack}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
