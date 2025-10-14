@@ -56,11 +56,6 @@ export default function ProviderListingsRequestDetailsView() {
     // TODO: Implement accept request logic
   };
 
-  const handleDecline = () => {
-    setStatus('declined');
-    // TODO: Implement decline request logic
-  };
-
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
       <div className="grid lg:grid-cols-3 gap-6">
@@ -90,7 +85,6 @@ export default function ProviderListingsRequestDetailsView() {
           <ProviderListingsActionButtons
             status={status}
             onAccept={handleAccept}
-            onDecline={handleDecline}
           />
         </div>
       </div>
