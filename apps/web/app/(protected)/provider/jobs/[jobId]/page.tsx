@@ -4,6 +4,7 @@ import { Card } from '@hanapp-ph/commons';
 import React, { useState } from 'react';
 
 import { ProviderListingsActionButtons } from '../../../../../components/provider-listing-details/provider-listings-action-buttons';
+import { ProviderListingsAttachedPhotos } from '../../../../../components/provider-listing-details/provider-listings-attached-photos';
 import { ProviderListingsClientProfile } from '../../../../../components/provider-listing-details/provider-listings-client-profile';
 import { ProviderListingsQualificationsCard } from '../../../../../components/provider-listing-details/provider-listings-qualifications-card';
 import { ProviderListingsServiceInfoCard } from '../../../../../components/provider-listing-details/provider-listings-service-info-card';
@@ -30,6 +31,11 @@ export default function ProviderListingsRequestDetailsView() {
       'Please bring ladder (units are wall-mounted)',
       'Prefer eco-friendly cleaning solutions',
       'Need service completed before 5 PM',
+    ],
+    attachedPhotos: [
+      '/img-carousel-placeholder_1.png',
+      '/img-carousel-placeholder_2.png',
+      '/img-carousel-placeholder_3.png',
     ],
     client: {
       name: 'Maria Santos',
@@ -73,6 +79,7 @@ export default function ProviderListingsRequestDetailsView() {
           <ProviderListingsQualificationsCard
             qualifications={request.qualifications}
           />
+          <ProviderListingsAttachedPhotos photos={request.attachedPhotos} />
         </div>
 
         {/* Right Column - Client Info & Actions */}
