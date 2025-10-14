@@ -228,7 +228,7 @@ export function ListingsSection() {
                       ))}
                     </div>
                     {/* Price */}
-                    <div className=" bg-black text-white px-2 py-1 rounded text-sm font-semibold">
+                    <div className="bg-black text-white px-2 py-1 rounded text-sm font-semibold">
                       {listing.price}
                     </div>
                   </div>
