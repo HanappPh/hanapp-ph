@@ -138,7 +138,7 @@ export function JobListings() {
               (filter === activeFilter
                 ? 'bg-hanapp-secondary text-white hover:bg-hanapp-primary'
                 : 'border-hanapp-secondary bg-white text-hanapp-secondary hover:bg-hanapp-secondary hover:border-hanapp-secondary hover:text-white') +
-              ' rounded-xl px-4 text-md'
+              ' rounded-xl px-4 text-base'
             }
           >
             {filter}
