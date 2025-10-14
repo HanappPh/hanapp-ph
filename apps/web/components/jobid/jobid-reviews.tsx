@@ -1,5 +1,5 @@
-import { Button } from '@hanapp-ph/commons';
-import { Star } from 'lucide-react';
+import { Button, Card, CardContent, Badge } from '@hanapp-ph/commons';
+import { Star, Calendar } from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
 
@@ -15,8 +15,19 @@ interface Review {
   imageUrl?: string;
 }
 
+interface SellerProfile {
+  name: string;
+  phone: string;
+  email: string;
+  positiveRating: string;
+  joinedDate: string;
+  jobPreferences: string;
+  profileImage?: string;
+}
+
 interface ReviewsSectionProps {
   reviews: Review[];
+  sellerProfile?: SellerProfile;
 }
 
 function ReviewItem({
@@ -41,10 +52,10 @@ function ReviewItem({
   };
 
   return (
-    <div
-      className={`bg-white p-6 sm:p-8 lg:p-10 rounded-lg shadow-sm border border-gray-100 w-full min-h-[120px] sm:min-h-[140px] ${className}`}
+    <Card
+      className={`p-6 sm:p-8 lg:p-10 w-full min-h-[120px] sm:min-h-[140px] ${className}`}
     >
-      <div className="flex flex-col gap-5 sm:gap-6 w-full h-full">
+      <CardContent className="flex flex-col gap-5 sm:gap-6 w-full h-full p-0">
         <div className="flex items-start justify-between gap-3 w-full">
           <h4 className="font-semibold text-[#102E50] text-base sm:text-2xl flex-1 break-words">
             {name}
@@ -83,13 +94,13 @@ function ReviewItem({
           )}
 
           <Button
-            className="text-sm bg-[#102E50] text-white rounded-md hover:bg-blue-700 self-end"
+            className="text-sm bg-[#102E50] text-white rounded-md hover:bg-[#0a1f35] self-end"
             onClick={handleReplyClick}
           >
             Reply
           </Button>
         </div>
-      </div>
+      </CardContent>
 
       {showImageModal && (
         <div
@@ -105,8 +116,8 @@ function ReviewItem({
           className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4"
           onClick={() => setShowReplyModal(false)}
         >
-          <div
-            className="bg-white rounded-lg p-6 w-full max-w-md mx-auto"
+          <Card
+            className="p-6 w-full max-w-md mx-auto"
             onClick={e => e.stopPropagation()}
           >
             <h3 className="text-xl font-bold mb-4">Reply to Review</h3>
@@ -119,27 +130,114 @@ function ReviewItem({
             ></textarea>
             <div className="flex justify-end gap-2">
               <Button
-                className="px-4 py-2 bg-[#102E50] text-white rounded-md hover:bg-blue-700"
+                className="px-4 py-2 bg-[#102E50] text-white rounded-md hover:bg-[#0a1f35]"
                 onClick={() => setShowReplyModal(false)}
               >
                 Cancel
               </Button>
               <Button
-                className="px-4 py-2 bg-[#102E50] text-white rounded-md hover:bg-blue-700"
+                className="px-4 py-2 bg-[#102E50] text-white rounded-md hover:bg-[#0a1f35]"
                 onClick={handleSubmitReply}
                 disabled={!replyText.trim()}
               >
                 Submit Reply
               </Button>
             </div>
-          </div>
+          </Card>
         </div>
       )}
-    </div>
+    </Card>
   );
 }
 
-export function ReviewsSection({ reviews }: ReviewsSectionProps) {
+function SellerProfileCard({ profile }: { profile: SellerProfile }) {
+  return (
+    <Card className="p-5 sticky top-4">
+      <CardContent className="p-0 space-y-4">
+        <h3 className="text-xl font-bold text-[#102E50]">
+          About this provider
+        </h3>
+
+        {/* Profile Image and Name */}
+        <div className="flex items-center gap-3 mb-4">
+          <div className="relative w-20 h-20 rounded-full overflow-hidden bg-red-600 flex items-center justify-center flex-shrink-0">
+            {profile.profileImage ? (
+              <Image
+                src={profile.profileImage}
+                alt={profile.name}
+                fill
+                className="object-cover"
+              />
+            ) : (
+              <div className="text-white text-center font-bold">
+                <div className="text-lg">MAKE</div>
+                <div className="text-lg">AN</div>
+                <div className="text-lg">OFFER</div>
+              </div>
+            )}
+          </div>
+          <div className="flex-1">
+            <h4 className="font-semibold text-[#102E50] text-lg mb-1">
+              {profile.name}
+            </h4>
+            <p className="text-base text-gray-600">{profile.phone}</p>
+          </div>
+        </div>
+
+        {/* Stats */}
+        <div className="space-y-2 mb-4">
+          <div className="flex items-center gap-2 text-base">
+            <span className="text-[#102E50] font-semibold">
+              {profile.positiveRating}
+            </span>
+          </div>
+        </div>
+
+        {/* Additional Info */}
+        <div className="space-y-2 mb-4 text-base">
+          <div className="flex items-start gap-2">
+            <Calendar className="w-5 h-5 text-gray-600 mt-0.5 flex-shrink-0" />
+            <span className="text-gray-600">{profile.joinedDate}</span>
+          </div>
+        </div>
+
+        {/* Email */}
+        <div className="mb-4">
+          <h5 className="font-semibold text-[#102E50] text-base mb-1">Email</h5>
+          <p className="text-base text-gray-700">{profile.email}</p>
+        </div>
+
+        {/* Job Preferences */}
+        <div className="mb-4">
+          <h5 className="font-semibold text-[#102E50] text-base mb-2">
+            Job Preferences
+          </h5>
+          <div className="flex flex-wrap gap-2">
+            {profile.jobPreferences.split(',').map((preference, index) => (
+              <Badge
+                key={index}
+                variant="outline"
+                className="border-[#102E50] text-[#102E50] hover:bg-[#102E50] hover:text-white transition-colors text-sm"
+              >
+                {preference.trim()}
+              </Badge>
+            ))}
+          </div>
+        </div>
+
+        {/* Visit Profile Button */}
+        <Button className="w-full bg-[#102E50] hover:bg-[#0a1f35] text-white font-semibold py-2.5">
+          Visit profile
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
+
+export function ReviewsSection({
+  reviews,
+  sellerProfile,
+}: ReviewsSectionProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedRating, setSelectedRating] = useState(0);
   const reviewsPerPage = 5;
@@ -194,102 +292,117 @@ export function ReviewsSection({ reviews }: ReviewsSectionProps) {
   const ratingCounts = getRatingCounts();
 
   return (
-    <div className="w-full xl:max-w-screen-xl 2xl:max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 space-y-5 sm:space-y-6 pb-5 sm:pb-6 lg:pb-8 overflow-hidden flex flex-col items-start">
-      <div className="mb-5 sm:mb-6 w-full text-left">
-        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#102E50] break-words">
-          Reviews
-        </h2>
-        <p className="text-gray-600 text-lg sm:text-xl">
-          {totalReviewsCount} reviews for this service
-        </p>
-      </div>
+    <div className="w-full xl:max-w-screen-xl 2xl:max-w-screen-2xl mx-auto pr-4 sm:pr-6 lg:pr-8 pb-5 sm:pb-6 lg:pb-8 overflow-hidden">
+      {/* Two Column Layout - Profile + Review Filters */}
+      <div className="flex flex-col lg:flex-row lg:items-center gap-6 lg:gap-8 mb-6 px-4 sm:px-0">
+        {/* Left Column - Seller Profile */}
+        {sellerProfile && (
+          <div className="w-full lg:w-[400px] xl:w-[450px] flex-shrink-0">
+            <SellerProfileCard profile={sellerProfile} />
+          </div>
+        )}
 
-      <div className="w-full space-y-2 mb-6">
-        {[5, 4, 3, 2, 1].map(star => {
-          const count = ratingCounts[star as keyof typeof ratingCounts];
-          const percentage =
-            totalReviewsCount > 0 ? (count / totalReviewsCount) * 100 : 0;
-          return (
-            <button
-              key={star}
-              onClick={() => handleRatingFilter(star)}
-              className={`flex items-center w-full sm:w-1/2 py-1.5 px-2 rounded-md transition-colors
+        {/* Right Column - Review Header and Filters */}
+        <div className="flex-1 min-w-0 space-y-4 sm:space-y-4">
+          <div className="mb-5 sm:mb-6 w-full text-left">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#102E50] break-words">
+              Reviews
+            </h2>
+            <p className="text-gray-600 text-lg sm:text-xl">
+              {totalReviewsCount} reviews for this service
+            </p>
+          </div>
+
+          <div className="w-full space-y-2 mb-6">
+            {[5, 4, 3, 2, 1].map(star => {
+              const count = ratingCounts[star as keyof typeof ratingCounts];
+              const percentage =
+                totalReviewsCount > 0 ? (count / totalReviewsCount) * 100 : 0;
+              return (
+                <button
+                  key={star}
+                  onClick={() => handleRatingFilter(star)}
+                  className={`flex items-center w-full sm:w-full md:w-full lg:w-full py-1.5 px-2 rounded-md transition-colors
                 ${selectedRating === star ? 'bg-[#102E50]/5' : 'hover:bg-[#102E50]/5'}
               `}
-            >
-              <span className="font-medium text-[#102E50] w-16 text-left mr-2 text-sm sm:text-base">
-                {star} Stars
-              </span>
-              <div className="w-full bg-gray-200 rounded-full h-2.5">
-                <div
-                  className={`h-2.5 rounded-full bg-[#102E50] transition-all duration-300`}
-                  style={{ width: `${percentage}%` }}
-                ></div>
-              </div>
-              <span className="text-sm text-gray-600 ml-3 w-10 text-right">
-                ({count})
-              </span>
-            </button>
-          );
-        })}
-      </div>
+                >
+                  <span className="font-medium text-[#102E50] w-16 text-left mr-2 text-sm sm:text-base">
+                    {star} Stars
+                  </span>
+                  <div className="w-full bg-gray-200 rounded-full h-2.5">
+                    <div
+                      className={`h-2.5 rounded-full bg-[#102E50] transition-all duration-300`}
+                      style={{ width: `${percentage}%` }}
+                    ></div>
+                  </div>
+                  <span className="text-sm text-gray-600 ml-3 w-10 text-right">
+                    ({count})
+                  </span>
+                </button>
+              );
+            })}
+          </div>
 
-      <div className="flex justify-end mb-4">
-        <Button
-          onClick={() => handleRatingFilter(0)}
-          className={`text-sm rounded-md px-2 py-1 transition-colors duration-200
+          <div className="flex justify-end mb-4">
+            <Button
+              onClick={() => handleRatingFilter(0)}
+              className={`text-sm rounded-md px-2 py-1 transition-colors duration-200
             ${
               selectedRating > 0
-                ? 'bg-[#102E50] text-white hover:bg-blue-700'
+                ? 'bg-[#102E50] text-white hover:bg-[#0a1f35]'
                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
             }
           `}
-        >
-          Clear Filter
-        </Button>
-      </div>
-
-      <div className="mb-5 sm:mb-6 w-full text-left">
-        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#102E50] break-words">
-          All Reviews
-        </h2>
-      </div>
-
-      {filteredReviews.length > 0 ? (
-        <>
-          <div className="grid grid-cols-1 w-full">
-            {currentReviews.map((review, index) => (
-              <ReviewItem
-                key={review.id || `${currentPage}-${index}`}
-                {...review}
-              />
-            ))}
-            {(() => {
-              const needed =
-                columns === 1
-                  ? Math.max(0, reviewsPerPage - currentReviews.length)
-                  : (columns - (currentReviews.length % columns)) % columns;
-
-              return Array.from({ length: needed }).map((_, i) => (
-                <ReviewItem
-                  key={`placeholder-${i}`}
-                  name=""
-                  rating={0}
-                  comment=""
-                  date=""
-                  className="bg-transparent invisible pointer-events-none"
-                />
-              ));
-            })()}
+            >
+              Clear Filter
+            </Button>
           </div>
+        </div>
+      </div>
 
-          {totalPages > 1 && (
-            <div className="flex justify-center items-center gap-3 pt-4 sm:pt-5 max-w-screen-xl">
-              {getVisiblePages().map(pageNumber => (
-                <button
-                  key={pageNumber}
-                  onClick={() => handlePageChange(pageNumber)}
-                  className={`
+      {/* Full Width Comments Section */}
+      <div className="w-full space-y-5 sm:space-y-6 px-4 sm:px-0">
+        <div className="mb-5 sm:mb-6 w-full text-left">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#102E50] break-words">
+            All Reviews
+          </h2>
+        </div>
+
+        {filteredReviews.length > 0 ? (
+          <>
+            <div className="grid grid-cols-1 w-full">
+              {currentReviews.map((review, index) => (
+                <ReviewItem
+                  key={review.id || `${currentPage}-${index}`}
+                  {...review}
+                />
+              ))}
+              {(() => {
+                const needed =
+                  columns === 1
+                    ? Math.max(0, reviewsPerPage - currentReviews.length)
+                    : (columns - (currentReviews.length % columns)) % columns;
+
+                return Array.from({ length: needed }).map((_, i) => (
+                  <ReviewItem
+                    key={`placeholder-${i}`}
+                    name=""
+                    rating={0}
+                    comment=""
+                    date=""
+                    className="bg-transparent invisible pointer-events-none"
+                  />
+                ));
+              })()}
+            </div>
+
+            {totalPages > 1 && (
+              <div className="flex justify-center items-center gap-3 pt-4 sm:pt-5 max-w-screen-xl">
+                {getVisiblePages().map(pageNumber => (
+                  <button
+                    key={pageNumber}
+                    onClick={() => handlePageChange(pageNumber)}
+                    className={`
                     w-10 h-10 sm:w-11 sm:h-11 lg:w-12 lg:h-12 
                     rounded-md border text-lg sm:text-xl font-medium 
                     transition-colors duration-200 flex items-center justify-center
@@ -299,21 +412,22 @@ export function ReviewsSection({ reviews }: ReviewsSectionProps) {
                         : 'bg-white text-[#102E50] border-gray-300 hover:bg-gray-50'
                     }
                   `}
-                  aria-label={`Go to page ${pageNumber}`}
-                >
-                  {pageNumber}
-                </button>
-              ))}
-            </div>
-          )}
-        </>
-      ) : (
-        <div className="bg-white rounded-lg shadow-lg border border-gray-100 p-6 sm:p-8 text-left max-w-6xl w-full">
-          <p className="text-lg sm:text-xl text-gray-500 break-words">
-            No reviews yet. Be the first to leave a review!
-          </p>
-        </div>
-      )}
+                    aria-label={`Go to page ${pageNumber}`}
+                  >
+                    {pageNumber}
+                  </button>
+                ))}
+              </div>
+            )}
+          </>
+        ) : (
+          <Card className="p-6 sm:p-8 text-left max-w-6xl w-full">
+            <p className="text-lg sm:text-xl text-gray-500 break-words">
+              No reviews yet. Be the first to leave a review!
+            </p>
+          </Card>
+        )}
+      </div>
     </div>
   );
 }
