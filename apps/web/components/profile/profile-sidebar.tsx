@@ -1,3 +1,4 @@
+import { Button, Card } from '@hanapp-ph/commons';
 import {
   User,
   Star,
@@ -7,10 +8,8 @@ import {
   CreditCard,
 } from 'lucide-react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import React from 'react';
-
-import { Button } from '../../../libs/commons/src/components/ui/button';
-import { Card } from '../../../libs/commons/src/components/ui/card';
 
 export function Sidebar({
   initialSelected,
@@ -32,6 +31,14 @@ export function Sidebar({
   const [selected, setSelected] = React.useState<'Provider' | 'Client'>(
     initialSelected ?? 'Client'
   );
+  const router = useRouter();
+  const handlePageChange = () => {
+    if (selected === 'Provider') {
+      router.push('/profile');
+    } else {
+      router.push('/provider/profile');
+    }
+  };
 
   return (
     <aside className="w-80 bg-white border-r border-[#8e8e8e] p-6">
@@ -73,7 +80,10 @@ export function Sidebar({
                 }
               : {}
           }
-          onClick={() => setSelected('Provider')}
+          onClick={() => {
+            setSelected('Provider');
+            handlePageChange();
+          }}
         >
           Provider
         </Button>
@@ -88,7 +98,10 @@ export function Sidebar({
                 }
               : {}
           }
-          onClick={() => setSelected('Client')}
+          onClick={() => {
+            setSelected('Client');
+            handlePageChange();
+          }}
         >
           Client
         </Button>

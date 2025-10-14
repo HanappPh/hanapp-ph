@@ -7,7 +7,7 @@ import {
   FormData,
   SignUpFormProps,
   SignUpFormRef,
-} from '../types/signupinterface';
+} from '../../types/signupinterface';
 
 const SignUpForm = forwardRef<SignUpFormRef, SignUpFormProps>(
   ({ onSubmit }, ref) => {
