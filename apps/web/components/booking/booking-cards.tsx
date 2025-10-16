@@ -30,6 +30,7 @@ interface BookingCardProps {
     | 'Cancelled';
   serviceImage?: string;
   providerImage?: string;
+  tabContext?: 'sent' | 'received' | 'ongoing' | 'past' | 'cancelled';
 }
 
 export default function BookingCard(booking: BookingCardProps) {
@@ -73,7 +74,7 @@ export default function BookingCard(booking: BookingCardProps) {
                 </div>
               </div>
               <div className="text-right">
-                <div className="text-xl font-bold text-hanapp-primary">
+                <div className="text-2xl font-bold text-hanapp-primary">
                   ₱{booking.price}
                 </div>
                 <BookingStatusBadge
@@ -96,10 +97,13 @@ export default function BookingCard(booking: BookingCardProps) {
                 <span>{booking.location}</span>
               </div>
             </div>
-            <BookingActionButton
-              status={booking.status}
-              bookingId={booking.id}
-            ></BookingActionButton>
+            <div className="flex justify-end">
+              <BookingActionButton
+                status={booking.status}
+                bookingId={booking.id}
+                tabContext={booking.tabContext}
+              ></BookingActionButton>
+            </div>
           </div>
         </div>
       </CardContent>
