@@ -44,5 +44,5 @@ export default function BookingStatusBadge({
       break;
   }
 
-  return <Badge className={className}>{status}</Badge>;
+  return <Badge className={`${className} pointer-events-none`}>{status}</Badge>;
 }
