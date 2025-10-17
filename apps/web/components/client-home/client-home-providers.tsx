@@ -41,12 +41,7 @@ export function ClientHomeProviders({
     <section className="bg-hanapp-gradient text-white py-12">
       <div className="container mx-auto px-4">
         <div className="mb-6">
-          <h2 className="text-3xl font-bold mb-2">Find Help. Find Income.</h2>
-          <h2 className="text-3xl font-bold">Find Peace of Mind.</h2>
-        </div>
-
-        <div className="mb-6">
-          <h3 className="text-xl font-semibold">Providers Near You</h3>
+          <h3 className="text-3xl font-semibold">Providers Near You</h3>
         </div>
 
         <div className="relative">
