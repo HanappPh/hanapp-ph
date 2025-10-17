@@ -10,7 +10,7 @@ export function ClientHomeHero({ userName = 'Andrew' }: ClientHomeHeroProps) {
   return (
     <section className="relative bg-gray-50">
       {/* Blue gradient background - only top half */}
-      <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-r from-blue-900 to-blue-800" />
+      <div className="absolute inset-x-0 top-0 h-1/2 bg-hanapp-gradient" />
 
       <div className="relative container mx-auto px-4 py-6">
         {/* Greeting */}
