@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 
+import { ClientBanner } from '../../components/client-home/client-home-banner';
 import { ClientHomeCategories } from '../../components/client-home/client-home-categories';
 import { ClientHomeHero } from '../../components/client-home/client-home-hero';
 import { LowerHeroSection } from '../../components/client-home/client-home-lower-hero-section';
@@ -138,6 +139,8 @@ export default function HomePage() {
         onCategoryClick={handleCategoryClick}
         onPostAll={handlePostAll}
       />
+
+      <ClientBanner />
 
       <ClientHomeProviders
         providers={mockProviders}
