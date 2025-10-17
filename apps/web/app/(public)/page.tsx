@@ -2,10 +2,6 @@
 
 import { useRouter } from 'next/navigation';
 
-import {
-  ClientHomeBookings,
-  type Booking,
-} from '../../components/client-home/client-home-bookings';
 import { ClientHomeCategories } from '../../components/client-home/client-home-categories';
 import { ClientHomeCta } from '../../components/client-home/client-home-cta';
 import { ClientHomeHero } from '../../components/client-home/client-home-hero';
@@ -20,24 +16,6 @@ import {
 
 export default function HomePage() {
   const router = useRouter();
-
-  // Mock data - replace with actual API calls
-  const mockBookings: Booking[] = [
-    {
-      id: '1',
-      type: 'pending',
-      title: 'Laundry - Booking Request',
-      provider: 'Martin Santos',
-      timeAgo: '5 mins ago',
-    },
-    {
-      id: '2',
-      type: 'completed',
-      title: 'Babysitting Completed',
-      provider: 'Jenna Lee',
-      timeAgo: '5 hours ago',
-    },
-  ];
 
   const mockProviders: Provider[] = [
     {
@@ -120,11 +98,6 @@ export default function HomePage() {
     },
   ];
 
-  // Event handlers
-  const handleViewBooking = (bookingId: string) => {
-    router.push(`/bookings/${bookingId}`);
-  };
-
   const handleCategoryClick = (categoryId: string) => {
     router.push(`/services?category=${categoryId}`);
   };
@@ -160,11 +133,6 @@ export default function HomePage() {
   return (
     <>
       <ClientHomeHero userName="Andrew" voucherDiscount={50} />
-
-      <ClientHomeBookings
-        bookings={mockBookings}
-        onViewBooking={handleViewBooking}
-      />
 
       <ClientHomeCategories
         onCategoryClick={handleCategoryClick}
