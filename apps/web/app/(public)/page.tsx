@@ -3,8 +3,8 @@
 import { useRouter } from 'next/navigation';
 
 import { ClientHomeCategories } from '../../components/client-home/client-home-categories';
-import { ClientHomeCta } from '../../components/client-home/client-home-cta';
 import { ClientHomeHero } from '../../components/client-home/client-home-hero';
+import { LowerHeroSection } from '../../components/client-home/client-home-lower-hero-section';
 import {
   ClientHomeProviders,
   type Provider,
@@ -122,13 +122,13 @@ export default function HomePage() {
     router.push('/services');
   };
 
-  const handlePostJob = () => {
-    router.push('/post-job');
-  };
+  // const handlePostJob = () => {
+  //   router.push('/post-job');
+  // };
 
-  const handleFindJob = () => {
-    router.push('/find-jobs');
-  };
+  // const handleFindJob = () => {
+  //   router.push('/find-jobs');
+  // };
 
   return (
     <>
@@ -151,7 +151,7 @@ export default function HomePage() {
         onViewAll={handleViewAllListings}
       />
 
-      <ClientHomeCta onPostJob={handlePostJob} onFindJob={handleFindJob} />
+      <LowerHeroSection />
     </>
   );
 }

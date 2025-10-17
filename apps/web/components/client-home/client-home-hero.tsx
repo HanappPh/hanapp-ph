@@ -1,14 +1,12 @@
 import { Search } from 'lucide-react';
+import Image from 'next/image';
 
 interface ClientHomeHeroProps {
   userName?: string;
   voucherDiscount?: number;
 }
 
-export function ClientHomeHero({
-  userName = 'Andrew',
-  voucherDiscount = 50,
-}: ClientHomeHeroProps) {
+export function ClientHomeHero({ userName = 'Andrew' }: ClientHomeHeroProps) {
   return (
     <section className="relative bg-gray-50">
       {/* Blue gradient background - only top half */}
@@ -23,21 +21,15 @@ export function ClientHomeHero({
         </div>
 
         {/* Voucher Banner */}
-        <div className="bg-white rounded-lg p-4 mb-6 flex items-center justify-between shadow-md">
-          <div className="flex items-center gap-3">
-            <div className="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
-              <span className="text-2xl">📦</span>
-            </div>
-            <div>
-              <p className="text-gray-800 font-medium">
-                Invite a friend and claim your
-              </p>
-              <p className="text-blue-900 font-bold">
-                {voucherDiscount}% off voucher!
-              </p>
-            </div>
-          </div>
-          <div className="text-yellow-400 text-4xl font-bold">Hanapp</div>
+        <div className="mb-6 rounded-lg overflow-hidden">
+          <Image
+            src="/hanapp-banner.jpg"
+            alt="Invite a friend and claim your 50% off voucher - Hanapp"
+            width={1092}
+            height={150}
+            className="w-full h-auto block"
+            priority
+          />
         </div>
 
         {/* Search Bar */}
