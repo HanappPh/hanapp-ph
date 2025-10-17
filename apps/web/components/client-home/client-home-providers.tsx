@@ -38,7 +38,7 @@ export function ClientHomeProviders({
   );
 
   return (
-    <section className="bg-gradient-to-r from-blue-800 to-blue-900 text-white py-12">
+    <section className="bg-hanapp-gradient text-white py-12">
       <div className="container mx-auto px-4">
         <div className="mb-6">
           <h2 className="text-3xl font-bold mb-2">Find Help. Find Income.</h2>

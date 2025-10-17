@@ -20,7 +20,7 @@ export function ClientHomeFooter({
   };
 
   return (
-    <footer className="bg-blue-900 text-white">
+    <footer className="bg-hanapp-gradient text-white">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* Logo & Brand */}

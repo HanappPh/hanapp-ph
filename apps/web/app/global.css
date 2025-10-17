@@ -112,7 +112,7 @@
 
 @layer utilities {
   .bg-hanapp-gradient {
-    background: linear-gradient(135deg, #014182fc 0%, #102e50 100%);
+    background: linear-gradient(135deg, #014182fd 0%, #102e50 100%);
   }
 
   .text-hanapp-primary {
