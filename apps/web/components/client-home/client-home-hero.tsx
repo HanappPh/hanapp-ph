@@ -7,7 +7,6 @@ import { useState, KeyboardEvent } from 'react';
 
 interface ClientHomeHeroProps {
   userName?: string;
-  voucherDiscount?: number;
 }
 
 export function ClientHomeHero({ userName = 'Andrew' }: ClientHomeHeroProps) {
