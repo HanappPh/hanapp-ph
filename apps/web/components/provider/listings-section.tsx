@@ -2,8 +2,10 @@
 import { Card, CardContent } from '@hanapp-ph/commons';
 import { Star, MapPin, ChevronRight, ChevronLeft } from 'lucide-react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 export function ListingsSection() {
+  const router = useRouter();
   const listings = [
     {
       id: 1,
@@ -205,13 +207,13 @@ export function ListingsSection() {
             ref={scrollRef}
             className="flex gap-6 overflow-x-auto pb-2 pt-2 scrollbar-hide scroll-smooth pl-8 md:pl-14"
             id="listings-scroll"
-            onMouseEnter={() => setIsPaused(true)}
             onMouseLeave={() => setIsPaused(false)}
           >
             {listings.map(listing => (
               <Card
                 key={listing.id}
-                className="w-[300px] flex-shrink-0 rounded-lg overflow-hidden shadow-sm transition-all duration-200 ease-in-out hover:shadow-lg hover:-translate-y-1 hover:scale-[1.01]"
+                onClick={() => router.push(`/provider/jobs/${listing.id}`)}
+                className="w-[300px] flex-shrink-0 rounded-lg overflow-hidden shadow-sm transition-all duration-200 ease-in-out hover:shadow-lg hover:-translate-y-1 hover:scale-[1.01] cursor-pointer"
               >
                 <div className="relative">
                   <Image
