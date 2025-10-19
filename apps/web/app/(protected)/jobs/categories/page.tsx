@@ -2,7 +2,13 @@
 
 import { Search } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import React, {
+  useState,
+  useMemo,
+  useCallback,
+  useEffect,
+  Suspense,
+} from 'react';
 
 // import { CategoriesHeader } from '../../../../components/categories/categories-header';
 import { CategoriesSidebar } from '../../../../components/categories/categories-sidebar';
@@ -206,7 +212,7 @@ const jobs: Job[] = [
 
 type SortOption = 'location' | 'rating' | 'price-high-low' | 'price-low-high';
 
-export default function CategoriesPage() {
+function CategoriesPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -496,5 +502,19 @@ export default function CategoriesPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function CategoriesPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-white flex items-center justify-center">
+          Loading...
+        </div>
+      }
+    >
+      <CategoriesPageContent />
+    </Suspense>
   );
 }
