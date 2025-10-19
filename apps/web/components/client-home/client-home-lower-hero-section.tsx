@@ -17,7 +17,7 @@ export function LowerHeroSection() {
             </Button>
             <Button
               variant="outline"
-              className="border-2 border-white text-white hover:bg-white hover:text-hanapp-primary rounded-full px-6 md:px-8 bg-transparent"
+              className="border-2 border-hanapp-accent text-white hover:bg-hanapp-accent hover:text-hanapp-primary rounded-full px-6 md:px-8 bg-transparent"
             >
               Find a Job
             </Button>
