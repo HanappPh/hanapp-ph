@@ -15,8 +15,8 @@ import React, { useState, useRef, useCallback } from 'react';
 import { AvailabilityForm } from './post-availability';
 import { ContactInfoForm } from './post-contact';
 
-export function CreateListingForm(props: { onListingChange?: Function }) {
-  const { onListingChange } = props;
+export function CreateListingForm(props?: { onListingChange?: Function }) {
+  const { onListingChange } = props || {};
   const [serviceTitle, setServiceTitle] = useState<string>('');
   const [category, setCategory] = useState<string>('Transport');
   const [description, setDescription] = useState<string>('');

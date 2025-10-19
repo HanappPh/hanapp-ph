@@ -93,6 +93,13 @@ export function ClientHomeCategories({
     router.push(`/jobs/categories?category=${encodeURIComponent(categoryId)}`);
   };
 
+  const handlePostJobClick = () => {
+    if (onPostAll) {
+      onPostAll();
+    }
+    router.push('/jobs/create');
+  };
+
   return (
     <section className="container mx-auto px-4 py-6">
       <div className="flex items-center justify-between mb-6">
@@ -101,9 +108,9 @@ export function ClientHomeCategories({
           variant="outline"
           size="sm"
           className="bg-yellow-400 hover:bg-yellow-500 border-none text-gray-800 font-semibold"
-          onClick={onPostAll}
+          onClick={handlePostJobClick}
         >
-          + Post to All
+          + Post a Job
         </Button>
       </div>
 

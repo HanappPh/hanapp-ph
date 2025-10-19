@@ -2,6 +2,7 @@
 
 import { Button, Checkbox } from '@hanapp-ph/commons';
 import { Plus } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 import { ServiceCard } from '../../../../../components/post-job-listing/post-service-card';
@@ -23,7 +24,8 @@ function App() {
   const [services, setServices] = useState<ServiceType[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const [listingData, setListingData] = useState<Record<string, unknown>>({});
+  // const [listingData, setListingData] = useState<Record<string, unknown>>({});
+  const router = useRouter();
 
   const handleAddService = (service: ServiceType) => {
     if (editingIndex !== null) {
@@ -56,32 +58,33 @@ function App() {
   };
 
   const handlePostAll = () => {
-    if (
-      !listingData.service_title ||
-      !listingData.category ||
-      !listingData.description
-    ) {
-      alert('Please fill in all required listing information');
-      return;
-    }
+    // if (
+    //   !listingData.service_title ||
+    //   !listingData.category ||
+    //   !listingData.description
+    // ) {
+    //   alert('Please fill in all required listing information');
+    //   return;
+    // }
 
-    if (!listingData.contact_number) {
-      alert('Please fill in contact information');
-      return;
-    }
+    // if (!listingData.contact_number) {
+    //   alert('Please fill in contact information');
+    //   return;
+    // }
 
-    if (!listingData.availability) {
-      alert('Please fill in availability information');
-      return;
-    }
+    // if (!listingData.availability) {
+    //   alert('Please fill in availability information');
+    //   return;
+    // }
 
-    if (services.length === 0) {
-      alert('Please add at least one service');
-      return;
-    }
+    // if (services.length === 0) {
+    //   alert('Please add at least one service');
+    //   return;
+    // }
 
-    setServices([]);
-    setListingData({});
+    // setServices([]);
+    // setListingData({});
+    router.push('/public/');
   };
 
   return (
@@ -123,7 +126,8 @@ function App() {
 
         <div className="max-w-4xl mx-auto">
           {viewMode === 'listing' ? (
-            <CreateListingForm onListingChange={setListingData} />
+            // <CreateListingForm onListingChange={setListingData} />
+            <CreateListingForm />
           ) : (
             <div className="space-y-6">
               <div>
