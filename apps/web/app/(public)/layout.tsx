@@ -17,10 +17,6 @@ export default function PublicLayout({
 }) {
   const router = useRouter();
 
-  const handleNotificationClick = () => {
-    router.push('/notifications');
-  };
-
   const handleProfileClick = () => {
     router.push('/profile');
   };
@@ -44,7 +40,6 @@ export default function PublicLayout({
   return (
     <div className="min-h-screen flex flex-col">
       <ClientHomeNavbar
-        onNotificationClick={handleNotificationClick}
         onProfileClick={handleProfileClick}
         notificationCount={3}
       />

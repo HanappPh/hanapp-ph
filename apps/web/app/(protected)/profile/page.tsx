@@ -42,7 +42,7 @@ export default function ProfilePage() {
         </div>
       </div>
       {/* Mobile layout*/}
-      <main className="flex-1 pb-24 flex flex-col items-center w-full px-0 pt-0 pb-4 gap-0 md:hidden bg-white relative">
+      <main className="flex-1 flex flex-col items-center w-full px-0 pt-0 gap-0 md:hidden bg-white relative">
         {/* Mobile modular layout */}
         <MobileProfileHeader fromColor="#014182" toColor="#102E50" />
         <MobileProfileImage />

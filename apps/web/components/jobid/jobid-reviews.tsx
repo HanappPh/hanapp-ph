@@ -1,6 +1,9 @@
+'use client';
+
 import { Button, Card, CardContent, Badge } from '@hanapp-ph/commons';
 import { Star, Calendar } from 'lucide-react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 const PLACEHOLDER_IMAGE_URL = '/img-carousel-placeholder_2.png'; // You might want to replace this with a real placeholder image path
@@ -151,6 +154,12 @@ function ReviewItem({
 }
 
 function SellerProfileCard({ profile }: { profile: SellerProfile }) {
+  const router = useRouter();
+
+  const handleViewProfile = () => {
+    router.push('/profile');
+  };
+
   return (
     <Card className="p-5 sticky top-4">
       <CardContent className="p-0 space-y-4">
@@ -226,7 +235,10 @@ function SellerProfileCard({ profile }: { profile: SellerProfile }) {
         </div>
 
         {/* Visit Profile Button */}
-        <Button className="w-full bg-[#102E50] hover:bg-[#0a1f35] text-white font-semibold py-2.5">
+        <Button
+          className="w-full bg-[#102E50] hover:bg-[#0a1f35] text-white font-semibold py-2.5"
+          onClick={handleViewProfile}
+        >
           Visit profile
         </Button>
       </CardContent>

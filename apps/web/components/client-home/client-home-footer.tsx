@@ -1,5 +1,6 @@
 import { Button } from '@hanapp-ph/commons';
 import { Instagram, Facebook } from 'lucide-react';
+import Image from 'next/image';
 import React from 'react';
 
 interface ClientHomeFooterProps {
@@ -20,15 +21,19 @@ export function ClientHomeFooter({
   };
 
   return (
-    <footer className="bg-blue-900 text-white">
+    <footer className="bg-hanapp-gradient text-white">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* Logo & Brand */}
           <div>
-            <div className="text-2xl font-bold mb-4">
-              <span className="text-white">Han</span>
-              <span className="text-yellow-400">app</span>
-            </div>
+            <Image
+              src="/Hanapp-Logo-Registered-2.png"
+              alt="Hanapp Logo"
+              width={240}
+              height={120}
+              className="h-16 w-auto"
+              priority
+            />
           </div>
 
           {/* Company Links */}
