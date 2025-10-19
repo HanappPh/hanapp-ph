@@ -1,5 +1,8 @@
+'use client';
+
 import { Button, Card } from '@hanapp-ph/commons';
 import { Clock, MapPin } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface PricingInfo {
   startingPrice: string;
@@ -42,13 +45,19 @@ export function Sidebar({
   availability,
   serviceAreas,
   onBookNow,
-  onChatFirst,
   title,
   rating,
   totalReviews,
   responseTime,
   location,
 }: SidebarProps) {
+  const router = useRouter();
+
+  const handleChatClick = () => {
+    // Redirect to chat page with a default user ID since data is hardcoded
+    router.push('/chat?userId=1');
+  };
+
   return (
     <div
       className="w-full"
@@ -120,7 +129,7 @@ export function Sidebar({
             <Button
               variant="outline"
               className="flex-1 bg-transparent text-xs sm:text-sm lg:text-base min-w-0 h-8 sm:h-10 lg:h-12"
-              onClick={onChatFirst}
+              onClick={handleChatClick}
               aria-label="Chat with service provider first"
             >
               <span className="truncate">Chat</span>

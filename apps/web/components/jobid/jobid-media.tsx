@@ -29,7 +29,7 @@ export function PhotosMedia({ images: _images = [] }: PhotosMediaProps) {
   };
 
   return (
-    <Card className="w-full h-full p-4 sm:p-6 lg:p-8 bg-white text-gray-900 shadow-lg flex flex-col">
+    <Card className="w-full h-full min-h-[400px] sm:min-h-[500px] lg:min-h-[600px] p-4 sm:p-6 lg:p-8 bg-white text-gray-900 shadow-lg flex flex-col">
       <div className="mb-2 sm:mb-3 w-full">
         <h2 className="text-base sm:text-lg lg:text-xl font-bold text-[#102E50] mb-1 sm:mb-2">
           Photos & Media
@@ -39,7 +39,7 @@ export function PhotosMedia({ images: _images = [] }: PhotosMediaProps) {
         </p>
       </div>
 
-      <div className="relative w-full overflow-hidden flex-1">
+      <div className="relative w-full overflow-hidden flex-1 min-h-[300px]">
         <div className="relative bg-gray-50 rounded-lg sm:rounded-xl overflow-hidden h-full w-full">
           <Image
             src={imageFiles[currentImageIndex]}
