@@ -16,7 +16,7 @@ export default function ProfilePage() {
   const [showDropdown, setShowDropdown] = React.useState(false);
   const [selectedTab, setSelectedTab] = React.useState('Profile');
   return (
-    <div className="min-h-screen bg-[#F3F5F9] flex flex-col">
+    <div className="bg-[#F3F5F9] flex flex-col">
       {/* Desktop layout */}
       <div className="hidden md:block">
         {/* <Header
@@ -41,7 +41,7 @@ export default function ProfilePage() {
         </div>
       </div>
       {/* Mobile layout*/}
-      <main className="flex-1 pb-24 flex flex-col items-center w-full px-0 pt-0 pb-4 gap-0 md:hidden bg-white relative">
+      <main className="flex flex-col items-center w-full px-0 pt-0 gap-0 md:hidden bg-white relative">
         {/* Mobile modular layout */}
         <MobileProfileHeader fromColor="#FFDD8E" toColor="#F5C45E" />
         <MobileProfileImage />

@@ -219,7 +219,7 @@ export function MainContent({
                 {providers.map(p => (
                   <div
                     key={p.name}
-                    className="bg-white flex flex-col items-center border border-[#8e8e8e] p-4 rounded-lg w-36 flex-shrink-0"
+                    className="bg-white flex flex-col items-center shadow-md p-4 rounded-lg w-36 flex-shrink-0"
                   >
                     <div className="flex flex-col items-center flex-grow w-full">
                       <Image
@@ -227,7 +227,7 @@ export function MainContent({
                         alt={p.name}
                         width={64}
                         height={64}
-                        className="w-16 h-16 rounded-full object-cover border border-[#8e8e8e]"
+                        className="w-16 h-16 rounded-full object-cover"
                       />
                       <span className="mt-1 font-semibold text-[#0B2C4A] text-xs text-center break-words whitespace-normal block w-full">
                         {p.name}

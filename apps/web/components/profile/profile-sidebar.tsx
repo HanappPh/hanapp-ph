@@ -41,9 +41,9 @@ export function Sidebar({
   };
 
   return (
-    <aside className="w-80 bg-white border-r border-[#8e8e8e] p-6">
+    <aside className="w-80 bg-white p-6">
       {/* Profile Card */}
-      <Card className="p-6 mb-6 border-[#8e8e8e] border">
+      <Card className="p-6 mb-6 shadow-md">
         <div className="text-center">
           <div className="w-48 h-48 mx-auto mb-4 rounded-full overflow-hidden">
             {/* Profile Picture */}
