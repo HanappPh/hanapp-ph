@@ -150,8 +150,8 @@ export function ClientHomeCategories({
                         onClick={() => handleCategoryClick(category.id)}
                         className={`flex flex-col items-center justify-center p-4 rounded-2xl transition-all ${
                           isSelected
-                            ? 'bg-white border-3 border-gray-800 shadow-md'
-                            : 'bg-blue-100 border-3 border-transparent'
+                            ? 'bg-white border-2 border-gray-800 shadow-md'
+                            : 'bg-blue-100 border-2 border-transparent'
                         }`}
                       >
                         <div className="flex items-center justify-center w-14 h-14 bg-white rounded-full mb-2">
