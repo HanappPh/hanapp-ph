@@ -1,6 +1,9 @@
+'use client';
+
 import { Button } from '@hanapp-ph/commons';
-import { MapPin, Star } from 'lucide-react';
+import { MapPin, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
+import { useState } from 'react';
 
 export interface ServiceListing {
   id: string;
@@ -22,21 +25,55 @@ interface ClientHomeServiceListingsProps {
 }
 
 const defaultFilters = ['Trending', 'Near Me', 'Top Picks', 'Book Again'];
+const LISTINGS_PER_PAGE = 5;
 
 export function ClientHomeServiceListings({
   listings,
-  filters: _filters = defaultFilters,
-  onFilterChange: _onFilterChange,
+  filters = defaultFilters,
+  onFilterChange,
   onViewListing,
   onViewAll,
 }: ClientHomeServiceListingsProps) {
-  // Commented out until filtering logic is implemented
-  // const [activeFilter, setActiveFilter] = useState(filters[0]);
+  const [activeFilter, setActiveFilter] = useState(filters[0]);
+  const [currentPage, setCurrentPage] = useState(1);
 
-  // const handleFilterClick = (filter: string) => {
-  //   setActiveFilter(filter);
-  //   onFilterChange?.(filter);
-  // };
+  const filteredListings = (() => {
+    switch (activeFilter) {
+      case 'Near Me':
+        // Filter by listings that contain "Bulacan" in location
+        return listings.filter(listing =>
+          listing.location.toLowerCase().includes('bulacan')
+        );
+      case 'Top Picks':
+        // Filter by high ratings (4.5+)
+        return listings.filter(listing => listing.rating >= 4.5);
+      case 'Book Again':
+        // Return first 2 listings as "booked before" (you can customize this logic)
+        return listings.slice(0, 2);
+      case 'Trending':
+      default:
+        return listings;
+    }
+  })();
+
+  const totalPages = Math.ceil(filteredListings.length / LISTINGS_PER_PAGE);
+
+  const paginatedListings = filteredListings.slice(
+    (currentPage - 1) * LISTINGS_PER_PAGE,
+    currentPage * LISTINGS_PER_PAGE
+  );
+
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
+  const handleFilterClick = (filter: string) => {
+    setActiveFilter(filter);
+    setCurrentPage(1); // reset to page 1 when filter changes
+    onFilterChange?.(filter);
+  };
 
   return (
     <section className="container mx-auto px-4 py-8">
@@ -51,41 +88,29 @@ export function ClientHomeServiceListings({
         </Button>
       </div>
 
-      {/* Filters - Commented out until filtering logic is implemented */}
-      {/* <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+      {/* Filters */}
+      <div className="flex gap-2 mb-6 flex-wrap">
         {filters.map(filter => (
-          <button
+          <Button
             key={filter}
+            variant={filter === activeFilter ? 'default' : 'outline'}
+            size="sm"
             onClick={() => handleFilterClick(filter)}
-            className={`px-4 py-2 rounded-full whitespace-nowrap font-medium transition-colors ${
-              activeFilter === filter
-                ? 'bg-blue-900 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
+            className={
+              (filter === activeFilter
+                ? 'bg-hanapp-secondary text-white hover:bg-hanapp-primary'
+                : 'border-hanapp-secondary bg-white text-hanapp-secondary hover:bg-hanapp-secondary hover:border-hanapp-secondary hover:text-white') +
+              ' rounded-xl px-4 text-base'
+            }
           >
             {filter}
-          </button>
+          </Button>
         ))}
-
-        <div className="flex gap-2 ml-auto">
-          <button
-            className="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 hover:bg-gray-100"
-            aria-label="Previous page"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-          <button
-            className="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 hover:bg-gray-100"
-            aria-label="Next page"
-          >
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
-      </div> */}
+      </div>
 
       {/* Listings Grid */}
       <div className="space-y-4">
-        {listings.map(listing => (
+        {paginatedListings.map(listing => (
           <div
             key={listing.id}
             className="flex gap-4 p-4 bg-white rounded-lg border border-gray-200 hover:shadow-md transition-shadow cursor-pointer"
@@ -146,6 +171,52 @@ export function ClientHomeServiceListings({
             </div>
           </div>
         ))}
+
+        {paginatedListings.length === 0 && (
+          <p className="text-center text-gray-500 mt-10">No listings found.</p>
+        )}
+
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="flex justify-center items-center gap-2 mt-6">
+            {/* Left arrow */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => goToPage(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="h-8 w-8 text-hanapp-primary hover:bg-gray-200 disabled:opacity-50 hover:text-hanapp-primary"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+
+            {/* Page numbers */}
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+              <Button
+                key={page}
+                onClick={() => goToPage(page)}
+                className={`h-8 w-8 text-sm font-semibold ${
+                  currentPage === page
+                    ? 'bg-hanapp-primary hover:bg-hanapp-secondary text-white'
+                    : 'bg-transparent text-hanapp-primary hover:bg-gray-200'
+                }`}
+              >
+                {page}
+              </Button>
+            ))}
+
+            {/* Right arrow */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => goToPage(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="h-8 w-8 text-hanapp-primary hover:bg-gray-200 disabled:opacity-50 hover:text-hanapp-primary"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
       </div>
     </section>
   );
