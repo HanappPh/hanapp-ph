@@ -1,5 +1,9 @@
+'use client';
+
 import { Search } from 'lucide-react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { useState, KeyboardEvent } from 'react';
 
 interface ClientHomeHeroProps {
   userName?: string;
@@ -7,6 +11,23 @@ interface ClientHomeHeroProps {
 }
 
 export function ClientHomeHero({ userName = 'Andrew' }: ClientHomeHeroProps) {
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      router.push(
+        `/jobs/categories?search=${encodeURIComponent(searchQuery.trim())}`
+      );
+    }
+  };
+
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
   return (
     <section className="relative bg-gray-50">
       {/* Blue gradient background - only top half */}
@@ -38,6 +59,9 @@ export function ClientHomeHero({ userName = 'Andrew' }: ClientHomeHeroProps) {
           <input
             type="text"
             placeholder="Search here"
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            onKeyDown={handleKeyDown}
             className="w-full pl-10 pr-4 py-3 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-yellow-400"
           />
         </div>
