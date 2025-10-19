@@ -201,7 +201,7 @@ export function ClientHomeServiceListings({
               <Button
                 key={page}
                 onClick={() => goToPage(page)}
-                className={`h-8 w-8 text-sm font-semibold ${
+                className={`h-8 w-8 text-sm font-semibold rounded-md ${
                   currentPage === page
                     ? 'bg-hanapp-primary hover:bg-hanapp-secondary text-white'
                     : 'bg-transparent text-hanapp-primary hover:bg-gray-200'
