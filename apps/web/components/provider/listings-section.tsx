@@ -207,6 +207,7 @@ export function ListingsSection() {
             ref={scrollRef}
             className="flex gap-6 overflow-x-auto pb-2 pt-2 scrollbar-hide scroll-smooth pl-8 md:pl-14"
             id="listings-scroll"
+            onMouseEnter={() => setIsPaused(true)}
             onMouseLeave={() => setIsPaused(false)}
           >
             {listings.map(listing => (
