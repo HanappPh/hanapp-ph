@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@hanapp-ph/commons';
+import { Button, Badge } from '@hanapp-ph/commons';
 import { MapPin, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -78,16 +78,17 @@ export function ClientHomeServiceListings({
   };
 
   return (
-    <section className="container mx-auto px-4 py-8">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-bold text-gray-800">Service Listings</h2>
-        <Button
-          variant="link"
-          className="text-blue-600 hover:text-blue-700 font-semibold"
+    <section className="max-w-7xl mx-auto py-8 px-6">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-3xl font-semibold text-[#102e50]">
+          Service Listings
+        </h2>
+        <button
           onClick={onViewAll}
+          className="text-xs text-[#102e50] font-semibold hover:underline"
         >
           View All
-        </Button>
+        </button>
       </div>
 
       {/* Filters */}
@@ -111,69 +112,68 @@ export function ClientHomeServiceListings({
       </div>
 
       {/* Listings Grid */}
-      <div className="space-y-4">
+      <div className="space-y-5">
         {paginatedListings.map(listing => (
           <div
             key={listing.id}
-            className="flex gap-4 p-4 bg-white rounded-lg border border-gray-200 hover:shadow-md transition-shadow cursor-pointer"
+            className="flex gap-4 rounded-lg bg-white shadow-sm transition-all duration-200 ease-in-out hover:shadow-md hover:-translate-y-1 hover:scale-[1.01] cursor-pointer"
             onClick={() => {
               onViewListing?.(listing.id);
-              // router.push(`/job/${listing.id}`);
-              router.push(`jobs/[jobId]`);
+              router.push(`/jobs/${listing.id}`);
             }}
           >
             {/* Image */}
-            <div className="w-24 h-24 flex-shrink-0 bg-gray-200 rounded-lg overflow-hidden">
-              {listing.image ? (
-                <Image
-                  src={listing.image}
-                  alt={listing.title}
-                  width={96}
-                  height={96}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-gray-400">
-                  📷
-                </div>
-              )}
+            <div className="hidden md:block relative h-[155px] w-[155px] rounded-l-lg overflow-hidden">
+              <Image
+                src={listing.image || '/placeholder.svg'}
+                alt={listing.title}
+                fill
+                className="object-cover"
+              />
             </div>
 
             {/* Content */}
-            <div className="flex-1 min-w-0">
-              <h3 className="font-bold text-gray-800 mb-1">{listing.title}</h3>
-              <p className="text-sm text-gray-600 mb-2">{listing.provider}</p>
-
-              <div className="flex items-center gap-1 text-sm text-gray-500 mb-2">
-                <MapPin className="w-4 h-4" />
-                <span>{listing.location}</span>
+            <div className="flex flex-1 flex-col justify-between p-4">
+              <div>
+                <div className="mb-1 flex items-start justify-between">
+                  <h3 className="text-xl sm:text-2xl font-semibold text-[#102e50]">
+                    {listing.title}
+                  </h3>
+                  <Badge
+                    variant="outline"
+                    className="ml-2 border-gray-300 bg-white text-sm md:text-md text-[#102e50] hover:bg-gray-100 text-center"
+                  >
+                    {listing.category}
+                  </Badge>
+                </div>
+                <p className="mb-4 text-md text-[#014182FC]">
+                  {listing.provider}
+                </p>
               </div>
 
-              <div className="flex items-center gap-1">
-                {[...Array(5)].map((_, i) => (
-                  <Star
-                    key={i}
-                    className={`w-4 h-4 ${
-                      i < Math.floor(listing.rating)
-                        ? 'fill-yellow-400 text-yellow-400'
-                        : 'text-gray-300'
-                    }`}
-                  />
-                ))}
-                <span className="text-sm text-gray-600 ml-1">
-                  {listing.rating.toFixed(1)}
-                </span>
-              </div>
-            </div>
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-1 text-xs sm:text-sm text-[#102e50]">
+                    <MapPin className="h-3.5 w-3.5 text-[#102e50]" />
+                    <span>{listing.location}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        className="h-2.5 w-2.5 md:h-3.5 md:w-3.5 fill-amber-400 text-amber-400"
+                      />
+                    ))}
+                    <span className="ml-1 text-xs sm:text-sm text-[#102e50]">
+                      {listing.rating}
+                    </span>
+                  </div>
+                </div>
 
-            {/* Price & Category */}
-            <div className="flex flex-col items-end justify-between">
-              <span className="px-3 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">
-                {listing.category}
-              </span>
-              <span className="text-xl font-bold text-blue-900">
-                {listing.price}
-              </span>
+                <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#102e50]">
+                  {listing.price}
+                </div>
+              </div>
             </div>
           </div>
         ))}
@@ -184,7 +184,7 @@ export function ClientHomeServiceListings({
 
         {/* Pagination Controls */}
         {totalPages > 1 && (
-          <div className="flex justify-center items-center gap-2 mt-6">
+          <div className="flex justify-center items-center gap-2 mt-4">
             {/* Left arrow */}
             <Button
               variant="ghost"
