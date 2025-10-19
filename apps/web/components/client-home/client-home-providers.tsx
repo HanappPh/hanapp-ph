@@ -3,6 +3,7 @@
 import { Button } from '@hanapp-ph/commons';
 import { MapPin, ChevronLeft, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
 
 export interface Provider {
@@ -20,13 +21,14 @@ interface ClientHomeProvidersProps {
 
 export function ClientHomeProviders({
   providers,
-  onViewProvider,
+  // onViewProvider,
 }: ClientHomeProvidersProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isPaused, setIsPaused] = useState(false);
   const directionRef = useRef(1);
   const isPausedAtEndRef = useRef(false);
   const timeoutIdRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const router = useRouter();
 
   const pauseDuration = 1500; // ms to pause at ends
   const scrollSpeed = 3; // adjust for speed
@@ -170,7 +172,8 @@ export function ClientHomeProviders({
                 <Button
                   size="sm"
                   className="w-full bg-hanapp-accent hover:bg-yellow-500 text-hanapp-primary font-semibold"
-                  onClick={() => onViewProvider?.(provider.id)}
+                  // onClick={() => onViewProvider?.(provider.id)}
+                  onClick={() => router.push(`/profile`)}
                 >
                   See Details
                 </Button>
