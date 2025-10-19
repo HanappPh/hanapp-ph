@@ -43,7 +43,7 @@ export function OnboardingSection() {
                 </ul>
                 <div className="mt-auto pt-6 flex flex-wrap gap-4 justify-start w-full">
                   <Button
-                    onClick={() => router.push(`provider/jobs/create`)}
+                    onClick={() => router.push(`/provider/jobs/create`)}
                     className="bg-hanapp-primary hover:bg-hanapp-secondary text-white rounded-full"
                   >
                     List My Service
