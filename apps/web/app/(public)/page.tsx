@@ -60,6 +60,7 @@ export default function HomePage() {
       rating: 4.9,
       price: '₱28',
       category: 'Laundry',
+      image: '/laundry-service.png',
     },
     {
       id: '2',
@@ -69,6 +70,7 @@ export default function HomePage() {
       rating: 4.9,
       price: '₱2.5K',
       category: 'Transport',
+      image: '/img-carousel-placeholder_2.png',
     },
     {
       id: '3',
@@ -78,6 +80,7 @@ export default function HomePage() {
       rating: 4.9,
       price: '₱650',
       category: 'Babysitting',
+      image: '/house-cleaning-service.png',
     },
     {
       id: '4',
@@ -87,6 +90,7 @@ export default function HomePage() {
       rating: 4.9,
       price: '₱300',
       category: 'Errands',
+      image: '/delivery-person-parcel.jpg',
     },
     {
       id: '5',
@@ -96,6 +100,7 @@ export default function HomePage() {
       rating: 4.9,
       price: '₱2.5K',
       category: 'Pet care',
+      image: '/pet-grooming-dog.jpg',
     },
   ];
 
