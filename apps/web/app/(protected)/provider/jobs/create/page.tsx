@@ -84,7 +84,7 @@ function App() {
 
     // setServices([]);
     // setListingData({});
-    router.push('/public/');
+    router.push('/');
   };
 
   return (
