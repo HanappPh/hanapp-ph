@@ -1,4 +1,8 @@
+'use client';
+
 import { Bell } from 'lucide-react';
+import Image from 'next/image';
+import { useRouter, usePathname } from 'next/navigation';
 
 interface ClientHomeNavbarProps {
   onNotificationClick?: () => void;
@@ -11,32 +15,46 @@ export function ClientHomeNavbar({
   onProfileClick,
   notificationCount = 3,
 }: ClientHomeNavbarProps) {
+  const router = useRouter();
+  const pathname = usePathname();
   return (
     <nav className="bg-white border-b border-gray-200">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-14">
           {/* Logo */}
           <div className="flex items-center">
-            <span className="text-xl font-bold">
-              <span className="text-blue-900">Han</span>
-              <span className="text-yellow-400">app</span>
-            </span>
+            <Image
+              src="/Hanapp-Logo-Registered.png"
+              alt="Hanapp Logo"
+              width={120}
+              height={40}
+              className="h-8 w-auto"
+              priority
+            />
           </div>
 
           {/* Navigation Items */}
-          <div className="hidden md:flex items-center gap-8">
-            <a
-              href="/"
-              className="flex flex-col items-center gap-1 text-blue-900"
+          <div className="hidden md:flex items-center gap-1">
+            <button
+              onClick={() => router.push('/')}
+              className={`flex flex-col items-center gap-1 px-4 py-2 transition-colors ${
+                pathname === '/'
+                  ? 'bg-hanapp-secondary text-white'
+                  : 'text-gray-500 hover:text-hanapp-primary hover:bg-gray-100'
+              }`}
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
               </svg>
               <span className="text-xs font-medium">Home</span>
-            </a>
-            <a
-              href="/bookings"
-              className="flex flex-col items-center gap-1 text-gray-500 hover:text-blue-900"
+            </button>
+            <button
+              onClick={() => router.push('/bookings')}
+              className={`flex flex-col items-center gap-1 px-4 py-2 transition-colors ${
+                pathname.startsWith('/bookings')
+                  ? 'bg-hanapp-secondary text-white'
+                  : 'text-gray-500 hover:text-hanapp-primary hover:bg-gray-100'
+              }`}
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
@@ -47,10 +65,14 @@ export function ClientHomeNavbar({
                 />
               </svg>
               <span className="text-xs font-medium">Bookings</span>
-            </a>
-            <a
-              href="/chat"
-              className="flex flex-col items-center gap-1 text-gray-500 hover:text-blue-900"
+            </button>
+            <button
+              onClick={() => router.push('/chat')}
+              className={`flex flex-col items-center gap-1 px-4 py-2 transition-colors ${
+                pathname.startsWith('/chat')
+                  ? 'bg-hanapp-secondary text-white'
+                  : 'text-gray-500 hover:text-hanapp-primary hover:bg-gray-100'
+              }`}
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                 <path
@@ -60,7 +82,7 @@ export function ClientHomeNavbar({
                 />
               </svg>
               <span className="text-xs font-medium">Chat</span>
-            </a>
+            </button>
           </div>
 
           {/* Right side - Notification and Profile */}
