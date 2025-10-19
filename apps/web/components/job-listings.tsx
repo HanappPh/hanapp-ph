@@ -2,6 +2,7 @@
 import { Button, Badge } from '@hanapp-ph/commons';
 import { MapPin, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 type Job = {
   id: number;
@@ -81,6 +82,7 @@ const filterButtons = ['Show all', 'Near Me', 'Top Picks', 'Book Again'];
 const JOBS_PER_PAGE = 5;
 
 export function JobListings() {
+  const router = useRouter();
   const [activeFilter, setActiveFilter] = useState<string>('Show all');
   const [currentPage, setCurrentPage] = useState<number>(1);
 
@@ -120,12 +122,12 @@ export function JobListings() {
     <section className="max-w-7xl mx-auto py-8 px-6">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-3xl font-semibold text-[#102e50]">Job listings</h2>
-        <a
-          href="#"
+        <button
+          onClick={() => router.push('/jobs/categories')}
           className="text-xs text-[#102e50] font-semibold hover:underline"
         >
           View All
-        </a>
+        </button>
       </div>
       <div className="flex gap-2 mb-6 flex-wrap">
         {filterButtons.map(filter => (
@@ -164,7 +166,8 @@ export function JobListings() {
         {paginatedJobs.map(job => (
           <div
             key={job.id}
-            className="flex gap-4 rounded-lg bg-white shadow-sm transition-all duration-200 ease-in-out hover:shadow-md hover:-translate-y-1 hover:scale-[1.01]"
+            onClick={() => router.push(`/provider/jobs/${job.id}`)}
+            className="flex gap-4 rounded-lg bg-white shadow-sm transition-all duration-200 ease-in-out hover:shadow-md hover:-translate-y-1 hover:scale-[1.01] cursor-pointer"
           >
             <div className="hidden md:block relative h-[155px] w-[155px] rounded-l-lg overflow-hidden">
               <Image

@@ -1,26 +1,27 @@
-const PromoBanner = ({ userName }: { userName: string }) => {
+import Image from 'next/image';
+
+export function ClientBanner() {
   return (
-    <div className="bg-primary text-primary-foreground px-4 pb-6 pt-2">
-      <h2 className="text-xl font-semibold mb-4">
-        Ano <span className="text-warning">Hanapp</span> mo, {userName}?
-      </h2>
+    <section className="relative h-[200px] md:h-[300px] overflow-hidden">
+      {/* Background Image */}
+      <Image
+        src="/smiling_man.jpg"
+        alt="Smiling man"
+        fill
+        className="object-cover"
+        priority
+      />
 
-      <div className="relative bg-gradient-to-r from-secondary/90 to-muted/80 rounded-2xl p-6 overflow-hidden shadow-lg">
-        <div className="relative z-10">
-          <p className="text-foreground text-base font-semibold mb-1">
-            Invite a friend and claim your
-          </p>
-          <p className="text-foreground text-2xl font-bold">50% off voucher!</p>
-        </div>
-
-        <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-20">
-          <div className="text-6xl font-bold text-foreground">
-            Hanapp<span className="text-warning">®</span>
-          </div>
+      {/* Content */}
+      <div className="relative h-full flex items-center">
+        <div className="container mx-auto px-4 md:px-8 lg:px-16 xl:px-40">
+          <h1 className="text-xl md:text-4xl lg:text-5xl font-bold text-white leading-tight max-w-2xl">
+            Find Help. Find Income.
+            <br />
+            Find Peace of Mind.
+          </h1>
         </div>
       </div>
-    </div>
+    </section>
   );
-};
-
-export default PromoBanner;
+}

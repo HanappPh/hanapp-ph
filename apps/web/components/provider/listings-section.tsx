@@ -2,8 +2,10 @@
 import { Card, CardContent } from '@hanapp-ph/commons';
 import { Star, MapPin, ChevronRight, ChevronLeft } from 'lucide-react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 export function ListingsSection() {
+  const router = useRouter();
   const listings = [
     {
       id: 1,
@@ -13,7 +15,7 @@ export function ListingsSection() {
       price: '₱700',
       location: 'Baliuag, Bulacan',
       rating: 5,
-      image: '/img-carousel-placeholder_1.png',
+      image: '/construction-worker-tools.jpg',
     },
     {
       id: 2,
@@ -23,7 +25,7 @@ export function ListingsSection() {
       price: '₱350',
       location: 'Baliuag, Bulacan',
       rating: 4,
-      image: '/img-carousel-placeholder_2.png',
+      image: '/plumber-fixing-drain.png',
     },
     {
       id: 3,
@@ -33,37 +35,57 @@ export function ListingsSection() {
       price: '₱850',
       location: 'Baliuag, Bulacan',
       rating: 5,
-      image: '/home-repair-tools.jpg',
+      image: '/mechanic-repairing-car.jpg',
     },
     {
       id: 4,
-      title: 'Auto repair home service',
-      category: 'Auto Repair',
-      provider: "Mike's Auto Shop",
-      price: '₱850',
+      title: 'Labada per kilo service',
+      category: 'Laundry',
+      provider: 'Clean & Fresh Laundry',
+      price: '₱28',
       location: 'Baliuag, Bulacan',
       rating: 5,
-      image: '/img-carousel-placeholder_1.png',
+      image: '/laundry-service.png',
     },
     {
       id: 5,
-      title: 'Auto repair home service',
-      category: 'Auto Repair',
-      provider: "Mike's Auto Shop",
-      price: '₱850',
+      title: 'House cleaning service',
+      category: 'Cleaning',
+      provider: 'Sparkle Home Services',
+      price: '₱650',
       location: 'Baliuag, Bulacan',
       rating: 5,
-      image: '/img-carousel-placeholder_1.png',
+      image: '/house-cleaning-service.png',
     },
     {
       id: 6,
-      title: 'Auto repair home service',
-      category: 'Auto Repair',
-      provider: "Mike's Auto Shop",
-      price: '₱850',
+      title: 'Delivery rider services',
+      category: 'Delivery',
+      provider: 'FastRide Express',
+      price: '₱300',
+      location: 'Baliuag, Bulacan',
+      rating: 4,
+      image: '/delivery-rider-on-motorcycle.jpg',
+    },
+    {
+      id: 7,
+      title: 'Pet grooming service',
+      category: 'Pet Care',
+      provider: 'Paws & Claws Grooming',
+      price: '₱500',
       location: 'Baliuag, Bulacan',
       rating: 5,
-      image: '/img-carousel-placeholder_1.png',
+      image: '/pet-grooming-dog.jpg',
+    },
+    {
+      id: 8,
+      title: 'Catering for events',
+      category: 'Catering',
+      provider: 'Delicious Catering Co.',
+      price: '₱15,000',
+      location: 'Baliuag, Bulacan',
+      rating: 5,
+      image: '/catering-buffet-food-service.jpg',
     },
   ];
 
@@ -137,7 +159,7 @@ export function ListingsSection() {
           {/* Left arrow button */}
           <button
             type="button"
-            className="hidden sm:block absolute top-1/2 -translate-y-1/2 left-4 bg-white rounded-lg shadow-md p-3 z-20 hover:shadow-lg hover:bg-gray-100 transition-all duration-200"
+            className="hidden sm:block absolute top-1/2 -translate-y-1/2 left-4 bg-white rounded-full shadow-md p-3 z-20 hover:shadow-lg hover:bg-gray-100 transition-all duration-200"
             onClick={() => {
               if (scrollRef.current) {
                 scrollRef.current.scrollBy({
@@ -162,7 +184,7 @@ export function ListingsSection() {
           {/* Right arrow button */}
           <button
             type="button"
-            className="hidden sm:block absolute top-1/2 -translate-y-1/2 right-4 bg-white rounded-lg shadow-md p-3 z-20 hover:shadow-lg hover:bg-gray-100 transition-all duration-200"
+            className="hidden sm:block absolute top-1/2 -translate-y-1/2 right-4 bg-white rounded-full shadow-md p-3 z-20 hover:shadow-lg hover:bg-gray-100 transition-all duration-200"
             onClick={() => {
               if (scrollRef.current) {
                 scrollRef.current.scrollBy({ left: 320, behavior: 'smooth' });
@@ -191,7 +213,8 @@ export function ListingsSection() {
             {listings.map(listing => (
               <Card
                 key={listing.id}
-                className="w-[300px] flex-shrink-0 rounded-lg overflow-hidden shadow-sm transition-all duration-200 ease-in-out hover:shadow-lg hover:-translate-y-1 hover:scale-[1.01]"
+                onClick={() => router.push(`/provider/jobs/${listing.id}`)}
+                className="w-[300px] flex-shrink-0 rounded-lg overflow-hidden shadow-sm transition-all duration-200 ease-in-out hover:shadow-lg hover:-translate-y-1 hover:scale-[1.01] cursor-pointer"
               >
                 <div className="relative">
                   <Image

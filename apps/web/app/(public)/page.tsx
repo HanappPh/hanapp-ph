@@ -2,13 +2,10 @@
 
 import { useRouter } from 'next/navigation';
 
-import {
-  ClientHomeBookings,
-  type Booking,
-} from '../../components/client-home/client-home-bookings';
+import { ClientBanner } from '../../components/client-home/client-home-banner';
 import { ClientHomeCategories } from '../../components/client-home/client-home-categories';
-import { ClientHomeCta } from '../../components/client-home/client-home-cta';
 import { ClientHomeHero } from '../../components/client-home/client-home-hero';
+import { LowerHeroSection } from '../../components/client-home/client-home-lower-hero-section';
 import {
   ClientHomeProviders,
   type Provider,
@@ -21,54 +18,62 @@ import {
 export default function HomePage() {
   const router = useRouter();
 
-  // Mock data - replace with actual API calls
-  const mockBookings: Booking[] = [
-    {
-      id: '1',
-      type: 'pending',
-      title: 'Laundry - Booking Request',
-      provider: 'Martin Santos',
-      timeAgo: '5 mins ago',
-    },
-    {
-      id: '2',
-      type: 'completed',
-      title: 'Babysitting Completed',
-      provider: 'Jenna Lee',
-      timeAgo: '5 hours ago',
-    },
-  ];
-
   const mockProviders: Provider[] = [
     {
       id: '1',
-      name: 'Gary',
-      service: 'Haircut',
-      distance: '0.3m',
+      name: 'Maria Santos',
+      service: 'House Cleaning',
+      distance: '0.3 km',
+      avatar: '/cleaning-service-provider.jpg',
     },
     {
       id: '2',
-      name: 'Mario',
-      service: 'Massage',
-      distance: '0.5m',
+      name: 'Juan Reyes',
+      service: 'Construction',
+      distance: '0.5 km',
+      avatar: '/construction-worker-tools.jpg',
     },
     {
       id: '3',
-      name: 'Linda',
-      service: 'Spa',
-      distance: '0.3m',
+      name: 'Lucia Cruz',
+      service: 'Dog Grooming',
+      distance: '0.4 km',
+      avatar: '/dog-groomer-with-pet.jpg',
     },
     {
       id: '4',
-      name: 'Amy',
-      service: 'Nails',
-      distance: '0.3m',
+      name: 'Pedro Mendoza',
+      service: 'Handyman',
+      distance: '0.6 km',
+      avatar: '/handyman-repair.jpg',
     },
     {
       id: '5',
-      name: 'Cecilio',
-      service: 'Car wash',
-      distance: '0.5m',
+      name: 'Ana Garcia',
+      service: 'Nanny Services',
+      distance: '0.2 km',
+      avatar: '/nanny-with-child.jpg',
+    },
+    {
+      id: '6',
+      name: 'Carlos Ramos',
+      service: 'Delivery Rider',
+      distance: '0.7 km',
+      avatar: '/delivery-rider-on-motorcycle.jpg',
+    },
+    {
+      id: '7',
+      name: 'Rosa Fernandez',
+      service: 'Laundry Service',
+      distance: '0.3 km',
+      avatar: '/woman-doing-laundry-service.jpg',
+    },
+    {
+      id: '8',
+      name: 'Miguel Torres',
+      service: 'Auto Mechanic',
+      distance: '0.8 km',
+      avatar: '/mechanic-repairing-car.jpg',
     },
   ];
 
@@ -81,6 +86,7 @@ export default function HomePage() {
       rating: 4.9,
       price: '₱28',
       category: 'Laundry',
+      image: '/laundry-service.png',
     },
     {
       id: '2',
@@ -90,6 +96,7 @@ export default function HomePage() {
       rating: 4.9,
       price: '₱2.5K',
       category: 'Transport',
+      image: '/img-carousel-placeholder_2.png',
     },
     {
       id: '3',
@@ -99,6 +106,7 @@ export default function HomePage() {
       rating: 4.9,
       price: '₱650',
       category: 'Babysitting',
+      image: '/house-cleaning-service.png',
     },
     {
       id: '4',
@@ -108,6 +116,7 @@ export default function HomePage() {
       rating: 4.9,
       price: '₱300',
       category: 'Errands',
+      image: '/delivery-person-parcel.jpg',
     },
     {
       id: '5',
@@ -117,13 +126,79 @@ export default function HomePage() {
       rating: 4.9,
       price: '₱2.5K',
       category: 'Pet care',
+      image: '/pet-grooming-dog.jpg',
+    },
+    {
+      id: '6',
+      title: 'Catering services for events',
+      provider: 'Oca Catering',
+      location: 'San Fernando, Pampanga',
+      rating: 4.6,
+      price: '₱50K',
+      category: 'Catering',
+      image: '/catering-buffet-food-service.jpg',
+    },
+    {
+      id: '7',
+      title: 'House cleaning service',
+      provider: 'Sparkle Home Services',
+      location: 'Balingog, Bulacan',
+      rating: 4.8,
+      price: '₱650',
+      category: 'Cleaning',
+      image: '/cleaning-service-provider.jpg',
+    },
+    {
+      id: '8',
+      title: 'Auto repair home service',
+      provider: "Mike's Auto Shop",
+      location: 'Malolos, Bulacan',
+      rating: 4.7,
+      price: '₱850',
+      category: 'Auto Repair',
+      image: '/mechanic-repairing-car.jpg',
+    },
+    {
+      id: '9',
+      title: 'Plumbing and drain service',
+      provider: 'Quick Fix Plumbing',
+      location: 'Balingog, Bulacan',
+      rating: 4.5,
+      price: '₱450',
+      category: 'Plumbing',
+      image: '/plumber-fixing-drain.png',
+    },
+    {
+      id: '10',
+      title: 'Landscaping and gardening',
+      provider: 'Green Thumb Services',
+      location: 'Angat, Bulacan',
+      rating: 4.9,
+      price: '₱800',
+      category: 'Landscaping',
+      image: '/landscaper-cutting-grass.jpg',
+    },
+    {
+      id: '11',
+      title: 'Construction handyman',
+      provider: 'Build Right Construction',
+      location: 'Balingog, Bulacan',
+      rating: 4.8,
+      price: '₱700',
+      category: 'Construction',
+      image: '/construction-worker-tools.jpg',
+    },
+    {
+      id: '12',
+      title: 'Tutor for elementary students',
+      provider: 'Smart Learning Center',
+      location: 'Malolos, Bulacan',
+      rating: 4.9,
+      price: '₱350',
+      category: 'Education',
+      image: '/tutor-teacher.jpg',
     },
   ];
-
-  // Event handlers
-  const handleViewBooking = (bookingId: string) => {
-    router.push(`/bookings/${bookingId}`);
-  };
 
   const handleCategoryClick = (categoryId: string) => {
     router.push(`/services?category=${categoryId}`);
@@ -149,27 +224,24 @@ export default function HomePage() {
     router.push('/services');
   };
 
-  const handlePostJob = () => {
-    router.push('/post-job');
-  };
+  // const handlePostJob = () => {
+  //   router.push('/post-job');
+  // };
 
-  const handleFindJob = () => {
-    router.push('/find-jobs');
-  };
+  // const handleFindJob = () => {
+  //   router.push('/find-jobs');
+  // };
 
   return (
     <>
-      <ClientHomeHero userName="Andrew" voucherDiscount={50} />
-
-      <ClientHomeBookings
-        bookings={mockBookings}
-        onViewBooking={handleViewBooking}
-      />
+      <ClientHomeHero userName="Andrew" />
 
       <ClientHomeCategories
         onCategoryClick={handleCategoryClick}
         onPostAll={handlePostAll}
       />
+
+      <ClientBanner />
 
       <ClientHomeProviders
         providers={mockProviders}
@@ -183,7 +255,7 @@ export default function HomePage() {
         onViewAll={handleViewAllListings}
       />
 
-      <ClientHomeCta onPostJob={handlePostJob} onFindJob={handleFindJob} />
+      <LowerHeroSection />
     </>
   );
 }
