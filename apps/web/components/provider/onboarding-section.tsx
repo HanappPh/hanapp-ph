@@ -1,7 +1,13 @@
+'use client';
+
 import { Button, Card } from '@hanapp-ph/commons';
 import { Camera, NotebookPen, BellRing, Sparkles } from 'lucide-react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+
 export function OnboardingSection() {
+  const router = useRouter();
+
   return (
     <section className="px-6 py-8">
       <div className="max-w-7xl mx-auto">
@@ -36,7 +42,10 @@ export function OnboardingSection() {
                   </li>
                 </ul>
                 <div className="mt-auto pt-6 flex flex-wrap gap-4 justify-start w-full">
-                  <Button className="bg-hanapp-primary hover:bg-hanapp-secondary text-white rounded-full">
+                  <Button
+                    onClick={() => router.push(`provider/jobs/create`)}
+                    className="bg-hanapp-primary hover:bg-hanapp-secondary text-white rounded-full"
+                  >
                     List My Service
                   </Button>
                   <Button className="bg-white text-hanapp-primary hover:bg-hanapp-secondary hover:text-white rounded-full">

@@ -1,7 +1,12 @@
+'use client';
+
 import { Button } from '@hanapp-ph/commons';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 export function LowerHeroSection() {
+  const router = useRouter();
+
   return (
     <section className="relative overflow-hidden bg-hanapp-accent">
       <div className="mx-auto grid items-center gap-8 sm:grid-cols-2">
@@ -12,10 +17,14 @@ export function LowerHeroSection() {
           </h1>
 
           <div className="flex flex-wrap gap-3 md:gap-4">
-            <Button className="bg-hanapp-primary text-white hover:bg-hanapp-secondary rounded-full px-6 md:px-8">
+            <Button
+              onClick={() => router.push('/jobs/categories')}
+              className="bg-hanapp-primary text-white hover:bg-hanapp-secondary rounded-full px-6 md:px-8"
+            >
               Find a Job
             </Button>
             <Button
+              onClick={() => router.push('/provider/jobs/create')}
               variant="outline"
               className="border-2 border-hanapp-primary text-hanapp-primary hover:bg-hanapp-secondary hover:text-white hover:border-hanapp-secondary rounded-full px-6 md:px-8 bg-transparent"
             >
