@@ -234,7 +234,7 @@ export default function HomePage() {
 
   return (
     <>
-      <ClientHomeHero userName="Andrew" voucherDiscount={50} />
+      <ClientHomeHero userName="Andrew" />
 
       <ClientHomeCategories
         onCategoryClick={handleCategoryClick}
