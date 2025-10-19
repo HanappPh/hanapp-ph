@@ -27,7 +27,7 @@ export function HeroSection() {
             onClick={() => router.push('/bookings')}
             size="lg"
             variant="outline"
-            className="border-2 border-[#014182] bg-trasnparent font-semibold px-8 py-3 rounded-xl text-base text-hanapp-primary hover:bg-hanapp-secondary hover:border-[#102e50] hover:text-white"
+            className="border-2 border-[#014182] bg-transparent font-semibold px-8 py-3 rounded-xl text-base text-hanapp-primary hover:bg-hanapp-secondary hover:border-[#102e50] hover:text-white"
           >
             Preview My Listings
           </Button>
