@@ -1,7 +1,8 @@
 'use client';
 
-import { useSearchParams } from 'next/navigation';
-import { useState, useMemo, useCallback, useEffect } from 'react';
+import { Search } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 
 // import { CategoriesHeader } from '../../../../components/categories/categories-header';
 import { CategoriesSidebar } from '../../../../components/categories/categories-sidebar';
@@ -206,13 +207,23 @@ const jobs: Job[] = [
 type SortOption = 'location' | 'rating' | 'price-high-low' | 'price-low-high';
 
 export default function CategoriesPage() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<SortOption>('location');
+  const [searchQuery, setSearchQuery] = useState('');
 
-  // Check for category parameter in URL and set it as selected
+  // Initialize search query and category from URL parameters
   useEffect(() => {
+    const searchParam = searchParams.get('search');
     const categoryParam = searchParams.get('category');
+
+    // Set search query from URL
+    if (searchParam) {
+      setSearchQuery(searchParam);
+    }
+
+    // Set selected category from URL
     if (categoryParam) {
       // Convert category ID to proper category name format
       // e.g., 'pet-care' -> 'Pet Care', 'laundry' -> 'Laundry'
@@ -280,17 +291,56 @@ export default function CategoriesPage() {
     });
   }, []); // Empty dependency array since helper functions are in scope
 
+  // Update URL when search query changes
+  const handleSearch = useCallback(() => {
+    const params = new URLSearchParams();
+
+    if (searchQuery.trim()) {
+      params.set('search', searchQuery.trim());
+    }
+
+    if (selectedCategories.length > 0) {
+      // Keep the first selected category in URL
+      const categoryId = selectedCategories[0]
+        .toLowerCase()
+        .replace(/\s+/g, '-');
+      params.set('category', categoryId);
+    }
+
+    const queryString = params.toString();
+    router.push(`/jobs/categories${queryString ? `?${queryString}` : ''}`, {
+      scroll: false,
+    });
+  }, [searchQuery, selectedCategories, router]);
+
+  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
   const filteredJobs = useMemo(() => {
     const filtered = jobs.filter(job => {
+      // Filter by categories
       const matchesCategories =
         selectedCategories.length === 0 ||
         selectedCategories.some(cat => job.categories.includes(cat));
 
-      return matchesCategories;
+      // Filter by search query
+      const matchesSearch =
+        !searchQuery.trim() ||
+        job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        job.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        job.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        job.categories.some(cat =>
+          cat.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+
+      return matchesCategories && matchesSearch;
     });
 
     return sortJobs(filtered, sortBy);
-  }, [selectedCategories, sortBy, sortJobs]);
+  }, [selectedCategories, searchQuery, sortBy, sortJobs]);
 
   const categoryCounts = useMemo(() => {
     const counts: Record<string, number> = {};
@@ -308,6 +358,21 @@ export default function CategoriesPage() {
     <div className="min-h-screen bg-white flex flex-col">
       <div className="flex-1 lg:overflow-hidden">
         <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 lg:py-8">
+          {/* Search Bar */}
+          <div className="mb-6">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <input
+                type="text"
+                placeholder="Search services, categories, or locations..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                onKeyDown={handleSearchKeyDown}
+                className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+          </div>
+
           {/* Mobile filter button */}
           <button
             onClick={() => setIsSidebarOpen(true)}
@@ -385,10 +450,15 @@ export default function CategoriesPage() {
                 <p className="text-gray-900">
                   <span className="font-semibold">{filteredJobs.length}</span>{' '}
                   results found
-                  {selectedCategories.length > 0 && (
+                  {(selectedCategories.length > 0 || searchQuery.trim()) && (
                     <span className="text-gray-600 block sm:inline mt-1 sm:mt-0">
                       {' '}
-                      for {`${selectedCategories.join(', ')}`}
+                      {selectedCategories.length > 0 &&
+                        `for ${selectedCategories.join(', ')}`}
+                      {selectedCategories.length > 0 &&
+                        searchQuery.trim() &&
+                        ' '}
+                      {searchQuery.trim() && `matching "${searchQuery}"`}
                     </span>
                   )}
                 </p>
