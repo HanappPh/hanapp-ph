@@ -19,6 +19,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useRef, useState } from 'react';
 
 export interface Category {
@@ -57,6 +58,7 @@ export function ClientHomeCategories({
   onCategoryClick,
   onPostAll,
 }: ClientHomeCategoriesProps) {
+  const router = useRouter();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
@@ -85,6 +87,10 @@ export function ClientHomeCategories({
   const handleCategoryClick = (categoryId: string) => {
     setSelectedId(categoryId);
     onCategoryClick?.(categoryId);
+    // Redirect to categories page with the selected category
+    // Convert category name to match the format in categories page
+    // e.g., 'Pet Care' -> 'pet-care' for URL, but it will be converted back
+    router.push(`/jobs/categories?category=${encodeURIComponent(categoryId)}`);
   };
 
   return (

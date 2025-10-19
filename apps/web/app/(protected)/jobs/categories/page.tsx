@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 
 // import { CategoriesHeader } from '../../../../components/categories/categories-header';
 import { CategoriesSidebar } from '../../../../components/categories/categories-sidebar';
@@ -205,8 +206,31 @@ const jobs: Job[] = [
 type SortOption = 'location' | 'rating' | 'price-high-low' | 'price-low-high';
 
 export default function CategoriesPage() {
+  const searchParams = useSearchParams();
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<SortOption>('location');
+
+  // Check for category parameter in URL and set it as selected
+  useEffect(() => {
+    const categoryParam = searchParams.get('category');
+    if (categoryParam) {
+      // Convert category ID to proper category name format
+      // e.g., 'pet-care' -> 'Pet Care', 'laundry' -> 'Laundry'
+      const categoryName = categoryParam
+        .split('-')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+
+      // Find matching category in the categories list
+      const matchedCategory = categories.find(
+        cat => cat.toLowerCase() === categoryName.toLowerCase()
+      );
+
+      if (matchedCategory) {
+        setSelectedCategories([matchedCategory]);
+      }
+    }
+  }, [searchParams]);
 
   const toggleCategory = (category: string) => {
     setSelectedCategories(prev =>
