@@ -122,12 +122,12 @@ export function JobListings() {
     <section className="max-w-7xl mx-auto py-8 px-6">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-3xl font-semibold text-[#102e50]">Job listings</h2>
-        <a
-          href="#"
+        <button
+          onClick={() => router.push('/jobs/categories')}
           className="text-xs text-[#102e50] font-semibold hover:underline"
         >
           View All
-        </a>
+        </button>
       </div>
       <div className="flex gap-2 mb-6 flex-wrap">
         {filterButtons.map(filter => (

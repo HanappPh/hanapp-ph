@@ -84,7 +84,10 @@ export function ClientHomeServiceListings({
           Service Listings
         </h2>
         <button
-          onClick={onViewAll}
+          onClick={() => {
+            onViewAll?.();
+            router.push('/jobs/categories');
+          }}
           className="text-xs text-[#102e50] font-semibold hover:underline"
         >
           View All
