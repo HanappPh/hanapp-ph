@@ -359,8 +359,8 @@ export default function CategoriesPage() {
       <div className="flex-1 lg:overflow-hidden">
         <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 lg:py-8">
           {/* Search Bar */}
-          <div className="mb-6">
-            <div className="relative">
+          <div className="mb-6 flex justify-center">
+            <div className="relative w-full max-w-4xl">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
                 type="text"
@@ -368,7 +368,7 @@ export default function CategoriesPage() {
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 onKeyDown={handleSearchKeyDown}
-                className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 text-gray-800 focus:outline-none focus:ring-2 focus:ring-hanapp-accent focus:border-transparent"
               />
             </div>
           </div>

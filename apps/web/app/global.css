@@ -154,4 +154,8 @@
   .border-hanapp-secondary {
     border-color: #102e50;
   }
+
+  .ring-hanapp-accent {
+    --tw-ring-color: #f5c45e;
+  }
 }
