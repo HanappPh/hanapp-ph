@@ -3,6 +3,7 @@
 import { Button } from '@hanapp-ph/commons';
 import { MapPin, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export interface ServiceListing {
@@ -34,6 +35,7 @@ export function ClientHomeServiceListings({
   onViewListing,
   onViewAll,
 }: ClientHomeServiceListingsProps) {
+  const router = useRouter();
   const [activeFilter, setActiveFilter] = useState(filters[0]);
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -114,7 +116,11 @@ export function ClientHomeServiceListings({
           <div
             key={listing.id}
             className="flex gap-4 p-4 bg-white rounded-lg border border-gray-200 hover:shadow-md transition-shadow cursor-pointer"
-            onClick={() => onViewListing?.(listing.id)}
+            onClick={() => {
+              onViewListing?.(listing.id);
+              // router.push(`/job/${listing.id}`);
+              router.push(`jobs/[jobId]`);
+            }}
           >
             {/* Image */}
             <div className="w-24 h-24 flex-shrink-0 bg-gray-200 rounded-lg overflow-hidden">
