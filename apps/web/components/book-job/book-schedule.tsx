@@ -13,15 +13,19 @@ import {
 import { CalendarIcon } from 'lucide-react';
 import React from 'react';
 interface DateTimePickerProps {
+  selectedLocation: string;
   selectedDate: Date;
   selectedTime: string;
+  onLocationChange: (location: string) => void;
   onDateChange: (date: Date) => void;
   onTimeChange: (time: string) => void;
 }
 
 export default function ScheduleService({
+  selectedLocation,
   selectedDate,
   selectedTime,
+  onLocationChange,
   onDateChange,
   onTimeChange,
 }: DateTimePickerProps) {
@@ -53,6 +57,8 @@ export default function ScheduleService({
             type="text"
             id="service-location"
             placeholder="Enter service location"
+            value={selectedLocation}
+            onChange={e => onLocationChange(e.target.value)}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
