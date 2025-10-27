@@ -111,33 +111,30 @@ export class UserController {
     return this.userService.login(loginDto);
   }
 
-  @Post('login-with-phone')
-  @ApiOperation({ summary: 'Login using verified phone number' })
+  @Post('create-session')
+  @ApiOperation({ summary: 'Create session for OTP-verified user' })
   @ApiBody({
     schema: {
       type: 'object',
       properties: {
-        phone: { type: 'string', example: '09171234567' },
+        userId: { type: 'string', example: 'uuid' },
+        email: { type: 'string', example: 'user@example.com' },
+        password: { type: 'string', example: 'password123' },
       },
     },
   })
   @ApiResponse({
     status: 200,
-    description: 'Logged in successfully',
-    schema: {
-      example: {
-        success: true,
-        message: 'Logged in successfully',
-        user: { id: 'uuid', email: 'user@example.com' },
-      },
-    },
+    description: 'Session created successfully',
   })
-  @ApiResponse({
-    status: 400,
-    description: 'Phone not verified',
-  })
-  async loginWithPhone(@Body() body: { phone: string }) {
-    return this.userService.loginWithPhone(body.phone);
+  async createSession(
+    @Body() body: { userId: string; email: string; password: string }
+  ) {
+    return this.userService.createSession(
+      body.userId,
+      body.email,
+      body.password
+    );
   }
 
   @Post('logout')

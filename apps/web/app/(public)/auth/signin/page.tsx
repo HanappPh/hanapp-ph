@@ -71,27 +71,31 @@ function AuthPageContent() {
       const userType = selectedUserType;
       const fullName = `${formData.firstName} ${formData.lastName}`;
 
-      // Use the verified phone number from URL parameter (from OTP verification)
-      // If not available, format the phone from form
-      let fullPhoneNumber: string;
+      // Normalize phone number to +63XXXXXXXXXX format (must match backend)
+      let normalizedPhone: string;
       if (verifiedPhone) {
-        // Use the exact phone number that was verified
-        fullPhoneNumber = verifiedPhone;
+        normalizedPhone = verifiedPhone;
       } else {
-        // Fallback: format phone number with country code
-        fullPhoneNumber = formData.phoneNumber.startsWith('+')
-          ? formData.phoneNumber
-          : `+63${formData.phoneNumber.replace(/^0+/, '')}`;
+        normalizedPhone = formData.phoneNumber;
       }
 
-      // Generate a temporary password from phone number (user can change later)
-      // This works for phone-based OTP authentication
-      const tempPassword = `HanApp${fullPhoneNumber.slice(-4)}!`;
+      // Normalize to +63 format
+      const cleaned = normalizedPhone.replace(/\D/g, '');
+      if (cleaned.startsWith('0') && cleaned.length === 11) {
+        normalizedPhone = `+63${cleaned.substring(1)}`;
+      } else if (!cleaned.startsWith('63') && cleaned.length === 10) {
+        normalizedPhone = `+63${cleaned}`;
+      } else if (!normalizedPhone.startsWith('+')) {
+        normalizedPhone = `+${cleaned}`;
+      }
+
+      // Generate temp password from normalized phone (last 4 digits)
+      const tempPassword = `HanApp${normalizedPhone.slice(-4)}!`;
 
       const { data, error: signUpError } = await signUp(
         formData.email,
         tempPassword,
-        fullPhoneNumber,
+        normalizedPhone,
         {
           full_name: fullName,
           user_type: userType,

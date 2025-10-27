@@ -70,12 +70,20 @@ export function AuthButtons({
       // OTP verified successfully
       const { data: verifyData } = result;
 
+      // eslint-disable-next-line no-console
+      console.log('OTP verification result:', verifyData);
+
       if (verifyData?.userExists) {
         // User exists - they're now logged in via session
-        // Always redirect existing users to regular home page (/)
+        // eslint-disable-next-line no-console
+        console.log('Existing user detected, redirecting to home');
+        // Wait a bit for session to be fully established
+        await new Promise(resolve => setTimeout(resolve, 500));
         router.push('/');
       } else {
         // New user, redirect to signup with phone number
+        // eslint-disable-next-line no-console
+        console.log('New user detected, redirecting to signup');
         router.push(
           `/auth/signin?mode=signup&phone=${encodeURIComponent(formattedPhone)}`
         );

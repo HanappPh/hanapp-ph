@@ -19,6 +19,7 @@ export function Sidebar({
   accentColorDark,
   accentColorLight,
   clickedColor,
+  profile,
 }: {
   initialSelected?: 'Provider' | 'Client';
   mainColorDark?: string;
@@ -27,6 +28,10 @@ export function Sidebar({
   accentColorDark?: string;
   accentColorLight?: string;
   clickedColor?: string;
+  profile: {
+    full_name?: string;
+    email?: string;
+  } | null;
 }) {
   const [selected, setSelected] = React.useState<'Provider' | 'Client'>(
     initialSelected ?? 'Client'
@@ -39,6 +44,8 @@ export function Sidebar({
       router.push('/provider/profile');
     }
   };
+
+  const displayName = profile?.full_name || 'User';
 
   return (
     <aside className="w-80 bg-white p-6">
@@ -57,7 +64,7 @@ export function Sidebar({
             />
           </div>
           <h3 className="text-xl font-semibold text-gray-900 mb-2">
-            Mario Garcia
+            {displayName}
           </h3>
           <div className="flex items-center justify-center space-x-2 mb-4">
             <div className="w-2 h-2 bg-green-500 rounded-full"></div>
