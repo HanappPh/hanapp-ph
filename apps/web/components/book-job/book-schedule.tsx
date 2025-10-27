@@ -1,6 +1,7 @@
 'use client';
 import {
   Label,
+  Input,
   Calendar,
   Button,
   Select,
@@ -39,7 +40,22 @@ export default function ScheduleService({
       <h2 className="text-2xl font-semibold text-hanapp-secondary mb-4">
         Schedule Services
       </h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Location */}
+        <div className="space-y-2">
+          <Label
+            htmlFor="service-location"
+            className="text-base font-semibold text-hanapp-primary"
+          >
+            Service Location
+          </Label>
+          <Input
+            type="text"
+            id="service-location"
+            placeholder="Enter service location"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
         {/* Date Picker */}
         <div className="space-y-2">
           <Label
@@ -90,7 +106,7 @@ export default function ScheduleService({
           </Label>
           <Select value={selectedTime} onValueChange={onTimeChange}>
             <SelectTrigger className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white hover:bg-blue-50 transition-colors">
-              <SelectValue placeholder="Select Time" />
+              <SelectValue placeholder="Select time" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="08:00">8:00 AM</SelectItem>
