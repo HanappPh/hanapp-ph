@@ -234,6 +234,24 @@ export function useAuth() {
         };
       }
 
+      // If user exists, automatically log them in
+      if (data.userExists && data.user) {
+        // Call login-with-phone endpoint to establish session
+        const loginResponse = await fetch(
+          `${API_URL}/api/user/login-with-phone`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phone }),
+          }
+        );
+
+        if (loginResponse.ok) {
+          // Refresh the Supabase session
+          await supabase.auth.refreshSession();
+        }
+      }
+
       return { success: true, error: null, data };
     } catch {
       return {

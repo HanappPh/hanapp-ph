@@ -1,6 +1,9 @@
+'use client';
+
 import { Badge } from '@hanapp-ph/commons';
 import { MapPin, Star } from 'lucide-react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 type Job = {
   id: string;
@@ -18,8 +21,17 @@ interface JobCardProps {
 }
 
 export default function CategoriesJobCard({ job }: JobCardProps) {
+  const router = useRouter();
+
+  const handleClick = () => {
+    router.push(`/jobs/${job.id}`);
+  };
+
   return (
-    <div className="bg-white rounded-lg overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow cursor-pointer w-full">
+    <div
+      onClick={handleClick}
+      className="bg-white rounded-lg overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow cursor-pointer w-full"
+    >
       {/* Image */}
       <div className="relative aspect-[3/2] overflow-hidden bg-gray-100">
         <Image
