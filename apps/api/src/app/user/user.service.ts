@@ -117,15 +117,25 @@ export class UserService {
     // Check if user already exists with this phone number
     const { data: existingUser } = await this.supabaseService
       .from('users')
-      .select('id, email, phone')
+      .select('id, email, phone, user_type')
       .eq('phone', phone)
       .single();
+
+    if (existingUser) {
+      // User exists - return user info so frontend can establish session
+      return {
+        success: true,
+        message: 'OTP verified successfully',
+        userExists: true,
+        user: existingUser,
+      };
+    }
 
     return {
       success: true,
       message: 'OTP verified successfully',
-      userExists: !!existingUser,
-      user: existingUser || null,
+      userExists: false,
+      user: null,
     };
   }
 
@@ -199,6 +209,57 @@ export class UserService {
       message: 'Logged in successfully',
       user: data.user,
       session: data.session,
+    };
+  }
+
+  async loginWithPhone(phone: string) {
+    // Check if OTP was verified for this phone
+    const { data: verifiedOtp } = await this.supabaseService
+      .from('otp_verifications')
+      .select('*')
+      .eq('phone', phone)
+      .eq('verified', true)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single();
+
+    if (!verifiedOtp) {
+      throw new HttpException(
+        'Phone number not verified. Please verify your phone first.',
+        HttpStatus.BAD_REQUEST
+      );
+    }
+
+    // Get user by phone
+    const { data: user, error: userError } = await this.supabaseService
+      .from('users')
+      .select('id, email')
+      .eq('phone', phone)
+      .single();
+
+    if (userError || !user) {
+      throw new HttpException(
+        'User not found with this phone number',
+        HttpStatus.NOT_FOUND
+      );
+    }
+
+    // Sign in the user using their email
+    // We'll use a magic link approach via admin API
+    const { data: authData, error: signInError } =
+      await this.supabaseService.auth.admin.getUserById(user.id);
+
+    if (signInError || !authData.user) {
+      throw new HttpException(
+        'Failed to authenticate user',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+
+    return {
+      success: true,
+      message: 'Logged in successfully',
+      user: authData.user,
     };
   }
 

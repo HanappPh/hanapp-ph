@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@hanapp-ph/commons';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 
 import { useAuth } from '../../lib/hooks/useAuth';
@@ -20,8 +20,6 @@ export function AuthButtons({
   className = '',
 }: AuthButtonsProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const redirectTo = searchParams.get('redirectTo') || '/';
   const { sendOTP: sendOTPApi, verifyOTP: verifyOTPApi } = useAuth();
 
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -70,12 +68,12 @@ export function AuthButtons({
       return false;
     } else {
       // OTP verified successfully
-      // Check if user exists - if yes, log them in; if no, redirect to signup
       const { data: verifyData } = result;
 
       if (verifyData?.userExists) {
-        // User exists, redirect to home
-        router.push(redirectTo);
+        // User exists - they're now logged in via session
+        // Always redirect existing users to regular home page (/)
+        router.push('/');
       } else {
         // New user, redirect to signup with phone number
         router.push(

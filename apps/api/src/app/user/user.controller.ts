@@ -111,6 +111,35 @@ export class UserController {
     return this.userService.login(loginDto);
   }
 
+  @Post('login-with-phone')
+  @ApiOperation({ summary: 'Login using verified phone number' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        phone: { type: 'string', example: '09171234567' },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Logged in successfully',
+    schema: {
+      example: {
+        success: true,
+        message: 'Logged in successfully',
+        user: { id: 'uuid', email: 'user@example.com' },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Phone not verified',
+  })
+  async loginWithPhone(@Body() body: { phone: string }) {
+    return this.userService.loginWithPhone(body.phone);
+  }
+
   @Post('logout')
   @ApiOperation({ summary: 'Logout current user' })
   @ApiResponse({

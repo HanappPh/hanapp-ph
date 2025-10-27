@@ -1,18 +1,36 @@
+'use client';
+
 import { Search } from 'lucide-react';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { useState, KeyboardEvent } from 'react';
 
 interface ClientHomeHeroProps {
   userName?: string;
-  voucherDiscount?: number;
 }
 
-export function ClientHomeHero({
-  userName = 'Andrew',
-  voucherDiscount = 50,
-}: ClientHomeHeroProps) {
+export function ClientHomeHero({ userName = 'Andrew' }: ClientHomeHeroProps) {
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      router.push(
+        `/jobs/categories?search=${encodeURIComponent(searchQuery.trim())}`
+      );
+    }
+  };
+
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
   return (
     <section className="relative bg-gray-50">
       {/* Blue gradient background - only top half */}
-      <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-r from-blue-900 to-blue-800" />
+      <div className="absolute inset-x-0 top-0 h-1/2 bg-hanapp-gradient" />
 
       <div className="relative container mx-auto px-4 py-6">
         {/* Greeting */}
@@ -23,21 +41,15 @@ export function ClientHomeHero({
         </div>
 
         {/* Voucher Banner */}
-        <div className="bg-white rounded-lg p-4 mb-6 flex items-center justify-between shadow-md">
-          <div className="flex items-center gap-3">
-            <div className="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
-              <span className="text-2xl">📦</span>
-            </div>
-            <div>
-              <p className="text-gray-800 font-medium">
-                Invite a friend and claim your
-              </p>
-              <p className="text-blue-900 font-bold">
-                {voucherDiscount}% off voucher!
-              </p>
-            </div>
-          </div>
-          <div className="text-yellow-400 text-4xl font-bold">Hanapp</div>
+        <div className="mb-6 rounded-lg overflow-hidden">
+          <Image
+            src="/hanapp-banner.jpg"
+            alt="Invite a friend and claim your 50% off voucher - Hanapp"
+            width={1092}
+            height={150}
+            className="w-full h-auto block"
+            priority
+          />
         </div>
 
         {/* Search Bar */}
@@ -46,6 +58,9 @@ export function ClientHomeHero({
           <input
             type="text"
             placeholder="Search here"
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            onKeyDown={handleKeyDown}
             className="w-full pl-10 pr-4 py-3 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-yellow-400"
           />
         </div>
