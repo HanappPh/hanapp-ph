@@ -1,7 +1,7 @@
 'use client';
 
-import { useSearchParams } from 'next/navigation';
-import { Suspense, useRef } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { Suspense, useRef, useState } from 'react';
 
 import { BackgroundImage } from '../../../../components/background';
 import { LoginDialog } from '../../../../components/login/login-dialog';
@@ -9,6 +9,7 @@ import { MainHeader } from '../../../../components/login/login-header';
 import SignUpForm from '../../../../components/signup/signup-forms';
 import SignInBrandHeader from '../../../../components/signup/signup-header';
 import SignInServiceSelector from '../../../../components/signup/signup-service';
+import { useAuth, UserType } from '../../../../lib/hooks/useAuth';
 import { FormData, SignUpFormRef } from '../../../../types/signupinterface';
 
 type ServiceOption = 'jobs' | 'services' | 'both';
@@ -16,24 +17,110 @@ type ServiceOption = 'jobs' | 'services' | 'both';
 function AuthPageContent() {
   const searchParams = useSearchParams();
   const mode = searchParams.get('mode') || 'login';
+  const verifiedPhone = searchParams.get('phone'); // Get verified phone from OTP
+  const router = useRouter();
+  const { signUp } = useAuth();
 
   const formRef = useRef<SignUpFormRef>(null);
+  const [selectedUserType, setSelectedUserType] = useState<UserType | null>(
+    null
+  );
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSelectionChange = (_selection: ServiceOption | null) => {
-    // Handle selection change
+    setError(null);
   };
 
-  // const handleCreateAccount = (_selection: ServiceOption | null) => {
-  //   // Call the form's submit method via ref
-  //   const success = formRef.current?.submitForm();
-  //   if (success) {
-  //     alert('Form submitted! Selection: ' + _selection);
-  //   }
-  // };
+  const handleUserTypeChange = (userType: UserType) => {
+    setSelectedUserType(userType);
+    setError(null); // Clear error when user selects a role
+  };
 
-  const handleFormSubmit = (formData: FormData) => {
-    // Handle form submission - integrate with your backend API
-    alert(`Account created successfully for ${formData.firstName}!`);
+  const handleCreateAccount = () => {
+    // First check if user has selected a role
+    if (!selectedUserType) {
+      setError(
+        'Please select whether you want to offer jobs or provide services'
+      );
+      return;
+    }
+
+    // Then validate and submit the form
+    const isFormValid = formRef.current?.submitForm();
+
+    if (!isFormValid) {
+      setError('Please fill in all required fields correctly');
+    }
+  };
+
+  const handleFormSubmit = async (formData: FormData) => {
+    // Double-check role selection (should already be validated by handleCreateAccount)
+    if (!selectedUserType) {
+      setError(
+        'Please select whether you want to offer jobs or provide services'
+      );
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      // Use the userType from service selector
+      const userType = selectedUserType;
+      const fullName = `${formData.firstName} ${formData.lastName}`;
+
+      // Use the verified phone number from URL parameter (from OTP verification)
+      // If not available, format the phone from form
+      let fullPhoneNumber: string;
+      if (verifiedPhone) {
+        // Use the exact phone number that was verified
+        fullPhoneNumber = verifiedPhone;
+      } else {
+        // Fallback: format phone number with country code
+        fullPhoneNumber = formData.phoneNumber.startsWith('+')
+          ? formData.phoneNumber
+          : `+63${formData.phoneNumber.replace(/^0+/, '')}`;
+      }
+
+      // Generate a temporary password from phone number (user can change later)
+      // This works for phone-based OTP authentication
+      const tempPassword = `HanApp${fullPhoneNumber.slice(-4)}!`;
+
+      const { data, error: signUpError } = await signUp(
+        formData.email,
+        tempPassword,
+        fullPhoneNumber,
+        {
+          full_name: fullName,
+          user_type: userType,
+        }
+      );
+
+      if (signUpError) {
+        setError(signUpError.message);
+        return;
+      }
+
+      if (data) {
+        // Redirect based on user role
+        if (userType === 'provider') {
+          router.push('/provider'); // Provider home page
+        } else if (userType === 'client') {
+          router.push('/'); // Client home page (regular page.tsx)
+        } else if (userType === 'both') {
+          // Default to client view for 'both', they can switch later
+          router.push('/');
+        }
+      }
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : 'An error occurred during signup'
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // LOGIN PAGE
@@ -61,7 +148,17 @@ function AuthPageContent() {
             <div className="flex-1 p-4 sm:p-6 lg:p-12 flex flex-col">
               <SignInBrandHeader logoSrc="/logo.png" logoAlt="HanApp Logo" />
               <div className="flex-1 mt-4 sm:mt-0">
-                <SignUpForm ref={formRef} onSubmit={handleFormSubmit} />
+                <SignUpForm
+                  ref={formRef}
+                  onSubmit={handleFormSubmit}
+                  isLoading={isLoading}
+                  initialPhone={verifiedPhone || undefined}
+                />
+                {error && (
+                  <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-sm text-red-600">{error}</p>
+                  </div>
+                )}
               </div>
               <div className="mt-4 text-center text-sm text-gray-600">
                 Already have an account?{' '}
@@ -77,14 +174,18 @@ function AuthPageContent() {
             <div className="hidden lg:flex flex-1 bg-white p-8 lg:p-12 flex-col">
               <SignInServiceSelector
                 onSelectionChange={handleSelectionChange}
-                //onCreateAccount={handleCreateAccount}
+                onCreateAccount={handleCreateAccount}
+                onUserTypeChange={handleUserTypeChange}
+                isLoading={isLoading}
               />
             </div>
             {/* Right - Service Selector (Mobile) */}
             <div className="lg:hidden bg-white p-4 sm:p-6">
               <SignInServiceSelector
                 onSelectionChange={handleSelectionChange}
-                //onCreateAccount={handleCreateAccount}
+                onCreateAccount={handleCreateAccount}
+                onUserTypeChange={handleUserTypeChange}
+                isLoading={isLoading}
               />
             </div>
           </div>

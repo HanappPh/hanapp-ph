@@ -2,32 +2,59 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Users table (extends Supabase auth.users)
-CREATE TABLE public.profiles (
+CREATE TABLE public.users (
   id UUID REFERENCES auth.users(id) PRIMARY KEY,
   email TEXT NOT NULL,
   full_name TEXT,
-  phone TEXT,
+  phone TEXT NOT NULL UNIQUE,
   avatar_url TEXT,
-  user_type TEXT CHECK (user_type IN ('client', 'provider', 'both')),
+  user_type TEXT CHECK (user_type IN ('client', 'provider', 'both')) DEFAULT 'client',
+  phone_verified BOOLEAN DEFAULT false,
+  is_active BOOLEAN DEFAULT true,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Enable Row Level Security
-ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 
--- Policies for profiles
-CREATE POLICY "Public profiles are viewable by everyone" 
-  ON public.profiles FOR SELECT 
+-- Policies for users
+CREATE POLICY "Public users are viewable by everyone" 
+  ON public.users FOR SELECT 
   USING (true);
 
 CREATE POLICY "Users can insert their own profile" 
-  ON public.profiles FOR INSERT 
+  ON public.users FOR INSERT 
   WITH CHECK (auth.uid() = id);
 
 CREATE POLICY "Users can update their own profile" 
-  ON public.profiles FOR UPDATE 
+  ON public.users FOR UPDATE 
   USING (auth.uid() = id);
+
+-- OTP verification table
+CREATE TABLE public.otp_verifications (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  phone TEXT NOT NULL,
+  otp_code TEXT NOT NULL,
+  expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
+  verified BOOLEAN DEFAULT false,
+  attempts INTEGER DEFAULT 0,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+ALTER TABLE public.otp_verifications ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view their own OTPs"
+  ON public.otp_verifications FOR SELECT
+  USING (true);
+
+CREATE POLICY "Anyone can insert OTP"
+  ON public.otp_verifications FOR INSERT
+  WITH CHECK (true);
+
+CREATE POLICY "Anyone can update OTP"
+  ON public.otp_verifications FOR UPDATE
+  USING (true);
 
 -- Categories table
 CREATE TABLE public.categories (
@@ -49,7 +76,7 @@ CREATE POLICY "Categories are viewable by everyone"
 -- Services table
 CREATE TABLE public.services (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  provider_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+  provider_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
   category_id UUID REFERENCES public.categories(id),
   title TEXT NOT NULL,
   description TEXT,
@@ -83,8 +110,8 @@ CREATE POLICY "Providers can update their own services"
 CREATE TABLE public.bookings (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   service_id UUID REFERENCES public.services(id),
-  client_id UUID REFERENCES public.profiles(id),
-  provider_id UUID REFERENCES public.profiles(id),
+  client_id UUID REFERENCES public.users(id),
+  provider_id UUID REFERENCES public.users(id),
   status TEXT CHECK (status IN ('pending', 'confirmed', 'in_progress', 'completed', 'cancelled')) DEFAULT 'pending',
   scheduled_date TIMESTAMP WITH TIME ZONE,
   total_price DECIMAL(10, 2),
@@ -113,8 +140,8 @@ CREATE TABLE public.reviews (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   booking_id UUID REFERENCES public.bookings(id),
   service_id UUID REFERENCES public.services(id),
-  client_id UUID REFERENCES public.profiles(id),
-  provider_id UUID REFERENCES public.profiles(id),
+  client_id UUID REFERENCES public.users(id),
+  provider_id UUID REFERENCES public.users(id),
   rating INTEGER CHECK (rating >= 1 AND rating <= 5),
   comment TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -134,8 +161,8 @@ CREATE POLICY "Clients can create reviews for their bookings"
 -- Messages table (for chat functionality)
 CREATE TABLE public.messages (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  sender_id UUID REFERENCES public.profiles(id),
-  receiver_id UUID REFERENCES public.profiles(id),
+  sender_id UUID REFERENCES public.users(id),
+  receiver_id UUID REFERENCES public.users(id),
   booking_id UUID REFERENCES public.bookings(id),
   content TEXT NOT NULL,
   is_read BOOLEAN DEFAULT false,
@@ -162,7 +189,7 @@ END;
 $$ language 'plpgsql';
 
 -- Triggers for updated_at
-CREATE TRIGGER update_profiles_updated_at BEFORE UPDATE ON public.profiles
+CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON public.users
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 CREATE TRIGGER update_categories_updated_at BEFORE UPDATE ON public.categories
@@ -177,17 +204,32 @@ CREATE TRIGGER update_bookings_updated_at BEFORE UPDATE ON public.bookings
 CREATE TRIGGER update_reviews_updated_at BEFORE UPDATE ON public.reviews
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
--- Function to create profile on signup
+-- Function to create user profile on signup
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO public.profiles (id, email, full_name)
-  VALUES (NEW.id, NEW.email, NEW.raw_user_meta_data->>'full_name');
+  INSERT INTO public.users (id, email, full_name, phone, user_type)
+  VALUES (
+    NEW.id, 
+    NEW.email, 
+    NEW.raw_user_meta_data->>'full_name',
+    NEW.raw_user_meta_data->>'phone',
+    COALESCE(NEW.raw_user_meta_data->>'user_type', 'client')
+  );
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Trigger to create profile automatically
+-- Trigger to create user profile automatically
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+-- Function to clean up expired OTPs
+CREATE OR REPLACE FUNCTION public.cleanup_expired_otps()
+RETURNS void AS $$
+BEGIN
+  DELETE FROM public.otp_verifications
+  WHERE expires_at < NOW() - INTERVAL '1 day';
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;

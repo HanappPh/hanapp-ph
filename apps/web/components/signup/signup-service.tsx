@@ -1,38 +1,51 @@
 'use client';
 
 import { Button } from '@hanapp-ph/commons';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
-type ServiceOption = 'jobs' | 'services';
+type ServiceOption = 'jobs' | 'services' | 'both';
 
 interface SignInServiceSelectorProps {
   onSelectionChange: (selection: ServiceOption | null) => void;
-  //onCreateAccount: (selection: ServiceOption | null) => void;
+  onCreateAccount?: () => void;
+  isLoading?: boolean;
+  onUserTypeChange?: (userType: 'client' | 'provider' | 'both') => void;
 }
 
 export default function ServiceSelector({
   onSelectionChange,
-  //onCreateAccount,
+  onCreateAccount,
+  isLoading = false,
+  onUserTypeChange,
 }: SignInServiceSelectorProps) {
   const [selectedOption, setSelectedOption] = useState<ServiceOption | null>(
     null
   );
-  const router = useRouter();
 
   const toggleSelection = (option: ServiceOption) => {
     const newSelection = selectedOption === option ? null : option;
     setSelectedOption(newSelection);
     onSelectionChange(newSelection);
+
+    // Map service option to userType and notify parent
+    if (onUserTypeChange) {
+      if (option === 'jobs') {
+        onUserTypeChange('client');
+      } else if (option === 'services') {
+        onUserTypeChange('provider');
+      } else if (option === 'both') {
+        onUserTypeChange('both');
+      }
+    }
   };
 
   const getButtonStyles = (option: ServiceOption) => {
     const isSelected = selectedOption === option;
     return `w-full py-6 px-6 text-base font-medium border-2 rounded-xl transition-all ${
       isSelected
-        ? 'bg-white text-[#102E50] '
-        : 'bg-white text-[#102E50] border-white '
-    }`;
+        ? 'bg-[#F5C45E] text-[#102E50] border-[#F5C45E] shadow-lg hover:bg-[#F5C45E]/90'
+        : 'bg-white text-[#102E50] border-white hover:bg-white/90 hover:border-[#F5C45E]/30'
+    } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`;
   };
 
   return (
@@ -56,6 +69,7 @@ export default function ServiceSelector({
             variant="outline"
             className={getButtonStyles('jobs')}
             onClick={() => toggleSelection('jobs')}
+            disabled={isLoading}
           >
             <div className="text-center">
               <div>I&apos;m here to</div>
@@ -67,6 +81,7 @@ export default function ServiceSelector({
             variant="outline"
             className={getButtonStyles('services')}
             onClick={() => toggleSelection('services')}
+            disabled={isLoading}
           >
             <div className="text-center">
               <div>I&apos;m here to</div>
@@ -78,11 +93,11 @@ export default function ServiceSelector({
         {/* Create Account Button */}
         <div className="px-2.5">
           <Button
-            className="w-full py-4 px-6 text-base font-semibold bg-[#F5C45E] hover:bg-[#F5C45E]/90 text-[#102E50] rounded-xl shadow-lg transition-all border-0"
-            //onClick={() => onCreateAccount(selectedOption)}
-            onClick={() => router.push('/')}
+            className="w-full py-4 px-6 text-base font-semibold bg-[#F5C45E] hover:bg-[#F5C45E]/90 text-[#102E50] rounded-xl shadow-lg transition-all border-0 disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={onCreateAccount}
+            disabled={isLoading || !selectedOption}
           >
-            Create Account
+            {isLoading ? 'Creating Account...' : 'Create Account'}
           </Button>
         </div>
       </div>

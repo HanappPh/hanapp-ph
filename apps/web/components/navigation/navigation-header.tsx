@@ -1,5 +1,9 @@
+'use client';
+
 import { Button } from '@hanapp-ph/commons';
 import { Home, Calendar, Users, MessageCircle, Bell } from 'lucide-react';
+
+import { useAuth } from '../../lib/hooks/useAuth';
 
 interface NavigationHeaderProps {
   activeTab?: 'home' | 'bookings' | 'providers' | 'chat';
@@ -8,6 +12,9 @@ interface NavigationHeaderProps {
 export const NavigationHeader = ({
   activeTab = 'home',
 }: NavigationHeaderProps) => {
+  const { activeRole } = useAuth();
+  const isProvider = activeRole === 'provider';
+
   const navItems = [
     { id: 'home', label: 'Home', icon: Home },
     { id: 'bookings', label: 'Bookings', icon: Calendar },
@@ -37,13 +44,21 @@ export const NavigationHeader = ({
                 isActive ? '' : ''
               }`}
               style={{
-                backgroundColor: isActive ? '#112d52' : 'transparent',
+                backgroundColor: isActive
+                  ? isProvider
+                    ? '#F5C45E'
+                    : '#112d52'
+                  : 'transparent',
                 borderRadius: isActive ? '0' : '0',
               }}
             >
               <div
                 className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                  isActive ? 'text-white' : 'text-gray-600 hover:text-gray-800'
+                  isActive
+                    ? isProvider
+                      ? 'text-gray-900'
+                      : 'text-white'
+                    : 'text-gray-600 hover:text-gray-800'
                 }`}
                 style={{
                   backgroundColor: isActive ? 'transparent' : 'transparent',
@@ -53,7 +68,11 @@ export const NavigationHeader = ({
               </div>
               <span
                 className={`text-xs mt-1 whitespace-nowrap ${
-                  isActive ? 'text-white' : 'text-gray-600'
+                  isActive
+                    ? isProvider
+                      ? 'text-gray-900'
+                      : 'text-white'
+                    : 'text-gray-600'
                 }`}
               >
                 {item.label}
@@ -71,13 +90,19 @@ export const NavigationHeader = ({
         >
           <Bell className="h-5 w-5" />
           <span
-            className="absolute -top-1 -right-1 bg-yellow-400 text-xs rounded-full h-5 w-5 flex items-center justify-center font-semibold"
-            style={{ color: '#112d52' }}
+            className={`absolute -top-1 -right-1 text-xs rounded-full h-5 w-5 flex items-center justify-center font-semibold ${
+              isProvider ? 'bg-[#F5C45E] text-gray-900' : 'bg-yellow-400'
+            }`}
+            style={{ color: isProvider ? '#000' : '#112d52' }}
           >
             8
           </span>
         </Button>
-        <div className="w-10 h-10 bg-yellow-400 rounded-full flex items-center justify-center">
+        <div
+          className={`w-10 h-10 rounded-full flex items-center justify-center ${
+            isProvider ? 'bg-[#F5C45E]' : 'bg-yellow-400'
+          }`}
+        >
           <span className="text-sm font-semibold" style={{ color: '#112d52' }}>
             LR
           </span>
