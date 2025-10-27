@@ -2,8 +2,11 @@
 
 import { Bell } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { useState } from 'react';
+
+import { useAuth } from '../../lib/hooks/useAuth';
 
 import { NotificationsDialog } from './notifications-dialog';
 
@@ -19,9 +22,31 @@ export function ClientHomeNavbar({
   const router = useRouter();
   const pathname = usePathname();
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const { activeRole, profile } = useAuth();
+  const isProvider = activeRole === 'provider';
 
   const handleNotificationClick = () => {
     setIsNotificationsOpen(!isNotificationsOpen);
+  };
+
+  const handleProfileClick = () => {
+    if (onProfileClick) {
+      onProfileClick();
+    } else {
+      router.push('/profile');
+    }
+  };
+
+  // Get user initials for avatar
+  const getUserInitials = () => {
+    if (profile?.full_name) {
+      const names = profile.full_name.split(' ');
+      if (names.length >= 2) {
+        return `${names[0][0]}${names[1][0]}`.toUpperCase();
+      }
+      return names[0].substring(0, 2).toUpperCase();
+    }
+    return 'U';
   };
 
   return (
@@ -43,11 +68,14 @@ export function ClientHomeNavbar({
 
             {/* Navigation Items */}
             <div className="hidden md:flex items-center gap-1">
-              <button
-                onClick={() => router.push('/')}
+              <Link
+                href="/"
+                prefetch={true}
                 className={`flex flex-col items-center gap-1 px-4 py-2 transition-colors ${
                   pathname === '/'
-                    ? 'bg-hanapp-secondary text-white'
+                    ? isProvider
+                      ? 'bg-[#F5C45E] text-gray-900'
+                      : 'bg-hanapp-secondary text-white'
                     : 'text-gray-500 hover:text-hanapp-primary hover:bg-gray-100'
                 }`}
               >
@@ -59,12 +87,15 @@ export function ClientHomeNavbar({
                   <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
                 </svg>
                 <span className="text-xs font-medium">Home</span>
-              </button>
-              <button
-                onClick={() => router.push('/bookings')}
+              </Link>
+              <Link
+                href="/bookings"
+                prefetch={true}
                 className={`flex flex-col items-center gap-1 px-4 py-2 transition-colors ${
                   pathname.startsWith('/bookings')
-                    ? 'bg-hanapp-secondary text-white'
+                    ? isProvider
+                      ? 'bg-[#F5C45E] text-gray-900'
+                      : 'bg-hanapp-secondary text-white'
                     : 'text-gray-500 hover:text-hanapp-primary hover:bg-gray-100'
                 }`}
               >
@@ -81,12 +112,15 @@ export function ClientHomeNavbar({
                   />
                 </svg>
                 <span className="text-xs font-medium">Bookings</span>
-              </button>
-              <button
-                onClick={() => router.push('/chat')}
+              </Link>
+              <Link
+                href="/chat"
+                prefetch={true}
                 className={`flex flex-col items-center gap-1 px-4 py-2 transition-colors ${
                   pathname.startsWith('/chat')
-                    ? 'bg-hanapp-secondary text-white'
+                    ? isProvider
+                      ? 'bg-[#F5C45E] text-gray-900'
+                      : 'bg-hanapp-secondary text-white'
                     : 'text-gray-500 hover:text-hanapp-primary hover:bg-gray-100'
                 }`}
               >
@@ -102,7 +136,7 @@ export function ClientHomeNavbar({
                   />
                 </svg>
                 <span className="text-xs font-medium">Chat</span>
-              </button>
+              </Link>
             </div>
 
             {/* Right side - Notification and Profile */}
@@ -114,7 +148,13 @@ export function ClientHomeNavbar({
               >
                 <Bell className="w-5 h-5" />
                 {notificationCount > 0 && (
-                  <span className="absolute top-1 right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                  <span
+                    className={`absolute top-1 right-1 text-xs rounded-full w-4 h-4 flex items-center justify-center font-semibold ${
+                      isProvider
+                        ? 'bg-[#F5C45E] text-gray-900'
+                        : 'bg-red-500 text-white'
+                    }`}
+                  >
                     {notificationCount}
                   </span>
                 )}
@@ -122,11 +162,15 @@ export function ClientHomeNavbar({
 
               {/* Profile Avatar */}
               <button
-                onClick={onProfileClick}
-                className="w-8 h-8 bg-blue-900 rounded-full flex items-center justify-center text-white font-semibold text-sm hover:bg-blue-800 transition-colors cursor-pointer"
+                onClick={handleProfileClick}
+                className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold text-sm hover:opacity-80 transition-colors cursor-pointer ${
+                  isProvider
+                    ? 'bg-[#F5C45E] text-gray-900'
+                    : 'bg-blue-900 text-white'
+                }`}
                 aria-label="Profile"
               >
-                MG
+                {getUserInitials()}
               </button>
             </div>
           </div>

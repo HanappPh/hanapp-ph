@@ -14,11 +14,28 @@ export class UserService {
   }
 
   // ============================================
-  // OTP MANAGEMENT
+  // HELPER METHODS
+  // ============================================
+
+  private normalizePhoneNumber(phone: string): string {
+    let cleaned = phone.replace(/\D/g, '');
+
+    if (cleaned.startsWith('0')) {
+      cleaned = '63' + cleaned.substring(1);
+    } else if (cleaned.startsWith('9')) {
+      cleaned = '63' + cleaned;
+    } else if (!cleaned.startsWith('63')) {
+      cleaned = '63' + cleaned;
+    }
+
+    return '+' + cleaned;
+  }
+
+  // ============================================
+  // OTP AUTHENTICATION FLOW
   // ============================================
 
   async sendOtp(phone: string) {
-    // Validate phone number
     if (!this.semaphoreService.validatePhoneNumber(phone)) {
       throw new HttpException(
         'Invalid phone number format',
@@ -26,10 +43,9 @@ export class UserService {
       );
     }
 
-    // Generate OTP
+    const normalizedPhone = this.normalizePhoneNumber(phone);
     const otp = this.semaphoreService.generateOTP();
 
-    // Set expiration time (5 minutes from now)
     const expiresAt = new Date();
     expiresAt.setMinutes(expiresAt.getMinutes() + 5);
 
@@ -37,7 +53,7 @@ export class UserService {
     const { error: dbError } = await this.supabaseService
       .from('otp_verifications')
       .insert({
-        phone,
+        phone: normalizedPhone,
         otp_code: otp,
         expires_at: expiresAt.toISOString(),
       });
@@ -50,7 +66,7 @@ export class UserService {
       );
     }
 
-    // Send OTP via Semaphore
+    // Send OTP via SMS
     const smsResult = await this.semaphoreService.sendOTP(phone, otp);
 
     if (!smsResult.success) {
@@ -67,45 +83,40 @@ export class UserService {
   }
 
   async verifyOtp(phone: string, otp: string) {
-    // Get the latest OTP for this phone number
-    const { data: otpRecord, error: fetchError } = await this.supabaseService
-      .from('otp_verifications')
-      .select('*')
-      .eq('phone', phone)
-      .eq('verified', false)
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .single();
+    const normalizedPhone = this.normalizePhoneNumber(phone);
 
-    if (fetchError || !otpRecord) {
-      throw new HttpException(
-        'No OTP found for this phone number',
-        HttpStatus.NOT_FOUND
-      );
+    // Check all possible phone formats for OTP
+    const phoneFormats = [
+      normalizedPhone,
+      normalizedPhone.substring(1),
+      '0' + normalizedPhone.substring(3),
+    ];
+
+    let otpRecord = null;
+    for (const phoneFormat of phoneFormats) {
+      const result = await this.supabaseService
+        .from('otp_verifications')
+        .select('*')
+        .eq('phone', phoneFormat)
+        .eq('otp_code', otp)
+        .eq('verified', false)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (result.data) {
+        otpRecord = result.data;
+        break;
+      }
     }
 
-    // Check if OTP has expired
+    if (!otpRecord) {
+      throw new HttpException('Invalid or expired OTP', HttpStatus.BAD_REQUEST);
+    }
+
+    // Check if OTP expired
     if (new Date(otpRecord.expires_at) < new Date()) {
       throw new HttpException('OTP has expired', HttpStatus.BAD_REQUEST);
-    }
-
-    // Check attempt limit (max 5 attempts)
-    if (otpRecord.attempts >= 5) {
-      throw new HttpException(
-        'Too many attempts. Please request a new OTP.',
-        HttpStatus.TOO_MANY_REQUESTS
-      );
-    }
-
-    // Verify OTP
-    if (otpRecord.otp_code !== otp) {
-      // Increment attempts
-      await this.supabaseService
-        .from('otp_verifications')
-        .update({ attempts: otpRecord.attempts + 1 })
-        .eq('id', otpRecord.id);
-
-      throw new HttpException('Invalid OTP', HttpStatus.BAD_REQUEST);
     }
 
     // Mark OTP as verified
@@ -114,15 +125,28 @@ export class UserService {
       .update({ verified: true })
       .eq('id', otpRecord.id);
 
-    // Check if user already exists with this phone number
-    const { data: existingUser } = await this.supabaseService
-      .from('users')
-      .select('id, email, phone, user_type')
-      .eq('phone', phone)
-      .single();
+    // Check if user exists
+    let existingUser = null;
+    for (const phoneFormat of phoneFormats) {
+      const result = await this.supabaseService
+        .from('users')
+        .select('id, email, phone, user_type, full_name')
+        .eq('phone', phoneFormat)
+        .maybeSingle();
+
+      if (result.data) {
+        existingUser = result.data;
+        break;
+      }
+    }
 
     if (existingUser) {
-      // User exists - return user info so frontend can establish session
+      // Existing user - ensure their email is confirmed
+      await this.supabaseService.adminAuth.admin.updateUserById(
+        existingUser.id,
+        { email_confirm: true }
+      );
+
       return {
         success: true,
         message: 'OTP verified successfully',
@@ -139,16 +163,54 @@ export class UserService {
     };
   }
 
+  async createSession(userId: string, email: string, password: string) {
+    try {
+      // First, ensure email is confirmed
+      await this.supabaseService.adminAuth.admin.updateUserById(userId, {
+        email_confirm: true,
+      });
+
+      // Create session using password
+      const { data, error } =
+        await this.supabaseService.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+      if (error) {
+        throw new HttpException(
+          'Failed to create session: ' + error.message,
+          HttpStatus.UNAUTHORIZED
+        );
+      }
+
+      return {
+        success: true,
+        message: 'Session created successfully',
+        session: data.session,
+        user: data.user,
+      };
+    } catch (error) {
+      console.error('Error creating session:', error);
+      throw new HttpException(
+        'Failed to create session',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
   // ============================================
-  // AUTHENTICATION
+  // USER MANAGEMENT
   // ============================================
 
   async signUp(signUpDto: SignUpDto) {
+    const normalizedPhone = this.normalizePhoneNumber(signUpDto.phone);
+
     // Check if phone is verified
     const { data: verifiedOtp } = await this.supabaseService
       .from('otp_verifications')
       .select('*')
-      .eq('phone', signUpDto.phone)
+      .eq('phone', normalizedPhone)
       .eq('verified', true)
       .order('created_at', { ascending: false })
       .limit(1)
@@ -156,12 +218,12 @@ export class UserService {
 
     if (!verifiedOtp) {
       throw new HttpException(
-        'Phone number not verified. Please verify your phone first.',
+        'Phone number not verified',
         HttpStatus.BAD_REQUEST
       );
     }
 
-    // Create user in Supabase Auth
+    // Create user in Supabase Auth with auto-confirmed email
     const { data: authData, error: signUpError } =
       await this.supabaseService.auth.signUp({
         email: signUpDto.email,
@@ -169,7 +231,7 @@ export class UserService {
         options: {
           data: {
             full_name: signUpDto.fullName,
-            phone: signUpDto.phone,
+            phone: normalizedPhone,
             user_type: signUpDto.userType,
           },
         },
@@ -179,8 +241,13 @@ export class UserService {
       throw new HttpException(signUpError.message, HttpStatus.BAD_REQUEST);
     }
 
-    // Update user record to mark phone as verified
+    // Auto-confirm email since phone is verified
     if (authData.user) {
+      await this.supabaseService.adminAuth.admin.updateUserById(
+        authData.user.id,
+        { email_confirm: true }
+      );
+
       await this.supabaseService
         .from('users')
         .update({ phone_verified: true })
@@ -212,57 +279,6 @@ export class UserService {
     };
   }
 
-  async loginWithPhone(phone: string) {
-    // Check if OTP was verified for this phone
-    const { data: verifiedOtp } = await this.supabaseService
-      .from('otp_verifications')
-      .select('*')
-      .eq('phone', phone)
-      .eq('verified', true)
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .single();
-
-    if (!verifiedOtp) {
-      throw new HttpException(
-        'Phone number not verified. Please verify your phone first.',
-        HttpStatus.BAD_REQUEST
-      );
-    }
-
-    // Get user by phone
-    const { data: user, error: userError } = await this.supabaseService
-      .from('users')
-      .select('id, email')
-      .eq('phone', phone)
-      .single();
-
-    if (userError || !user) {
-      throw new HttpException(
-        'User not found with this phone number',
-        HttpStatus.NOT_FOUND
-      );
-    }
-
-    // Sign in the user using their email
-    // We'll use a magic link approach via admin API
-    const { data: authData, error: signInError } =
-      await this.supabaseService.auth.admin.getUserById(user.id);
-
-    if (signInError || !authData.user) {
-      throw new HttpException(
-        'Failed to authenticate user',
-        HttpStatus.INTERNAL_SERVER_ERROR
-      );
-    }
-
-    return {
-      success: true,
-      message: 'Logged in successfully',
-      user: authData.user,
-    };
-  }
-
   async logout() {
     const { error } = await this.supabaseService.auth.signOut();
 
@@ -277,7 +293,7 @@ export class UserService {
   }
 
   // ============================================
-  // USER PROFILE MANAGEMENT
+  // PROFILE MANAGEMENT
   // ============================================
 
   async getProfile(userId: string) {
