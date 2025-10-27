@@ -1,10 +1,10 @@
 'use client';
 import { useState } from 'react';
 
-import { CostBreakdownCard } from '../../../../../components/book-job/book-cost-breakdown';
 import { CustomServices } from '../../../../../components/book-job/book-custom-services';
 import ScheduleService from '../../../../../components/book-job/book-schedule';
 import { SelectServices } from '../../../../../components/book-job/book-select-services';
+import { BookingSummaryCard } from '../../../../../components/book-job/book-summary';
 const data = {
   id: '1',
   title: '1-2 HP Split/Window AC Deep Clean',
@@ -67,6 +67,7 @@ interface Service {
 export default function BookServicePage() {
   const [selectedServices, setSelectedServices] = useState<number[]>([]);
   const [customServices, setCustomServices] = useState<Service[]>([]);
+  const [selectedLocation, setSelectedLocation] = useState<string>('');
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [selectedTime, setSelectedTime] = useState<string>('');
 
@@ -138,8 +139,10 @@ export default function BookServicePage() {
             />
 
             <ScheduleService
+              selectedLocation={selectedLocation}
               selectedDate={selectedDate}
               selectedTime={selectedTime}
+              onLocationChange={setSelectedLocation}
               onDateChange={setSelectedDate}
               onTimeChange={setSelectedTime}
             />
@@ -147,11 +150,14 @@ export default function BookServicePage() {
 
           {/* Cost Breakdown */}
           <div className="lg:col-span-1">
-            <CostBreakdownCard
+            <BookingSummaryCard
               selectedServices={data.services.filter(s =>
                 selectedServices.includes(s.id)
               )}
               customServices={customServices}
+              selectedDate={selectedDate}
+              selectedLocation={selectedLocation}
+              selectedTime={selectedTime}
               total={total}
             />
           </div>
