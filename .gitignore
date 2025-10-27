@@ -48,3 +48,15 @@ Thumbs.db
 out
 
 test-output
+
+# Environment files
+.env
+.env*.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Keep env templates and examples
+!.env.example
+!.env.template
+!*.env.template
