@@ -3,7 +3,12 @@
  * This is only a minimal backend to get started.
  */
 
-import { Logger } from '@nestjs/common';
+// Load environment variables before any other imports
+require('dotenv').config({
+  path: require('path').resolve(__dirname, '../.env'),
+});
+
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
@@ -13,6 +18,23 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
+
+  // Enable validation globally
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    })
+  );
+
+  // Enable CORS for Next.js frontend
+  app.enableCors({
+    origin: ['http://localhost:3000', 'http://localhost:4200'], // Add your frontend URLs
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  });
 
   const config = new DocumentBuilder()
     .setTitle('HanApp-PH API')

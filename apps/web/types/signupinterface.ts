@@ -14,6 +14,8 @@ export interface FormData {
  */
 export interface SignUpFormProps {
   onSubmit: (data: FormData) => void;
+  isLoading?: boolean;
+  initialPhone?: string; // Pre-filled phone number from OTP verification
 }
 
 /**

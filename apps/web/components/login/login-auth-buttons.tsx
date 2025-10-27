@@ -1,7 +1,10 @@
 'use client';
 
 import { Button } from '@hanapp-ph/commons';
-import { useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import React, { useState } from 'react';
+
+import { useAuth } from '../../lib/hooks/useAuth';
 
 import { OtpVerificationButtons } from './login-otp-verification';
 
@@ -16,14 +19,73 @@ export function AuthButtons({
   // onGoogleLogin,
   className = '',
 }: AuthButtonsProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get('redirectTo') || '/';
+  const { sendOTP: sendOTPApi, verifyOTP: verifyOTPApi } = useAuth();
+
   const [phoneNumber, setPhoneNumber] = useState('');
   const [showOtpVerification, setShowOtpVerification] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSendOTP = () => {
-    if (onSendOTP) {
-      onSendOTP(phoneNumber);
+  const handleSendOTP = async () => {
+    setError('');
+    setLoading(true);
+
+    // Format phone number
+    let formattedPhone = phoneNumber.trim();
+    if (!formattedPhone.startsWith('0') && !formattedPhone.startsWith('+')) {
+      formattedPhone = '0' + formattedPhone;
     }
-    setShowOtpVerification(true);
+
+    const result = await sendOTPApi(formattedPhone);
+
+    if (result.error) {
+      setError(result.error);
+      setLoading(false);
+    } else {
+      setShowOtpVerification(true);
+      setLoading(false);
+      if (onSendOTP) {
+        onSendOTP(formattedPhone);
+      }
+    }
+  };
+
+  const handleVerifyOTP = async (otp: string) => {
+    setError('');
+    setLoading(true);
+
+    let formattedPhone = phoneNumber.trim();
+    if (!formattedPhone.startsWith('0') && !formattedPhone.startsWith('+')) {
+      formattedPhone = '0' + formattedPhone;
+    }
+
+    const result = await verifyOTPApi(formattedPhone, otp);
+
+    if (result.error) {
+      setError(result.error);
+      setLoading(false);
+      return false;
+    } else {
+      // OTP verified successfully
+      // Check if user exists - if yes, log them in; if no, redirect to signup
+      const { data: verifyData } = result;
+
+      if (verifyData?.userExists) {
+        // User exists, redirect to home
+        router.push(redirectTo);
+      } else {
+        // New user, redirect to signup with phone number
+        router.push(
+          `/auth/signin?mode=signup&phone=${encodeURIComponent(formattedPhone)}`
+        );
+      }
+
+      setLoading(false);
+      return true;
+    }
   };
 
   const handleGoogleLogin = () => {
@@ -36,18 +98,25 @@ export function AuthButtons({
 
   const handleBackToLogin = () => {
     setShowOtpVerification(false);
+    setError('');
   };
 
   return (
     <div
       className={`flex flex-col flex-1 min-h-0 overflow-y-auto gap-2 sm:gap-4 px-2 sm:px-4 ${className}`}
     >
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded-lg text-sm">
+          {error}
+        </div>
+      )}
+
       {showOtpVerification ? (
         <OtpVerificationButtons
           phoneNumber={phoneNumber}
           onBackToLogin={handleBackToLogin}
-          // onVerifyOtp={otp => console.log('OTP Verified:', otp)}
-          // onResendCode={() => console.log('Resending code...')}
+          onVerifyOtp={handleVerifyOTP}
+          onResendCode={handleSendOTP}
         />
       ) : (
         <>
@@ -66,6 +135,7 @@ export function AuthButtons({
                 value={phoneNumber}
                 onChange={e => setPhoneNumber(e.target.value)}
                 className="flex-1 max-w-[220px] sm:max-w-[240px] border border-gray-200 rounded-[14px] px-3 py-2 sm:px-3.5 sm:py-2.5 text-base sm:text-lg focus:border-yellow-400 focus:ring-yellow-400 focus:outline-none"
+                disabled={loading}
               />
             </div>
           </div>
@@ -75,10 +145,10 @@ export function AuthButtons({
               onClick={handleSendOTP}
               className="w-full sm:mx-auto sm:w-[240px] h-[42px] sm:h-[48px] bg-[#F5C45E] hover:bg-[#F5C45E]/90 text-gray-900 text-[0.95rem] sm:text-base font-semibold rounded-[14px] transition-colors disabled:opacity-80 disabled:cursor-not-allowed shadow-md flex items-center justify-center mb-3 sm:mb-3 border-0"
               style={{ backdropFilter: 'blur(2px)' }}
-              disabled={!phoneNumber.trim()}
+              disabled={!phoneNumber.trim() || loading}
             >
               <span className="font-bold text-black text-[0.95rem] sm:text-base">
-                Send OTP
+                {loading ? 'Sending...' : 'Send OTP'}
               </span>
             </Button>
 

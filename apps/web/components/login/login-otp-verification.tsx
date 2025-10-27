@@ -1,11 +1,10 @@
 'use client';
 
 import { Button } from '@hanapp-ph/commons';
-import { useRouter } from 'next/navigation';
 import React, { useState, useRef } from 'react';
 
 interface OtpVerificationButtonsProps {
-  onVerifyOtp?: (otp: string) => void;
+  onVerifyOtp?: (otp: string) => Promise<boolean>;
   onResendCode?: () => void;
   onBackToLogin?: () => void;
   className?: string;
@@ -13,13 +12,15 @@ interface OtpVerificationButtonsProps {
 }
 
 export function OtpVerificationButtons({
-  // onVerifyOtp,
+  onVerifyOtp,
   onBackToLogin,
+  onResendCode,
   className = '',
   phoneNumber = '09xx xxx xxxx',
 }: OtpVerificationButtonsProps) {
-  const router = useRouter();
   const [code, setCode] = useState<string[]>(new Array(6).fill(''));
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
 
   const handleInputChange = (index: number, value: string) => {
@@ -45,14 +46,22 @@ export function OtpVerificationButtons({
     }
   };
 
-  const handleVerifyOtp = () => {
-    router.push('/auth/signin?mode=signup');
-    // const fullOtp = code.join('');
-    // if (onVerifyOtp) {
-    //   onVerifyOtp(fullOtp);
-    // } else {
-    //   console.log('Verifying OTP:', fullOtp);
-    // }
+  const handleVerifyOtp = async () => {
+    const fullOtp = code.join('');
+    if (fullOtp.length !== 6) {
+      setError('Please enter a 6-digit code');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    if (onVerifyOtp) {
+      const success = await onVerifyOtp(fullOtp);
+      if (!success) {
+        setLoading(false);
+      }
+    }
   };
 
   const handleBackToLogin = () => {
@@ -61,10 +70,24 @@ export function OtpVerificationButtons({
     }
   };
 
+  const handleResendCode = () => {
+    setCode(new Array(6).fill(''));
+    setError('');
+    if (onResendCode) {
+      onResendCode();
+    }
+  };
+
   return (
     <div
       className={`space-y-3 sm:space-y-4 w-full max-w-full overflow-hidden ${className}`}
     >
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded-lg text-sm mx-4">
+          {error}
+        </div>
+      )}
+
       <div className="mb-4">
         <p className="w-full text-center text-gray-700 text-sm sm:text-base font-normal px-4">
           We sent a 6-digit code to{' '}
@@ -90,25 +113,30 @@ export function OtpVerificationButtons({
               onKeyDown={e => handleKeyDown(index, e)}
               aria-label={`Digit ${index + 1} of 6`}
               autoComplete="one-time-code"
+              disabled={loading}
               className="w-9 h-9 sm:w-10 sm:h-10 text-center text-base sm:text-lg font-semibold border-[1px] border-[#E0E0E0] rounded-[8px] focus:border-yellow-400 focus:outline-none bg-[#F6F6F6]"
             />
           ))}
         </div>
 
         <div className="mt-1 text-right pr-1">
-          <p className="text-xs sm:text-[12px] text-[#014182] font-bold underline flex items-end sm:justify-end min-h-[14px]">
-            Resend code in XX
-          </p>
+          <button
+            type="button"
+            onClick={handleResendCode}
+            className="text-xs sm:text-[12px] text-[#014182] font-bold underline hover:text-[#013060]"
+          >
+            Resend code
+          </button>
         </div>
       </div>
 
       <Button
         onClick={handleVerifyOtp}
         className="w-full max-w-[260px] sm:max-w-[280px] h-[44px] sm:h-[50px] bg-[#F5C45E] hover:bg-[#F5C45E]/90 text-gray-900 text-sm sm:text-base font-semibold rounded-[14px] transition-colors disabled:opacity-80 disabled:cursor-not-allowed mx-auto shadow-md flex items-center justify-center border-0"
-        disabled={code.some(digit => !digit)}
+        disabled={code.some(digit => !digit) || loading}
       >
         <span className="font-bold text-black text-sm sm:text-base">
-          Verify & Continue
+          {loading ? 'Verifying...' : 'Verify & Continue'}
         </span>
       </Button>
 
