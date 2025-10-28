@@ -119,7 +119,7 @@ const TestimoniesSection: React.FC<TestimoniesSectionProps> = ({
           flex-shrink: 0;
           position: relative;
           background: rgba(254, 254, 254, 0.7);
-          border: 2px solid rgba(1, 65, 130, 0.2);
+          border: 1px solid rgba(1, 65, 130, 0.2);
           box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.06);
           transition: all 0.3s ease;
         }
