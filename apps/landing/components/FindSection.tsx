@@ -1,18 +1,37 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const FindSection = () => {
   const [showHelp, setShowHelp] = useState(false);
   const [showIncome, setShowIncome] = useState(false);
   const [showPeace, setShowPeace] = useState(false);
+  const [hasAnimated, setHasAnimated] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setTimeout(() => setShowHelp(true), 100);
-    setTimeout(() => setShowIncome(true), 700);
-    setTimeout(() => setShowPeace(true), 1300);
-  }, []);
+    if (typeof window === 'undefined') {
+      return;
+    }
+    const handleIntersection = (entries: IntersectionObserverEntry[]) => {
+      if (entries[0].isIntersecting && !hasAnimated) {
+        setHasAnimated(true);
+        setTimeout(() => setShowHelp(true), 100);
+        setTimeout(() => setShowIncome(true), 700);
+        setTimeout(() => setShowPeace(true), 1300);
+      }
+    };
+    const observer = new window.IntersectionObserver(handleIntersection, {
+      threshold: 0.4,
+    });
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+    return () => {
+      observer.disconnect();
+    };
+  }, [hasAnimated]);
 
   return (
-    <div className="text-center">
+    <div className="text-center" ref={ref}>
       <style jsx>{`
         .fade-in-up {
           opacity: 0;
