@@ -95,11 +95,9 @@ function AuthPageContent() {
       const { data, error: signUpError } = await signUp(
         formData.email,
         tempPassword,
+        fullName,
         normalizedPhone,
-        {
-          full_name: fullName,
-          user_type: userType,
-        }
+        userType
       );
 
       if (signUpError) {
