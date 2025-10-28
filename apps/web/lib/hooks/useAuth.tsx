@@ -7,16 +7,17 @@ import { supabase } from '../supabase/client';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
+export type UserType = 'client' | 'provider' | 'both';
+export type ActiveRole = 'client' | 'provider';
+
 interface Profile {
   id: string;
   email: string;
   full_name: string;
   phone: string;
-  user_type: 'client' | 'provider' | 'both';
+  user_type: UserType;
   phone_verified: boolean;
 }
-
-type ActiveRole = 'client' | 'provider';
 
 interface AuthContextType {
   user: User | null;
@@ -68,15 +69,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const data = await response.json();
         setProfile(data);
 
-        // Set active role based on user type
+        // Use saved role from localStorage if available, otherwise default to client
         const savedRole = localStorage.getItem('activeRole') as ActiveRole;
-        if (
-          savedRole &&
-          (data.user_type === 'both' || data.user_type === savedRole)
-        ) {
+        if (savedRole && (savedRole === 'client' || savedRole === 'provider')) {
           setActiveRole(savedRole);
         } else {
-          setActiveRole(data.user_type === 'both' ? 'client' : data.user_type);
+          // Default to client role
+          setActiveRole('client');
         }
       }
     } catch (error) {
@@ -116,22 +115,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Switch between client and provider role
   const switchRole = (role: ActiveRole) => {
-    if (profile?.user_type === 'both' || profile?.user_type === role) {
-      setActiveRole(role);
-      localStorage.setItem('activeRole', role);
-    }
+    // eslint-disable-next-line no-console
+    console.log('✅ Switching activeRole to:', role);
+    setActiveRole(role);
+    localStorage.setItem('activeRole', role);
   };
 
-  // Load active role from localStorage
+  // Load active role from localStorage on mount
   useEffect(() => {
     const savedRole = localStorage.getItem('activeRole') as ActiveRole;
-    if (
-      savedRole &&
-      (profile?.user_type === 'both' || profile?.user_type === savedRole)
-    ) {
+    if (savedRole && (savedRole === 'client' || savedRole === 'provider')) {
       setActiveRole(savedRole);
     }
-  }, [profile]);
+  }, []);
 
   // ============================================
   // AUTHENTICATION METHODS

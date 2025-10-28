@@ -69,14 +69,16 @@ export function ClientHomeNavbar({
             {/* Navigation Items */}
             <div className="hidden md:flex items-center gap-1">
               <Link
-                href="/"
+                href={isProvider ? '/provider' : '/'}
                 prefetch={true}
                 className={`flex flex-col items-center gap-1 px-4 py-2 transition-colors ${
-                  pathname === '/'
+                  pathname === '/' || pathname === '/provider'
                     ? isProvider
                       ? 'bg-[#F5C45E] text-gray-900'
                       : 'bg-hanapp-secondary text-white'
-                    : 'text-gray-500 hover:text-hanapp-primary hover:bg-gray-100'
+                    : isProvider
+                      ? 'text-gray-500 hover:text-[#F5C45E] hover:bg-gray-100'
+                      : 'text-gray-500 hover:text-hanapp-primary hover:bg-gray-100'
                 }`}
               >
                 <svg
@@ -96,7 +98,9 @@ export function ClientHomeNavbar({
                     ? isProvider
                       ? 'bg-[#F5C45E] text-gray-900'
                       : 'bg-hanapp-secondary text-white'
-                    : 'text-gray-500 hover:text-hanapp-primary hover:bg-gray-100'
+                    : isProvider
+                      ? 'text-gray-500 hover:text-[#F5C45E] hover:bg-gray-100'
+                      : 'text-gray-500 hover:text-hanapp-primary hover:bg-gray-100'
                 }`}
               >
                 <svg
@@ -121,7 +125,9 @@ export function ClientHomeNavbar({
                     ? isProvider
                       ? 'bg-[#F5C45E] text-gray-900'
                       : 'bg-hanapp-secondary text-white'
-                    : 'text-gray-500 hover:text-hanapp-primary hover:bg-gray-100'
+                    : isProvider
+                      ? 'text-gray-500 hover:text-[#F5C45E] hover:bg-gray-100'
+                      : 'text-gray-500 hover:text-hanapp-primary hover:bg-gray-100'
                 }`}
               >
                 <svg
@@ -144,7 +150,11 @@ export function ClientHomeNavbar({
               {/* Notification Icon */}
               <button
                 onClick={handleNotificationClick}
-                className="relative p-2 text-gray-600 hover:text-blue-900"
+                className={`relative p-2 transition-colors ${
+                  isProvider
+                    ? 'text-gray-600 hover:text-[#F5C45E]'
+                    : 'text-gray-600 hover:text-blue-900'
+                }`}
               >
                 <Bell className="w-5 h-5" />
                 {notificationCount > 0 && (

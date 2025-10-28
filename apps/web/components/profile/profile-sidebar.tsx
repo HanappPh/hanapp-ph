@@ -11,6 +11,8 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 
+import { useAuth } from '../../lib/hooks/useAuth';
+
 export function Sidebar({
   initialSelected,
   mainColorDark,
@@ -37,12 +39,30 @@ export function Sidebar({
     initialSelected ?? 'Client'
   );
   const router = useRouter();
-  const handlePageChange = () => {
-    if (selected === 'Provider') {
-      router.push('/profile');
-    } else {
-      router.push('/provider/profile');
+  const { switchRole, activeRole } = useAuth();
+
+  // Sync local state with prop changes (when user navigates back to profile)
+  React.useEffect(() => {
+    if (initialSelected) {
+      setSelected(initialSelected);
     }
+  }, [initialSelected]);
+
+  const handleRoleSwitch = (role: 'Provider' | 'Client') => {
+    const newRole = role.toLowerCase() as 'provider' | 'client';
+
+    // First update the auth state
+    switchRole(newRole);
+    setSelected(role);
+
+    // Use setTimeout to ensure state updates propagate before navigation
+    setTimeout(() => {
+      if (role === 'Provider') {
+        router.push('/provider/profile');
+      } else {
+        router.push('/profile');
+      }
+    }, 0);
   };
 
   const displayName = profile?.full_name || 'User';
@@ -87,10 +107,7 @@ export function Sidebar({
                 }
               : {}
           }
-          onClick={() => {
-            setSelected('Provider');
-            handlePageChange();
-          }}
+          onClick={() => handleRoleSwitch('Provider')}
         >
           Provider
         </Button>
@@ -105,10 +122,7 @@ export function Sidebar({
                 }
               : {}
           }
-          onClick={() => {
-            setSelected('Client');
-            handlePageChange();
-          }}
+          onClick={() => handleRoleSwitch('Client')}
         >
           Client
         </Button>
@@ -126,7 +140,11 @@ export function Sidebar({
           <Button
             variant="ghost"
             className="flex items-center gap-3 w-full justify-start pl-2 rounded-md"
-            style={{ background: clickedColor, color: '#fff' }}
+            style={{
+              background:
+                activeRole === 'provider' ? accentColorDark : clickedColor,
+              color: '#fff',
+            }}
           >
             <User className="w-5 h-5" />
             Profile
