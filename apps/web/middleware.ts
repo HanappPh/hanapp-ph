@@ -2,11 +2,8 @@ import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
 export async function middleware(request: NextRequest) {
-  let response = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
-  });
+  // Create response
+  const response = NextResponse.next();
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -17,24 +14,18 @@ export async function middleware(request: NextRequest) {
           return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
-          );
-          response = NextResponse.next({
-            request,
+          cookiesToSet.forEach(({ name, value, options }) => {
+            response.cookies.set(name, value, options);
           });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options)
-          );
         },
       },
     }
   );
 
-  // Check for session
+  // Refresh session if expired - required for Server Components
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
+    data: { user },
+  } = await supabase.auth.getUser();
 
   // Define protected routes
   const protectedRoutes = [
@@ -48,15 +39,15 @@ export async function middleware(request: NextRequest) {
     request.nextUrl.pathname.startsWith(route)
   );
 
-  // Redirect to signin if accessing protected route without session
-  if (isProtectedRoute && !session) {
+  // Redirect to signin if accessing protected route without user
+  if (isProtectedRoute && !user) {
     const redirectUrl = new URL('/auth/signin?mode=login', request.url);
     return NextResponse.redirect(redirectUrl);
   }
 
   // Redirect authenticated users away from auth pages
   const isAuthPage = request.nextUrl.pathname.startsWith('/auth/signin');
-  if (isAuthPage && session) {
+  if (isAuthPage && user) {
     const redirectUrl = new URL('/', request.url);
     return NextResponse.redirect(redirectUrl);
   }
