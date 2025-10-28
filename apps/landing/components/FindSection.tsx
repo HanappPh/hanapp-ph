@@ -8,7 +8,7 @@ const FindSection = () => {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (typeof window === 'undefined') {
+    if (typeof window === 'undefined' || !ref.current) {
       return;
     }
     function isInViewport(el: HTMLElement) {
