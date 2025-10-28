@@ -17,7 +17,11 @@ import { useAuth } from '../../../lib/hooks/useAuth';
 export default function ProfilePage() {
   const [showDropdown, setShowDropdown] = React.useState(false);
   const [selectedTab, setSelectedTab] = React.useState('Profile');
-  const { profile } = useAuth();
+  const { profile, activeRole } = useAuth();
+
+  // Convert activeRole to the format expected by Sidebar
+  const initialSelected = activeRole === 'provider' ? 'Provider' : 'Client';
+
   return (
     <div className="min-h-screen bg-[#F3F5F9] flex flex-col">
       {/* Desktop layout */}
@@ -32,7 +36,7 @@ export default function ProfilePage() {
         /> */}
         <div className="flex">
           <Sidebar
-            initialSelected="Client"
+            initialSelected={initialSelected}
             mainColorDark="#102E50"
             mainColorLight="#014182"
             hoverColor="#DEEFFF"
@@ -41,7 +45,7 @@ export default function ProfilePage() {
             clickedColor="#102E50"
             profile={profile}
           />
-          <MainContent initialSelected="Client" profile={profile} />
+          <MainContent initialSelected={initialSelected} profile={profile} />
         </div>
       </div>
       {/* Mobile layout*/}
