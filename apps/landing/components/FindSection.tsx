@@ -11,22 +11,23 @@ const FindSection = () => {
     if (typeof window === 'undefined') {
       return;
     }
-    const handleIntersection = (entries: IntersectionObserverEntry[]) => {
-      if (entries[0].isIntersecting && !hasAnimated) {
+    function isInViewport(el: HTMLElement) {
+      const rect = el.getBoundingClientRect();
+      return rect.top < window.innerHeight && rect.bottom > 0;
+    }
+    function onScroll() {
+      if (ref.current && !hasAnimated && isInViewport(ref.current)) {
         setHasAnimated(true);
         setTimeout(() => setShowHelp(true), 100);
         setTimeout(() => setShowIncome(true), 700);
         setTimeout(() => setShowPeace(true), 1300);
       }
-    };
-    const observer = new window.IntersectionObserver(handleIntersection, {
-      threshold: 0.4,
-    });
-    if (ref.current) {
-      observer.observe(ref.current);
     }
+    window.addEventListener('scroll', onScroll);
+    // Check on mount in case already in view
+    onScroll();
     return () => {
-      observer.disconnect();
+      window.removeEventListener('scroll', onScroll);
     };
   }, [hasAnimated]);
 
