@@ -36,7 +36,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col page-transition">
         <ClientHomeNavbar
           onProfileClick={handleProfileClick}
           notificationCount={3}
@@ -48,7 +48,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             </div>
           }
         >
-          <main className="flex-1">{children}</main>
+          <main className="flex-1 content-transition">{children}</main>
         </Suspense>
         <ClientHomeFooter
           onNavigate={handleNavigate}

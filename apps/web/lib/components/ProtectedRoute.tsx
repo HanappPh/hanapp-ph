@@ -1,8 +1,9 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
+import { PageLoader } from '../../components/loading/page-loader';
 import { useAuth } from '../hooks/useAuth';
 
 interface ProtectedRouteProps {
@@ -12,31 +13,30 @@ interface ProtectedRouteProps {
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
+      // Set redirecting state to show loading during redirect
+      setIsRedirecting(true);
       // Redirect to signin if not authenticated
       router.push('/auth/signin?mode=login');
     }
   }, [user, loading, router]);
 
-  // Show loading state while checking authentication
-  if (loading) {
+  // Show loading state while checking authentication or redirecting
+  if (loading || isRedirecting || !user) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
-        </div>
-      </div>
+      <PageLoader
+        message={
+          isRedirecting
+            ? 'Redirecting to sign in...'
+            : 'Verifying authentication...'
+        }
+      />
     );
   }
 
-  // Don't render children if not authenticated
-  if (!user) {
-    return null;
-  }
-
-  // Render protected content
+  // Render protected content only when authenticated
   return <>{children}</>;
 }
