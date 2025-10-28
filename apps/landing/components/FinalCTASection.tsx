@@ -7,7 +7,7 @@ const FinalCTASection = () => {
       {/* Footer text centered at bottom */}
       <div className="absolute bottom-4 left-0 right-0 text-center">
         <p className="text-black/70 text-sm font-light">
-          @ HanApp Technologies
+          @ Hanapp Technologies
         </p>
       </div>
     </section>
