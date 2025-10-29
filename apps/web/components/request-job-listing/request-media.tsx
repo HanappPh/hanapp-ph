@@ -3,7 +3,17 @@
 import { Upload, X, ImageIcon } from 'lucide-react';
 import React, { useState, useRef } from 'react';
 
-export function ImageUploadSection() {
+interface ImageUploadSectionProps {
+  formData: {
+    images: string[];
+  };
+  updateFormData: (field: string, value: string[]) => void;
+}
+
+export function ImageUploadSection({
+  formData: _formData,
+  updateFormData: _updateFormData,
+}: ImageUploadSectionProps) {
   const [dragActive, setDragActive] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);

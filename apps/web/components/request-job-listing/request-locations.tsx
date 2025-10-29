@@ -1,6 +1,18 @@
 import { Input } from '@hanapp-ph/commons';
 
-export function LocationAvailabilitySection() {
+interface LocationAvailabilitySectionProps {
+  formData: {
+    jobLocation: string;
+    jobDate: string;
+    jobTime: string;
+  };
+  updateFormData: (field: string, value: string) => void;
+}
+
+export function LocationAvailabilitySection({
+  formData,
+  updateFormData,
+}: LocationAvailabilitySectionProps) {
   return (
     <div className="bg-white rounded-lg p-6 shadow-sm">
       <h2
@@ -26,6 +38,8 @@ export function LocationAvailabilitySection() {
           <Input
             className="w-full font-light text-sm"
             style={{ backgroundColor: '#F3F5F9' }}
+            value={formData.jobLocation}
+            onChange={e => updateFormData('jobLocation', e.target.value)}
           />
         </div>
         <div>
@@ -34,9 +48,10 @@ export function LocationAvailabilitySection() {
           </label>
           <Input
             type="date"
-            defaultValue=""
             className="w-full font-light text-sm"
             style={{ backgroundColor: '#F3F5F9' }}
+            value={formData.jobDate}
+            onChange={e => updateFormData('jobDate', e.target.value)}
           />
         </div>
         <div>
@@ -45,9 +60,10 @@ export function LocationAvailabilitySection() {
           </label>
           <Input
             type="time"
-            defaultValue=""
             className="w-full font-light text-sm"
             style={{ backgroundColor: '#F3F5F9' }}
+            value={formData.jobTime}
+            onChange={e => updateFormData('jobTime', e.target.value)}
           />
         </div>
       </div>
