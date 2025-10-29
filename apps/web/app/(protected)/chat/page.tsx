@@ -1,51 +1,102 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 import {
   ChatList,
   type ChatListItem,
 } from '../../../components/chat/chat-list';
-
-const mockChats: ChatListItem[] = [
-  {
-    id: '1',
-    name: 'Martin Santos',
-    initials: 'MS',
-    avatar: '',
-    lastMessage: 'Thanks for the cleaning service!',
-    timestamp: new Date(Date.now() - 5 * 60 * 1000),
-    unreadCount: 2,
-    isOnline: true,
-  },
-  {
-    id: '2',
-    name: 'Jemma Lee',
-    initials: 'JL',
-    avatar: '',
-    lastMessage: 'When can you start the tutoring session?',
-    timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
-    unreadCount: 0,
-    isOnline: false,
-  },
-  {
-    id: '3',
-    name: 'Alex Johnson',
-    initials: 'AJ',
-    avatar: '',
-    lastMessage: "I'll be there at 3 PM for the repairs",
-    timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000),
-    unreadCount: 1,
-    isOnline: true,
-  },
-];
+import { useMessaging } from '../../../hooks/use-messaging';
+import { useAuth } from '../../../lib/hooks/useAuth';
 
 const ChatPage = () => {
   const router = useRouter();
+  const { profile, loading: authLoading } = useAuth();
+  const userId = profile?.id || '';
+
+  // Fetch real threads from API
+  const { threads, isLoading, error, fetchThreads } = useMessaging(userId);
+
+  // Load threads on mount when userId is available
+  useEffect(() => {
+    if (userId) {
+      fetchThreads();
+    }
+  }, [userId, fetchThreads]);
+
+  // Convert API threads to ChatListItem format
+  const chatListItems: ChatListItem[] = threads.map(thread => ({
+    id: thread.other_user_id,
+    name: thread.other_user_name,
+    initials: thread.other_user_name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2),
+    avatar: thread.other_user_avatar || '',
+    lastMessage: thread.last_message,
+    timestamp: new Date(thread.last_message_at),
+    unreadCount: 0,
+    isOnline: false,
+  }));
 
   const handleSelectChat = (chatId: string) => {
     router.push(`/chat/${chatId}`);
   };
+
+  // Show loading while checking auth
+  if (authLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show login prompt if not authenticated
+  if (!userId) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-gray-50">
+        <div className="bg-white rounded-xl shadow-lg p-8 max-w-md text-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            Authentication Required
+          </h2>
+          <p className="text-gray-600 mb-6">
+            Please log in to access your messages.
+          </p>
+          <button
+            onClick={() => router.push('/auth/signin')}
+            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Go to Login
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-gray-50">
+        <div className="bg-white rounded-xl shadow-lg p-8 max-w-md text-center">
+          <h2 className="text-xl font-bold text-red-600 mb-2">Error</h2>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <button
+            onClick={() => fetchThreads()}
+            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-gray-50 overflow-hidden">
@@ -54,11 +105,31 @@ const ChatPage = () => {
           {/* Chat list - full width on mobile, fixed width on desktop */}
           <div className="w-full md:w-80 bg-white md:border-r border-gray-200 flex flex-col overflow-hidden">
             <div className="p-4 overflow-y-auto flex-1">
-              <ChatList
-                chats={mockChats}
-                selectedChatId={undefined}
-                onSelectChat={handleSelectChat}
-              />
+              {isLoading ? (
+                <div className="flex items-center justify-center h-full">
+                  <div className="text-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+                    <p className="text-sm text-gray-600">
+                      Loading conversations...
+                    </p>
+                  </div>
+                </div>
+              ) : chatListItems.length === 0 ? (
+                <div className="flex items-center justify-center h-full">
+                  <div className="text-center text-gray-500">
+                    <p className="mb-2">💬 No conversations yet</p>
+                    <p className="text-sm text-gray-400">
+                      Send a message to start chatting
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <ChatList
+                  chats={chatListItems}
+                  selectedChatId={undefined}
+                  onSelectChat={handleSelectChat}
+                />
+              )}
             </div>
           </div>
 
@@ -84,7 +155,9 @@ const ChatPage = () => {
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">
                   Your messages
                 </h3>
-                <p className="text-gray-500">Send a message to start a chat</p>
+                <p className="text-gray-500">
+                  Select a conversation to start chatting
+                </p>
               </div>
             </div>
           </div>
