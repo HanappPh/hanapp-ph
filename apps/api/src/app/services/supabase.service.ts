@@ -51,4 +51,22 @@ export class SupabaseService {
   get from() {
     return this.supabase.from.bind(this.supabase);
   }
+
+  // Create a Supabase client with a specific user's access token
+  createClientWithToken(accessToken: string): SupabaseClient {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (!supabaseUrl || !supabaseKey) {
+      throw new Error('Missing Supabase environment variables');
+    }
+
+    return createClient(supabaseUrl, supabaseKey, {
+      global: {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      },
+    });
+  }
 }
