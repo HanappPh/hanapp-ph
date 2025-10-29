@@ -1,6 +1,17 @@
 import { Input } from '@hanapp-ph/commons';
 
-export function ContactInformationSection() {
+interface ContactInformationSectionProps {
+  formData: {
+    contact: string;
+    contactLink: string;
+  };
+  updateFormData: (field: string, value: string) => void;
+}
+
+export function ContactInformationSection({
+  formData,
+  updateFormData,
+}: ContactInformationSectionProps) {
   return (
     <div className="bg-white rounded-lg p-6 shadow-sm">
       <h2
@@ -31,6 +42,8 @@ export function ContactInformationSection() {
               placeholder="*** *** ****"
               className="rounded-l-none font-light text-sm mb-3"
               style={{ backgroundColor: '#F3F5F9' }}
+              value={formData.contact.replace('+63', '')}
+              onChange={e => updateFormData('contact', `+63${e.target.value}`)}
             />
           </div>
         </div>
@@ -42,6 +55,8 @@ export function ContactInformationSection() {
             placeholder="Messenger / Telegram /..."
             className="w-full font-light text-sm"
             style={{ backgroundColor: '#F3F5F9' }}
+            value={formData.contactLink}
+            onChange={e => updateFormData('contactLink', e.target.value)}
           />
         </div>
       </div>

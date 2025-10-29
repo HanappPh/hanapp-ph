@@ -1,6 +1,14 @@
 import { Button, Checkbox } from '@hanapp-ph/commons';
 
-export function TermsSubmitSection() {
+interface TermsSubmitSectionProps {
+  onSubmit: () => void;
+  isSubmitting: boolean;
+}
+
+export function TermsSubmitSection({
+  onSubmit,
+  isSubmitting,
+}: TermsSubmitSectionProps) {
   return (
     <div className="space-y-4">
       <div className="flex items-start space-x-2">
@@ -23,8 +31,10 @@ export function TermsSubmitSection() {
         style={{
           background: 'linear-gradient(to bottom, #025fbdff, #102E50FC)',
         }}
+        onClick={onSubmit}
+        disabled={isSubmitting}
       >
-        Post
+        {isSubmitting ? 'Posting...' : 'Post'}
       </Button>
     </div>
   );
