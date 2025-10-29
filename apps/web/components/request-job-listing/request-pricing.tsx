@@ -9,10 +9,10 @@ import {
 
 interface PricingInformationSectionProps {
   formData: {
-    rate: string;
+    rate: number | string; // Accept both number and string
     modeOfPayment: string;
   };
-  updateFormData: (field: string, value: string) => void;
+  updateFormData: (field: string, value: string | number) => void;
 }
 
 export function PricingInformationSection({
