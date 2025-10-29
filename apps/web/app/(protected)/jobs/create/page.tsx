@@ -47,10 +47,7 @@ export default function RequestServicePage() {
     images: [],
   });
 
-  const updateFormData = (
-    field: keyof FormData,
-    value: string | number | string[]
-  ) => {
+  const updateFormData = (field: string, value: string | number | string[]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
