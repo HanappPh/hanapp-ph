@@ -17,7 +17,7 @@ export class CreateServiceRequestDto {
 
   @IsNumber()
   @IsNotEmpty()
-  categoryId!: number; // Changed to number: 1=Cleaning, 2=Tutoring, 3=Repair, 4=Delivery
+  categoryId!: number; // 1=Cleaning, 2=Tutoring, 3=Repair, 4=Delivery
 
   @IsString()
   @IsNotEmpty()

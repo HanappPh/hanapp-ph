@@ -9,16 +9,8 @@ export class UpdateServiceRequestDto {
   @IsOptional()
   description?: string;
 
-  @IsString()
-  @IsOptional()
-  expertise?: string;
-
   @IsOptional()
   rate?: number;
-
-  @IsString()
-  @IsOptional()
-  modeOfPayment?: string;
 
   @IsString()
   @IsOptional()

@@ -47,6 +47,16 @@ export class ServiceRequestController {
     return this.serviceRequestService.findByStatus(status);
   }
 
+  @Get('public/job-listings')
+  findPublicJobListings() {
+    return this.serviceRequestService.findPublicJobListings();
+  }
+
+  @Get('approved/job-listings')
+  findForJobListings() {
+    return this.serviceRequestService.findForJobListings();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.serviceRequestService.findOne(id);

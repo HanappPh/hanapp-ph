@@ -14,24 +14,16 @@ export class ServiceRequestService {
     clientId: string,
     token?: string
   ) {
-    // If token provided, create authenticated client; otherwise use admin client
-    let supabase;
-    if (token) {
-      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-      const { createClient } = await import('@supabase/supabase-js');
-      supabase = createClient(supabaseUrl!, supabaseKey!, {
-        global: { headers: { Authorization: `Bearer ${token}` } },
-      });
-    } else {
-      supabase = this.supabaseService.getAdminClient();
-    }
+    // If token provided, create authenticated client; otherwise use regular client
+    const supabase = token
+      ? this.supabaseService.createUserClient(token)
+      : this.supabaseService.getClient();
 
     const { data, error } = await supabase
       .from('service_requests')
       .insert({
         client_id: clientId, // User ID from auth
-        category_id: createDto.categoryId, // Now a number: 1, 2, 3, or 4
+        category_id: createDto.categoryId, // 1=Cleaning, 2=Tutoring, 3=Repair, 4=Delivery
         title: createDto.title,
         description: createDto.description,
         rate: createDto.rate,
@@ -172,5 +164,69 @@ export class ServiceRequestService {
     }
 
     return data;
+  }
+
+  async findForJobListings() {
+    const supabase = this.supabaseService.getClient();
+
+    const { data, error } = await supabase
+      .from('service_requests')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      throw new HttpException(
+        `Failed to fetch service requests: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+
+    return data;
+  }
+
+  async findPublicJobListings() {
+    // Use regular client for public job listings
+    const supabase = this.supabaseService.getClient();
+
+    // Fetch service requests
+    const { data: serviceRequests, error: serviceRequestsError } =
+      await supabase
+        .from('service_requests')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+    if (serviceRequestsError) {
+      throw new HttpException(
+        `Failed to fetch service requests: ${serviceRequestsError.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+
+    // Get unique client IDs
+    const clientIds = [...new Set(serviceRequests.map(sr => sr.client_id))];
+
+    // Fetch user data for all clients
+    const { data: users, error: usersError } = await supabase
+      .from('users')
+      .select('id, full_name')
+      .in('id', clientIds);
+
+    if (usersError) {
+      throw new HttpException(
+        `Failed to fetch user data: ${usersError.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+
+    // Create a map of user data
+    const userMap = new Map(users.map(user => [user.id, user]));
+
+    // Combine the data
+    const result = serviceRequests.map(sr => ({
+      ...sr,
+      users: userMap.get(sr.client_id) || null,
+    }));
+
+    return result;
   }
 }

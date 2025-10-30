@@ -1,0 +1,91 @@
+// API client for service requests
+const getApiBaseUrl = () => {
+  if (typeof window !== 'undefined') {
+    // Client side - use the current host but point to port 3001
+    const protocol = window.location.protocol;
+    const hostname = window.location.hostname;
+    return `${protocol}//${hostname}:3001/api`;
+  }
+  // Server side or fallback
+  return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+};
+
+const API_BASE_URL = getApiBaseUrl();
+
+export interface ServiceRequest {
+  id: string;
+  client_id: string;
+  category_id: number; // 1=Cleaning, 2=Tutoring, 3=Repair, 4=Delivery
+  title: string;
+  description: string;
+  rate: number;
+  contact: string;
+  contact_link?: string;
+  job_location: string;
+  date: string;
+  time: string;
+  images?: string[];
+  status: 'pending' | 'approved' | 'rejected' | 'cancelled';
+  created_at: string;
+  updated_at: string;
+  users?: {
+    full_name: string;
+  };
+}
+
+export interface JobListing {
+  id: string;
+  image: string;
+  title: string;
+  provider: string;
+  location: string;
+  rating: number;
+  category: string;
+  price: string;
+}
+
+// Category mapping
+const getCategoryName = (categoryId: number): string => {
+  const categoryNames = {
+    1: 'Cleaning',
+    2: 'Tutoring',
+    3: 'Repair',
+    4: 'Delivery',
+  };
+  return categoryNames[categoryId as keyof typeof categoryNames] || 'Other';
+};
+
+// Map service request to job listing format
+export const mapServiceRequestToJobListing = (
+  serviceRequest: ServiceRequest
+): JobListing => {
+  return {
+    id: serviceRequest.id,
+    image: '/cleaning-service-provider.jpg',
+    title: serviceRequest.title,
+    provider: serviceRequest.users?.full_name || 'Unknown User',
+    location: serviceRequest.job_location,
+    rating: 4.5, // Default rating since we don't have ratings yet
+    category: getCategoryName(serviceRequest.category_id),
+    price: `₱${serviceRequest.rate.toLocaleString()}`,
+  };
+};
+
+export const fetchServiceRequestsForJobListings = async (): Promise<
+  JobListing[]
+> => {
+  try {
+    const fullUrl = `${API_BASE_URL}/service-requests/public/job-listings`;
+
+    const response = await fetch(fullUrl);
+    if (!response.ok) {
+      throw new Error('Failed to fetch service requests');
+    }
+
+    const serviceRequests: ServiceRequest[] = await response.json();
+    return serviceRequests.map(mapServiceRequestToJobListing);
+  } catch (error) {
+    console.error('Error fetching service requests:', error);
+    return [];
+  }
+};
