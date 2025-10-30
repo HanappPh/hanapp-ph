@@ -1,6 +1,7 @@
 'use client';
 
 import { Card } from '@hanapp-ph/commons';
+import { useRouter, useParams } from 'next/navigation';
 import React, { useState } from 'react';
 
 import { ProviderListingsActionButtons } from '../../../../../components/provider-listing-details/provider-listings-action-buttons';
@@ -8,8 +9,10 @@ import { ProviderListingsAttachedPhotos } from '../../../../../components/provid
 import { ProviderListingsClientProfile } from '../../../../../components/provider-listing-details/provider-listings-client-profile';
 import { ProviderListingsQualificationsCard } from '../../../../../components/provider-listing-details/provider-listings-qualifications-card';
 import { ProviderListingsServiceInfoCard } from '../../../../../components/provider-listing-details/provider-listings-service-info-card';
-
 export default function ProviderListingsRequestDetailsView() {
+  const router = useRouter();
+  const params = useParams();
+  const jobId = params.jobId;
   const [status, setStatus] = useState<'pending' | 'accepted' | 'declined'>(
     'pending'
   );
@@ -52,8 +55,9 @@ export default function ProviderListingsRequestDetailsView() {
   };
 
   const handleAccept = () => {
-    setStatus('accepted');
+    setStatus('pending');
     // TODO: Implement accept request logic
+    router.push(`/provider/jobs/${jobId}/apply`);
   };
 
   return (
