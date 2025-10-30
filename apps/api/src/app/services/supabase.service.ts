@@ -8,28 +8,24 @@ export class SupabaseService {
 
   constructor() {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-    if (!supabaseUrl || !supabaseKey) {
-      throw new Error('Missing Supabase environment variables');
+    if (!supabaseUrl || !supabaseServiceKey) {
+      throw new Error(
+        'Missing Supabase environment variables: NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY required'
+      );
     }
 
-    // Regular client for normal operations
-    this.supabase = createClient(supabaseUrl, supabaseKey);
+    // Use service role key for backend operations - this bypasses RLS and has full access
+    this.supabase = createClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
+    });
 
-    // Admin client with service role key for admin operations (like confirming emails)
-    if (supabaseServiceKey) {
-      this.adminClient = createClient(supabaseUrl, supabaseServiceKey, {
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false,
-        },
-      });
-    } else {
-      // Fallback to regular client if service key not provided
-      this.adminClient = this.supabase;
-    }
+    // Admin client is the same as regular client for server-side operations
+    this.adminClient = this.supabase;
   }
 
   getClient(): SupabaseClient {
@@ -38,6 +34,27 @@ export class SupabaseService {
 
   getAdminClient(): SupabaseClient {
     return this.adminClient;
+  }
+
+  // Create authenticated client with user token (for user-specific operations)
+  createUserClient(token: string): SupabaseClient {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (!supabaseUrl || !supabaseAnonKey) {
+      throw new Error('Missing Supabase environment variables for user client');
+    }
+
+    return createClient(supabaseUrl, supabaseAnonKey, {
+      global: {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+      auth: {
+        persistSession: false,
+      },
+    });
   }
 
   get auth() {
