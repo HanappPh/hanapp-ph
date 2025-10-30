@@ -308,6 +308,7 @@ export default function ClientJobPage() {
     serviceAreas: sidebarData.serviceAreas,
     safetyFeatures: sidebarData.safetyFeatures,
     schedule: sidebarData.availability.schedule,
+    jobId: '1',
   };
 
   return (
