@@ -64,7 +64,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Fetch user profile
   const fetchProfile = async (userId: string) => {
     try {
-      const response = await fetch(`${API_URL}/api/user/profile/${userId}`);
+      // Get the current session to extract the access token
+      const {
+        data: { session: currentSession },
+      } = await supabase.auth.getSession();
+      const token = currentSession?.access_token;
+
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+
+      // Add authorization header if token exists
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const response = await fetch(`${API_URL}/api/user/profile/${userId}`, {
+        headers,
+      });
+
       if (response.ok) {
         const data = await response.json();
         setProfile(data);
@@ -77,6 +95,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           // Default to client role
           setActiveRole('client');
         }
+      } else {
+        console.error(
+          'Failed to fetch profile:',
+          response.status,
+          response.statusText
+        );
       }
     } catch (error) {
       console.error('Failed to fetch profile:', error);

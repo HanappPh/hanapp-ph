@@ -77,7 +77,29 @@ export const fetchServiceRequestsForJobListings = async (): Promise<
   try {
     const fullUrl = `${API_BASE_URL}/service-requests/public/job-listings`;
 
-    const response = await fetch(fullUrl);
+    // Get auth token from Supabase if user is logged in
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+
+    // Only add auth token if we're in the browser
+    if (typeof window !== 'undefined') {
+      try {
+        // Import supabase dynamically to avoid SSR issues
+        const { supabase } = await import('../supabase/client');
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
+        if (session?.access_token) {
+          headers['Authorization'] = `Bearer ${session.access_token}`;
+        }
+      } catch (error) {
+        console.error('Failed to get auth token:', error);
+      }
+    }
+
+    const response = await fetch(fullUrl, { headers });
     if (!response.ok) {
       throw new Error('Failed to fetch service requests');
     }
