@@ -1,6 +1,6 @@
 'use client';
 
-import { Bell } from 'lucide-react';
+import { Bell, User } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
@@ -46,8 +46,11 @@ export function ClientHomeNavbar({
       }
       return names[0].substring(0, 2).toUpperCase();
     }
-    return 'U';
+    return null; // Return null for guest users to show icon instead
   };
+
+  const initials = getUserInitials();
+  const isGuest = !profile;
 
   return (
     <>
@@ -180,7 +183,7 @@ export function ClientHomeNavbar({
                 }`}
                 aria-label="Profile"
               >
-                {getUserInitials()}
+                {isGuest ? <User className="w-4 h-4" /> : initials}
               </button>
             </div>
           </div>
