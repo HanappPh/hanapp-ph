@@ -17,7 +17,6 @@ interface Profile {
   phone: string;
   user_type: UserType;
   phone_verified: boolean;
-  created_at?: string;
 }
 
 interface AuthContextType {
@@ -65,20 +64,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Fetch user profile
   const fetchProfile = async (userId: string) => {
     try {
-      // Get current session to access the JWT token
+      // Get the current session to extract the access token
       const {
-        data: { session },
+        data: { session: currentSession },
       } = await supabase.auth.getSession();
+      const token = currentSession?.access_token;
 
-      if (!session?.access_token) {
-        console.error('No access token available');
-        return;
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+
+      // Add authorization header if token exists
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
       }
 
       const response = await fetch(`${API_URL}/api/user/profile/${userId}`, {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
+        headers,
       });
 
       if (response.ok) {
@@ -377,12 +379,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       await supabase.auth.signOut();
       localStorage.removeItem('activeRole');
-
-      // Clear user state immediately
-      setUser(null);
-      setSession(null);
-      setProfile(null);
-      setActiveRole('client');
 
       return { error: null };
     } catch {
