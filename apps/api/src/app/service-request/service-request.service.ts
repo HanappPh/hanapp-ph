@@ -54,7 +54,7 @@ export class ServiceRequestService {
 
     let query = supabase
       .from('service_requests')
-      .select('*')
+      .select(`*`)
       .order('created_at', { ascending: false });
 
     if (clientId) {
@@ -68,6 +68,24 @@ export class ServiceRequestService {
         `Failed to fetch service requests: ${error.message}`,
         HttpStatus.INTERNAL_SERVER_ERROR
       );
+    }
+
+    // Fetch user data for each service request
+    if (data && data.length > 0) {
+      const userIds = [...new Set(data.map(sr => sr.client_id))];
+      const { data: users } = await supabase
+        .from('users')
+        .select('id, full_name, email, avatar_url')
+        .in('id', userIds);
+
+      // Create a map for quick lookup
+      const userMap = new Map(users?.map(u => [u.id, u]) || []);
+
+      // Attach user data to each service request
+      return data.map(request => ({
+        ...request,
+        users: userMap.get(request.client_id) || null,
+      }));
     }
 
     return data;
