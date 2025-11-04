@@ -115,10 +115,11 @@ export default function RequestServicePage() {
         throw new Error(errorMessage);
       }
 
-      await response.json();
+      const result = await response.json();
+      console.log('Service request created:', result);
 
-      // Redirect to bookings or success page
-      router.push('/bookings');
+      // Redirect to bookings page with a refresh indicator
+      router.push('/bookings?refresh=true');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
       console.error('Error creating service request:', err);
