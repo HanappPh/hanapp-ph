@@ -10,6 +10,7 @@
       "next",
       "@nx/next/typings/image.d.ts"
     ],
+    "lib": ["DOM", "ESNext"],
     "jsx": "react-jsx",
     "module": "esnext",
     "moduleResolution": "bundler",
