@@ -5,7 +5,10 @@ import {
   ApiResponse,
   ApiBody,
   ApiParam,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
+
+import { Public } from '../decorators/public.decorator';
 
 import {
   SendOtpDto,
@@ -25,6 +28,7 @@ export class UserController {
   // OTP ENDPOINTS
   // ============================================
 
+  @Public()
   @Post('send-otp')
   @ApiOperation({ summary: 'Send OTP verification code to phone' })
   @ApiBody({ type: SendOtpDto })
@@ -43,6 +47,7 @@ export class UserController {
     return this.userService.sendOtp(sendOtpDto.phone);
   }
 
+  @Public()
   @Post('verify-otp')
   @ApiOperation({ summary: 'Verify OTP code' })
   @ApiBody({ type: VerifyOtpDto })
@@ -65,6 +70,7 @@ export class UserController {
   // AUTHENTICATION ENDPOINTS
   // ============================================
 
+  @Public()
   @Post('signup')
   @ApiOperation({ summary: 'Register a new user account' })
   @ApiBody({ type: SignUpDto })
@@ -91,6 +97,7 @@ export class UserController {
     return this.userService.signUp(signUpDto);
   }
 
+  @Public()
   @Post('login')
   @ApiOperation({ summary: 'Login with email and password' })
   @ApiBody({ type: LoginDto })
@@ -111,6 +118,7 @@ export class UserController {
     return this.userService.login(loginDto);
   }
 
+  @Public()
   @Post('create-session')
   @ApiOperation({ summary: 'Create session for OTP-verified user' })
   @ApiBody({
@@ -137,6 +145,7 @@ export class UserController {
     );
   }
 
+  @Public()
   @Post('logout')
   @ApiOperation({ summary: 'Logout current user' })
   @ApiResponse({
@@ -158,25 +167,29 @@ export class UserController {
   // ============================================
 
   @Get('profile/:userId')
-  @ApiOperation({ summary: 'Get user profile by ID' })
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get user profile by ID (requires authentication)' })
   @ApiParam({ name: 'userId', description: 'User ID' })
   @ApiResponse({
     status: 200,
     description: 'User profile retrieved',
   })
+  @ApiResponse({ status: 401, description: 'Unauthorized - No valid token' })
   @ApiResponse({ status: 404, description: 'User not found' })
   async getProfile(@Param('userId') userId: string) {
     return this.userService.getProfile(userId);
   }
 
   @Patch('profile/:userId')
-  @ApiOperation({ summary: 'Update user profile' })
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update user profile (requires authentication)' })
   @ApiParam({ name: 'userId', description: 'User ID' })
   @ApiBody({ type: UpdateProfileDto })
   @ApiResponse({
     status: 200,
     description: 'Profile updated successfully',
   })
+  @ApiResponse({ status: 401, description: 'Unauthorized - No valid token' })
   async updateProfile(
     @Param('userId') userId: string,
     @Body() updates: UpdateProfileDto
