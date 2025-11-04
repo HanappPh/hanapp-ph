@@ -33,7 +33,7 @@ async function bootstrap() {
     origin: ['http://localhost:3000', 'http://localhost:4200'], // Add your frontend URLs
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-user-id'],
   });
 
   const config = new DocumentBuilder()
