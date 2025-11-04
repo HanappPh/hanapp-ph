@@ -2,8 +2,8 @@ import { Controller, Get } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiOkResponse } from '@nestjs/swagger';
 
 import { AppService } from './app.service';
+import { Public } from './decorators/public.decorator';
 import { AppDataResponseDto, HealthResponseDto } from './dto/app.dto';
-import { Public } from './guards/auth.guard';
 
 @ApiTags('hanapp')
 @Controller()

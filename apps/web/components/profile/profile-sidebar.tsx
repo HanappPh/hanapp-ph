@@ -6,6 +6,7 @@ import {
   DollarSign,
   Shield,
   CreditCard,
+  LogOut,
 } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -39,7 +40,7 @@ export function Sidebar({
     initialSelected ?? 'Client'
   );
   const router = useRouter();
-  const { switchRole, activeRole } = useAuth();
+  const { switchRole, activeRole, signOut } = useAuth();
 
   // Sync local state with prop changes (when user navigates back to profile)
   React.useEffect(() => {
@@ -66,6 +67,12 @@ export function Sidebar({
   };
 
   const displayName = profile?.full_name || 'User';
+
+  const handleLogout = async () => {
+    await signOut();
+    // Use hard navigation to ensure cookies are cleared and middleware sees fresh state
+    window.location.href = '/';
+  };
 
   return (
     <aside className="w-80 bg-white p-6">
@@ -208,6 +215,17 @@ export function Sidebar({
           >
             <CreditCard className="w-5 h-5" />
             Payment Settings
+          </Button>
+          <Button
+            variant="ghost"
+            className="flex items-center gap-3 w-full justify-start text-red-600 pl-2 rounded-md"
+            style={{}}
+            onMouseOver={e => (e.currentTarget.style.background = '#fee2e2')}
+            onMouseOut={e => (e.currentTarget.style.background = '')}
+            onClick={handleLogout}
+          >
+            <LogOut className="w-5 h-5" />
+            Logout
           </Button>
         </nav>
       </div>
