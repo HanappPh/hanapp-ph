@@ -9,9 +9,13 @@ import {
   TabsTrigger,
 } from '@hanapp-ph/commons';
 import { Clock, Calendar } from 'lucide-react';
-import { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { useState, useEffect } from 'react';
 
 import BookingCard from '../../../components/booking/booking-cards';
+import { useAuth } from '../../../lib/hooks/useAuth';
+import { supabase } from '../../../lib/supabase/client';
+
 interface BookingDetails {
   id: number;
   serviceName: string;
@@ -33,13 +37,8 @@ interface BookingDetails {
   providerImage?: string;
 }
 
-const bookingsData: {
-  sent: BookingDetails[];
-  received: BookingDetails[];
-  ongoing: BookingDetails[];
-  past: BookingDetails[];
-  cancelled: BookingDetails[];
-} = {
+// Hardcoded data as fallback
+const hardcodedBookings = {
   sent: [
     {
       id: 8,
@@ -52,7 +51,7 @@ const bookingsData: {
       date: '2024-01-18',
       time: '8:00 AM',
       location: 'Paranaque City',
-      status: 'Pending',
+      status: 'Pending' as const,
       serviceImage: '/landscaper-cutting-grass.jpg',
     },
     {
@@ -66,7 +65,7 @@ const bookingsData: {
       date: '2024-01-20',
       time: '3:00 PM',
       location: 'Makati City',
-      status: 'Pending',
+      status: 'Pending' as const,
       serviceImage: '/phone-and-tablet-repair.png',
     },
   ],
@@ -82,7 +81,7 @@ const bookingsData: {
       date: '2024-01-22',
       time: '10:00 AM',
       location: 'BGC, Taguig',
-      status: 'Pending',
+      status: 'Pending' as const,
       serviceImage: '/woman-using-phone.jpg',
     },
     {
@@ -96,7 +95,7 @@ const bookingsData: {
       date: '2024-01-25',
       time: '2:00 PM',
       location: 'Ortigas, Pasig',
-      status: 'Pending',
+      status: 'Pending' as const,
       serviceImage: '/woman-smiling.jpg',
     },
   ],
@@ -112,7 +111,7 @@ const bookingsData: {
       date: '2024-01-15',
       time: '10:00 AM',
       location: 'Makati, Manila',
-      status: 'Accepted',
+      status: 'Accepted' as const,
       serviceImage: '/house-cleaning-service.png',
     },
     {
@@ -126,7 +125,7 @@ const bookingsData: {
       date: '2024-01-16',
       time: '2:00 PM',
       location: 'Quezon City',
-      status: 'Pending',
+      status: 'Pending' as const,
       serviceImage: '/tutoring-education.jpg',
     },
     {
@@ -140,7 +139,7 @@ const bookingsData: {
       date: '2024-01-16',
       time: '2:00 PM',
       location: 'Quezon City',
-      status: 'Paid',
+      status: 'Paid' as const,
       serviceImage: '/tutoring-education.jpg',
     },
   ],
@@ -156,7 +155,7 @@ const bookingsData: {
       date: '2024-01-10',
       time: '9:00 AM',
       location: 'Pasig City',
-      status: 'Completed',
+      status: 'Completed' as const,
       serviceImage: '/laundry-washing.jpg',
     },
     {
@@ -170,7 +169,7 @@ const bookingsData: {
       date: '2024-01-08',
       time: '1:00 PM',
       location: 'Taguig City',
-      status: 'Completed',
+      status: 'Completed' as const,
       serviceImage: '/home-repair-tools.jpg',
     },
   ],
@@ -186,7 +185,7 @@ const bookingsData: {
       date: '2024-01-12',
       time: '11:00 AM',
       location: 'Mandaluyong',
-      status: 'Cancelled',
+      status: 'Cancelled' as const,
       serviceImage: '/pet-grooming-dog.jpg',
     },
     {
@@ -200,14 +199,157 @@ const bookingsData: {
       date: '2024-01-12',
       time: '11:00 AM',
       location: 'Mandaluyong',
-      status: 'Rejected',
+      status: 'Rejected' as const,
       serviceImage: '/pet-grooming-dog.jpg',
     },
   ],
 };
 
 export default function BookingsPage() {
-  const [activeTab, setActiveTab] = useState('ongoing');
+  const [activeTab, setActiveTab] = useState('sent'); // Start with 'sent' tab for new posts
+  const { user } = useAuth();
+  const searchParams = useSearchParams();
+  const [bookingsData, setBookingsData] = useState<{
+    sent: BookingDetails[];
+    received: BookingDetails[];
+    ongoing: BookingDetails[];
+    past: BookingDetails[];
+    cancelled: BookingDetails[];
+  }>(hardcodedBookings);
+  const [isLoading, setIsLoading] = useState(true);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  // Check if we need to refresh data
+  useEffect(() => {
+    const shouldRefresh = searchParams.get('refresh');
+    if (shouldRefresh === 'true') {
+      setRefreshTrigger(prev => prev + 1);
+    }
+  }, [searchParams]);
+
+  // Function to trigger data refresh
+  const handleDelete = () => {
+    setRefreshTrigger(prev => prev + 1);
+  };
+
+  // Fetch service requests from the API and merge with hardcoded data
+  useEffect(() => {
+    const fetchBookings = async () => {
+      if (!user?.id) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
+        if (!session?.access_token) {
+          console.error('No session token available');
+          setIsLoading(false);
+          return;
+        }
+
+        // Fetch service requests created by the user (where client_id matches user.id)
+        const response = await fetch(
+          `http://localhost:3001/api/service-requests?clientId=${user.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${session.access_token}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch bookings');
+        }
+
+        const serviceRequests = await response.json();
+
+        // Transform API data to BookingDetails format
+        const transformedBookings: BookingDetails[] = serviceRequests.map(
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (request: any) => {
+            // Map lowercase database status to capitalized UI status
+            const statusMap: Record<string, BookingDetails['status']> = {
+              pending: 'Pending',
+              approved: 'Accepted',
+              accepted: 'Accepted',
+              paid: 'Paid',
+              completed: 'Completed',
+              rejected: 'Rejected',
+              cancelled: 'Cancelled',
+            };
+
+            return {
+              id: request.id,
+              serviceName: request.title,
+              providerName: request.users?.full_name || 'Unknown',
+              rating: 0, // Default for now
+              reviewCount: 0, // Default for now
+              price: request.rate,
+              date: request.date,
+              time: `${request.time} - ${request.time_2}`,
+              location: request.job_location,
+              status: statusMap[request.status?.toLowerCase()] || 'Pending',
+              serviceImage:
+                request.images?.[0] || '/cleaning-service-provider.jpg',
+              providerImage:
+                request.users?.avatar_url || '/cleaning-service-provider.jpg',
+            };
+          }
+        );
+
+        // Categorize fetched bookings by status
+        const fetchedCategorized = {
+          sent: transformedBookings.filter(b => b.status === 'Pending'),
+          ongoing: transformedBookings.filter(
+            b => b.status === 'Accepted' || b.status === 'Paid'
+          ),
+          past: transformedBookings.filter(b => b.status === 'Completed'),
+          cancelled: transformedBookings.filter(
+            b => b.status === 'Cancelled' || b.status === 'Rejected'
+          ),
+        };
+
+        // Merge with hardcoded data
+        setBookingsData({
+          sent: [...fetchedCategorized.sent, ...hardcodedBookings.sent],
+          received: hardcodedBookings.received, // Keep hardcoded for received
+          ongoing: [
+            ...fetchedCategorized.ongoing,
+            ...hardcodedBookings.ongoing,
+          ],
+          past: [...fetchedCategorized.past, ...hardcodedBookings.past],
+          cancelled: [
+            ...fetchedCategorized.cancelled,
+            ...hardcodedBookings.cancelled,
+          ],
+        });
+      } catch (error) {
+        console.error('Error fetching bookings:', error);
+        // Keep hardcoded data on error
+        setBookingsData(hardcodedBookings);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchBookings();
+  }, [user?.id, refreshTrigger]); // Re-fetch when refreshTrigger changes
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen w-full bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-hanapp-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading bookings...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen w-full bg-white">
@@ -324,6 +466,7 @@ export default function BookingsPage() {
                     key={booking.id}
                     {...booking}
                     tabContext="sent"
+                    onDelete={handleDelete}
                   ></BookingCard>
                 ))
               ) : (

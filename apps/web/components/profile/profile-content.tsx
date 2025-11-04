@@ -47,32 +47,11 @@ export function MainContent({
     full_name?: string;
     email?: string;
     phone_number?: string;
-    created_at?: string;
   } | null;
 }) {
   const displayName = profile?.full_name || 'User';
   const displayEmail = profile?.email || 'Not provided';
   const displayPhone = profile?.phone_number || 'Not provided';
-
-  // Format created_at date to "Month Year" (e.g., "May 2023")
-  const formatMemberSince = (dateString?: string): string => {
-    if (!dateString) {
-      return 'May 2023';
-    }
-
-    try {
-      const date = new Date(dateString);
-      const options: Intl.DateTimeFormatOptions = {
-        year: 'numeric',
-        month: 'long',
-      };
-      return date.toLocaleDateString('en-US', options);
-    } catch {
-      return 'May 2023';
-    }
-  };
-
-  const memberSince = formatMemberSince(profile?.created_at);
 
   return (
     <main className="flex-1 p-6">
@@ -123,7 +102,7 @@ export function MainContent({
                     <Calendar className="w-4 h-4 mr-2" />
                     Member Since
                   </label>
-                  <p className="text-gray-900">{memberSince}</p>
+                  <p className="text-gray-900">May 2023</p>
                 </div>
                 <div className="mb-4">
                   <label className="text-sm text-gray-600 mb-1 block">

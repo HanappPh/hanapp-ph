@@ -19,6 +19,18 @@ const nextConfig = {
   },
   // Ensure transpilation of monorepo packages
   transpilePackages: ['@hanapp-ph/commons'],
+  // Image configuration for external domains
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: process.env.NEXT_PUBLIC_SUPABASE_URL
+          ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname
+          : 'localhost',
+        pathname: '/storage/v1/object/public/**',
+      },
+    ],
+  },
 };
 
 const plugins = [

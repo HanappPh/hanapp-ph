@@ -3,9 +3,23 @@
 import { Upload, X, ImageIcon } from 'lucide-react';
 import React, { useState, useRef } from 'react';
 
-export function ImageUploadSection() {
+import { supabase } from '../../lib/supabase/client';
+
+interface ImageUploadSectionProps {
+  formData: {
+    images: string[];
+  };
+  updateFormData: (field: string, value: string[]) => void;
+}
+
+export function ImageUploadSection({
+  formData,
+  updateFormData,
+}: ImageUploadSectionProps) {
   const [dragActive, setDragActive] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const [uploadedUrls, setUploadedUrls] = useState<string[]>(formData.images);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleDrag = (e: React.DragEvent) => {
@@ -31,18 +45,84 @@ export function ImageUploadSection() {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     if (e.target.files && e.target.files[0]) {
       const newFiles = Array.from(e.target.files).filter(file =>
         file.type.startsWith('image/')
       );
       setFiles(prev => [...prev, ...newFiles]);
+
+      // Upload files immediately
+      await uploadFiles(newFiles);
     }
   };
 
-  const removeFile = (index: number) => {
+  const uploadFiles = async (filesToUpload: File[]) => {
+    setUploading(true);
+    const newUrls: string[] = [];
+
+    try {
+      for (const file of filesToUpload) {
+        // Generate unique filename
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+        const filePath = `${fileName}`;
+
+        // Upload to Supabase storage
+        const { data, error } = await supabase.storage
+          .from('service-images')
+          .upload(filePath, file, {
+            cacheControl: '3600',
+            upsert: false,
+          });
+
+        if (error) {
+          console.error('Error uploading file:', error);
+          continue;
+        }
+
+        // Get public URL
+        const { data: urlData } = supabase.storage
+          .from('service-images')
+          .getPublicUrl(data.path);
+
+        newUrls.push(urlData.publicUrl);
+      }
+
+      // Update state and parent form data
+      const allUrls = [...uploadedUrls, ...newUrls];
+      setUploadedUrls(allUrls);
+      updateFormData('images', allUrls);
+    } catch (error) {
+      console.error('Error uploading files:', error);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const removeFile = async (index: number) => {
+    const urlToRemove = uploadedUrls[index];
+
+    // Remove from local state
     setFiles(prev => prev.filter((_, i) => i !== index));
+
+    // Remove from uploaded URLs
+    const newUrls = uploadedUrls.filter((_, i) => i !== index);
+    setUploadedUrls(newUrls);
+    updateFormData('images', newUrls);
+
+    // Try to delete from storage if URL exists
+    if (urlToRemove) {
+      try {
+        const path = urlToRemove.split('/service-images/')[1];
+        if (path) {
+          await supabase.storage.from('service-images').remove([path]);
+        }
+      } catch (error) {
+        console.error('Error deleting file from storage:', error);
+      }
+    }
   };
 
   const onButtonClick = () => {
@@ -111,6 +191,13 @@ export function ImageUploadSection() {
         </div>
       </div>
 
+      {/* Upload Status */}
+      {uploading && (
+        <div className="mt-4 text-center">
+          <p className="text-sm text-blue-600">Uploading images...</p>
+        </div>
+      )}
+
       {/* File Preview */}
       {files.length > 0 && (
         <div className="mt-4 space-y-2">
@@ -119,9 +206,18 @@ export function ImageUploadSection() {
             {files.map((file, index) => (
               <div key={index} className="relative group">
                 <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
-                  <div className="w-full h-full flex items-center justify-center">
-                    <ImageIcon className="w-8 h-8 text-gray-400" />
-                  </div>
+                  {uploadedUrls[index] ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={uploadedUrls[index]}
+                      alt={file.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <ImageIcon className="w-8 h-8 text-gray-400" />
+                    </div>
+                  )}
                 </div>
                 <button
                   type="button"
