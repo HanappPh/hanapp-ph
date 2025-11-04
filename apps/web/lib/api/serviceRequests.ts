@@ -18,6 +18,7 @@ export interface ServiceRequest {
   category_id: number; // 1=Cleaning, 2=Tutoring, 3=Repair, 4=Delivery
   title: string;
   description: string;
+  additional_requirements?: string;
   rate: number;
   contact: string;
   contact_link?: string;
@@ -30,6 +31,10 @@ export interface ServiceRequest {
   updated_at: string;
   users?: {
     full_name: string;
+    email?: string;
+    phone?: string;
+    avatar_url?: string;
+    created_at?: string;
   };
 }
 
@@ -109,5 +114,46 @@ export const fetchServiceRequestsForJobListings = async (): Promise<
   } catch (error) {
     console.error('Error fetching service requests:', error);
     return [];
+  }
+};
+
+// Fetch a single service request by ID
+export const fetchServiceRequestById = async (
+  id: string
+): Promise<ServiceRequest | null> => {
+  try {
+    const fullUrl = `${API_BASE_URL}/service-requests/${id}`;
+
+    // Get auth token from Supabase if user is logged in
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+
+    // Only add auth token if we're in the browser
+    if (typeof window !== 'undefined') {
+      try {
+        const { supabase } = await import('../supabase/client');
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
+        if (session?.access_token) {
+          headers['Authorization'] = `Bearer ${session.access_token}`;
+        }
+      } catch (error) {
+        console.error('Failed to get auth token:', error);
+      }
+    }
+
+    const response = await fetch(fullUrl, { headers });
+    if (!response.ok) {
+      throw new Error('Failed to fetch service request');
+    }
+
+    const serviceRequest: ServiceRequest = await response.json();
+    return serviceRequest;
+  } catch (error) {
+    console.error('Error fetching service request:', error);
+    return null;
   }
 };

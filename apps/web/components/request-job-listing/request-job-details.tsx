@@ -13,7 +13,7 @@ interface JobDetailsSectionProps {
     title: string;
     categoryId: string;
     description: string;
-    expertise: string;
+    additionalRequirements: string;
   };
   updateFormData: (field: string, value: string) => void;
 }
@@ -91,14 +91,16 @@ export function JobDetailsSection({
         </div>
         <div className="md:col-span-2">
           <label className="block text-base font-medium text-gray-700 mb-3">
-            Expertise
+            Additional Requirements
           </label>
           <Textarea
-            placeholder="Describe the expertise you require"
+            placeholder="Describe any additional requirements"
             className="min-h-[80px] font-light resize-none text-base"
             style={{ backgroundColor: '#F3F5F9' }}
-            value={formData.expertise}
-            onChange={e => updateFormData('expertise', e.target.value)}
+            value={formData.additionalRequirements}
+            onChange={e =>
+              updateFormData('additionalRequirements', e.target.value)
+            }
           />
         </div>
       </div>

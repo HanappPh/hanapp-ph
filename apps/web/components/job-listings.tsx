@@ -121,7 +121,7 @@ export function JobListings() {
           paginatedJobs.map(job => (
             <div
               key={job.id}
-              onClick={() => router.push(`/jobs/${job.id}`)}
+              onClick={() => router.push(`provider/jobs/${job.id}`)}
               className="flex gap-4 rounded-lg bg-white shadow-sm transition-all duration-200 ease-in-out hover:shadow-md hover:-translate-y-1 hover:scale-[1.01] cursor-pointer"
             >
               <div className="hidden md:block relative h-[155px] w-[155px] rounded-l-lg overflow-hidden">
