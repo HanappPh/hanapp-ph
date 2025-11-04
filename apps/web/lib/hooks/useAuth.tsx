@@ -17,6 +17,7 @@ interface Profile {
   phone: string;
   user_type: UserType;
   phone_verified: boolean;
+  created_at?: string;
 }
 
 interface AuthContextType {
@@ -64,7 +65,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Fetch user profile
   const fetchProfile = async (userId: string) => {
     try {
-      const response = await fetch(`${API_URL}/api/user/profile/${userId}`);
+      // Get current session to access the JWT token
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session?.access_token) {
+        console.error('No access token available');
+        return;
+      }
+
+      const response = await fetch(`${API_URL}/api/user/profile/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+
       if (response.ok) {
         const data = await response.json();
         setProfile(data);
@@ -77,6 +93,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           // Default to client role
           setActiveRole('client');
         }
+      } else {
+        console.error(
+          'Failed to fetch profile:',
+          response.status,
+          response.statusText
+        );
       }
     } catch (error) {
       console.error('Failed to fetch profile:', error);
@@ -355,6 +377,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       await supabase.auth.signOut();
       localStorage.removeItem('activeRole');
+
+      // Clear user state immediately
+      setUser(null);
+      setSession(null);
+      setProfile(null);
+      setActiveRole('client');
 
       return { error: null };
     } catch {
