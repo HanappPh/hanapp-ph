@@ -25,6 +25,7 @@ export interface ServiceRequest {
   job_location: string;
   date: string;
   time: string;
+  time_2?: string;
   images?: string[];
   status: 'pending' | 'approved' | 'rejected' | 'cancelled';
   created_at: string;
@@ -64,9 +65,15 @@ const getCategoryName = (categoryId: number): string => {
 export const mapServiceRequestToJobListing = (
   serviceRequest: ServiceRequest
 ): JobListing => {
+  // Get first image if available, otherwise use default
+  const firstImage =
+    serviceRequest.images && serviceRequest.images.length > 0
+      ? serviceRequest.images[0]
+      : '/cleaning-service-provider.jpg';
+
   return {
     id: serviceRequest.id,
-    image: '/cleaning-service-provider.jpg',
+    image: firstImage,
     title: serviceRequest.title,
     provider: serviceRequest.users?.full_name || 'Unknown User',
     location: serviceRequest.job_location,
