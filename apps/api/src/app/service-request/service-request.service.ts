@@ -26,12 +26,14 @@ export class ServiceRequestService {
         category_id: createDto.categoryId, // 1=Cleaning, 2=Tutoring, 3=Repair, 4=Delivery
         title: createDto.title,
         description: createDto.description,
+        additional_requirements: createDto.additional_requirements,
         rate: createDto.rate,
         contact: createDto.contact,
         contact_link: createDto.contactLink,
         job_location: createDto.jobLocation,
         date: createDto.jobDate,
         time: createDto.jobTime,
+        time_2: createDto.jobTime2,
         images: createDto.images || [],
       })
       .select()

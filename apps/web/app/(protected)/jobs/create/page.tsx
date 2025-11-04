@@ -93,7 +93,8 @@ export default function RequestServicePage() {
             contact: formData.contact,
             jobLocation: formData.jobLocation,
             jobDate: formData.jobDate,
-            jobTime: `${formData.jobTimeStart} - ${formData.jobTimeEnd}`, // Time range
+            jobTime: formData.jobTimeStart, // Start time
+            jobTime2: formData.jobTimeEnd, // End time
             images: formData.images,
           }),
         }

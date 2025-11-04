@@ -241,14 +241,14 @@ CREATE TABLE public.service_requests (
   category_id INTEGER NOT NULL CHECK (category_id IN (1, 2, 3, 4)), -- 1=Cleaning, 2=Tutoring, 3=Repair, 4=Delivery
   title TEXT NOT NULL,
   description TEXT NOT NULL,
-  expertise TEXT,
+  additional_requirements TEXT,
   rate DECIMAL(10, 2) NOT NULL,
-  mop TEXT NOT NULL,
   contact TEXT NOT NULL,
   contact_link TEXT,
   job_location TEXT NOT NULL,
   date DATE NOT NULL,
   time TIME NOT NULL,
+  time_2 TIME,
   images TEXT[],
   status TEXT CHECK (status IN ('pending', 'approved', 'rejected', 'cancelled')) DEFAULT 'pending',
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -286,3 +286,34 @@ CREATE TRIGGER update_service_requests_updated_at
   BEFORE UPDATE ON public.service_requests
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();
+
+-- Storage bucket for service request images
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('service-images', 'service-images', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- Storage policies for service-images bucket
+CREATE POLICY "Anyone can view service images"
+  ON storage.objects FOR SELECT
+  USING (bucket_id = 'service-images');
+
+CREATE POLICY "Authenticated users can upload service images"
+  ON storage.objects FOR INSERT
+  WITH CHECK (
+    bucket_id = 'service-images' AND
+    auth.role() = 'authenticated'
+  );
+
+CREATE POLICY "Users can update their own service images"
+  ON storage.objects FOR UPDATE
+  USING (
+    bucket_id = 'service-images' AND
+    auth.uid()::text = (storage.foldername(name))[1]
+  );
+
+CREATE POLICY "Users can delete their own service images"
+  ON storage.objects FOR DELETE
+  USING (
+    bucket_id = 'service-images' AND
+    auth.uid()::text = (storage.foldername(name))[1]
+  );

@@ -114,7 +114,10 @@ export default function ProviderListingsRequestDetailsView() {
         service: serviceRequest.title,
         category: getCategoryName(serviceRequest.category_id),
         date: serviceRequest.date || fallbackRequest.date,
-        time: serviceRequest.time || fallbackRequest.time,
+        time:
+          serviceRequest.time && serviceRequest.time_2
+            ? `${serviceRequest.time} - ${serviceRequest.time_2}`
+            : serviceRequest.time || fallbackRequest.time,
         location: serviceRequest.job_location || fallbackRequest.location,
         fullAddress: serviceRequest.job_location || fallbackRequest.fullAddress,
         estimatedDuration: fallbackRequest.estimatedDuration,
