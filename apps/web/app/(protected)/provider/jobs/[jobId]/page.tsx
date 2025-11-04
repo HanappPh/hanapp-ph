@@ -170,6 +170,16 @@ export default function ProviderListingsRequestDetailsView() {
     router.push(`/provider/jobs/${jobId}/apply`);
   };
 
+  const handleMessageClient = () => {
+    if (!serviceRequest?.client_id) {
+      console.error('No client ID available');
+      return;
+    }
+
+    // Navigate to the chat page
+    router.push(`/chat/${serviceRequest.client_id}`);
+  };
+
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-8 max-w-7xl flex justify-center items-center min-h-[400px]">
@@ -207,6 +217,7 @@ export default function ProviderListingsRequestDetailsView() {
           <ProviderListingsActionButtons
             status={status}
             onAccept={handleAccept}
+            onMessageClient={handleMessageClient}
           />
         </div>
       </div>
