@@ -1,7 +1,7 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState, useCallback } from 'react';
 
 import {
   ChatList,
@@ -15,9 +15,18 @@ import { useAuth } from '../../../../lib/hooks/useAuth';
 const ThreadPage = () => {
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
   const threadId = params?.threadId as string;
+
+  // Get the name from query params if available
+  const nameFromQuery = searchParams.get('name') || '';
+
   const [selectedChatId, setSelectedChatId] = useState<string | null>(
     threadId || null
+  );
+  const [newChatUserId, setNewChatUserId] = useState<string | null>(null);
+  const [newChatUserName, setNewChatUserName] = useState<string>(
+    nameFromQuery || 'User'
   );
 
   // Get the logged-in user from auth context
@@ -42,12 +51,76 @@ const ThreadPage = () => {
     }
   }, [userId, fetchThreads]);
 
-  // Load messages when selectedChatId changes
+  // Update name when query param changes
+  useEffect(() => {
+    if (nameFromQuery && nameFromQuery !== newChatUserName) {
+      setNewChatUserName(nameFromQuery);
+    }
+  }, [nameFromQuery, newChatUserName]);
+
+  // Fetch user profile for new chat
+  const fetchUserProfile = useCallback(
+    async (targetUserId: string) => {
+      try {
+        // Get the current session from useAuth or directly from supabase
+        const {
+          data: { session },
+        } = await (
+          await import('../../../../lib/supabase/client')
+        ).supabase.auth.getSession();
+        const token = session?.access_token;
+
+        if (!token) {
+          return;
+        }
+
+        const url = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/user/profile/${targetUserId}`;
+
+        const response = await fetch(url, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (response.ok) {
+          const userData = await response.json();
+          setNewChatUserName(userData.full_name || nameFromQuery || 'User');
+        }
+      } catch {
+        // Silent fail - will use name from query or default
+      }
+    },
+    [nameFromQuery]
+  );
+
+  // Load messages when selectedChatId changes OR handle new chat
   useEffect(() => {
     if (userId && selectedChatId) {
-      fetchThreadMessages(selectedChatId);
+      // Check if thread exists in the list
+      const threadExists = threads.some(
+        thread => thread.other_user_id === selectedChatId
+      );
+
+      if (threadExists) {
+        // Thread exists, load messages normally
+        fetchThreadMessages(selectedChatId);
+        setNewChatUserId(null);
+      } else if (!isLoading) {
+        // Threads loaded but selected chat not found - this is a new conversation
+        setNewChatUserId(selectedChatId);
+
+        // Try to fetch user profile for the new chat
+        fetchUserProfile(selectedChatId);
+      }
     }
-  }, [userId, selectedChatId, fetchThreadMessages]);
+  }, [
+    userId,
+    selectedChatId,
+    fetchThreadMessages,
+    threads,
+    isLoading,
+    fetchUserProfile,
+  ]);
 
   // Convert API threads to ChatListItem format for the UI
   const chatListItems: ChatListItem[] = threads.map(thread => ({
@@ -66,8 +139,26 @@ const ThreadPage = () => {
     isOnline: false,
   }));
 
-  // Find the selected chat from threads
-  const selectedChat = chatListItems.find(chat => chat.id === selectedChatId);
+  // Find the selected chat from threads, or create a new one for new conversations
+  const selectedChat =
+    chatListItems.find(chat => chat.id === selectedChatId) ||
+    (newChatUserId
+      ? {
+          id: newChatUserId,
+          name: newChatUserName,
+          initials: newChatUserName
+            .split(' ')
+            .map(n => n[0])
+            .join('')
+            .toUpperCase()
+            .slice(0, 2),
+          avatar: '',
+          lastMessage: '',
+          timestamp: new Date(),
+          unreadCount: 0,
+          isOnline: false,
+        }
+      : null);
 
   // Get the other user's name dynamically
   const getOtherUserName = (senderId: string): string => {
@@ -75,7 +166,7 @@ const ThreadPage = () => {
       return 'You';
     }
     const thread = threads.find(t => t.other_user_id === selectedChatId);
-    return thread?.other_user_name || 'Other User';
+    return thread?.other_user_name || newChatUserName || 'Other User';
   };
 
   // Get the other user's initials dynamically
@@ -86,6 +177,15 @@ const ThreadPage = () => {
     const thread = threads.find(t => t.other_user_id === selectedChatId);
     if (thread?.other_user_name) {
       return thread.other_user_name
+        .split(' ')
+        .map(n => n[0])
+        .join('')
+        .toUpperCase()
+        .slice(0, 2);
+    }
+    // For new chats, use the fetched name
+    if (newChatUserName && newChatUserName !== 'User') {
+      return newChatUserName
         .split(' ')
         .map(n => n[0])
         .join('')
@@ -116,6 +216,12 @@ const ThreadPage = () => {
 
     try {
       await sendMessage(selectedChatId, content);
+
+      // If this was a new chat, refresh threads to show it in the list
+      if (newChatUserId) {
+        await fetchThreads();
+        setNewChatUserId(null);
+      }
     } catch (err) {
       console.error('Failed to send message:', err);
     }
@@ -240,8 +346,8 @@ const ThreadPage = () => {
                 <div className="text-center">
                   <p className="text-gray-500 text-lg mb-2">
                     {chatListItems.length === 0
-                      ? '� No conversations yet'
-                      : '�👈 Select a conversation to start chatting'}
+                      ? 'No conversations yet'
+                      : 'Select a conversation to start chatting'}
                   </p>
                   {chatListItems.length === 0 && (
                     <p className="text-gray-400 text-sm">

@@ -368,8 +368,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
+      // Get the current session to extract the access token
+      const {
+        data: { session: currentSession },
+      } = await supabase.auth.getSession();
+      const token = currentSession?.access_token;
+
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+
+      // Add authorization header if token exists
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
       const response = await fetch(`${API_URL}/api/user/logout`, {
         method: 'POST',
+        headers,
       });
 
       if (!response.ok) {
@@ -379,6 +395,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       await supabase.auth.signOut();
       localStorage.removeItem('activeRole');
+
+      // Redirect to home page after successful logout
+      window.location.href = '/';
 
       return { error: null };
     } catch {

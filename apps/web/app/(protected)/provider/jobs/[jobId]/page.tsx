@@ -176,8 +176,13 @@ export default function ProviderListingsRequestDetailsView() {
       return;
     }
 
-    // Navigate to the chat page
-    router.push(`/chat/${serviceRequest.client_id}`);
+    // Get client name from the service request data
+    const clientName = serviceRequest.users?.full_name || 'User';
+
+    // Navigate to the chat page with client info in query params
+    router.push(
+      `/chat/${serviceRequest.client_id}?name=${encodeURIComponent(clientName)}`
+    );
   };
 
   if (loading) {
