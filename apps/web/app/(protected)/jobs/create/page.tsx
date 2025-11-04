@@ -15,14 +15,13 @@ interface FormData {
   title: string;
   categoryId: string;
   description: string;
-  expertise: string;
+  additionalRequirements: string;
   rate: number;
-  modeOfPayment: string;
   contact: string;
-  contactLink: string;
   jobLocation: string;
   jobDate: string;
-  jobTime: string;
+  jobTimeStart: string;
+  jobTimeEnd: string;
   images: string[];
 }
 
@@ -36,14 +35,13 @@ export default function RequestServicePage() {
     title: '',
     categoryId: '',
     description: '',
-    expertise: '',
+    additionalRequirements: '',
     rate: 0,
-    modeOfPayment: '',
     contact: '',
-    contactLink: '',
     jobLocation: '',
     jobDate: '',
-    jobTime: '',
+    jobTimeStart: '',
+    jobTimeEnd: '',
     images: [],
   });
 
@@ -90,13 +88,12 @@ export default function RequestServicePage() {
             categoryId: Number(formData.categoryId), // Convert string to number
             title: formData.title,
             description: formData.description,
-            // expertise and modeOfPayment removed - not stored in database
+            additional_requirements: formData.additionalRequirements, // Additional requirements
             rate: Number(formData.rate),
             contact: formData.contact,
-            contactLink: formData.contactLink,
             jobLocation: formData.jobLocation,
             jobDate: formData.jobDate,
-            jobTime: formData.jobTime,
+            jobTime: `${formData.jobTimeStart} - ${formData.jobTimeEnd}`, // Time range
             images: formData.images,
           }),
         }

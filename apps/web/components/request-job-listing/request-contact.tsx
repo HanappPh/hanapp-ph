@@ -3,7 +3,6 @@ import { Input } from '@hanapp-ph/commons';
 interface ContactInformationSectionProps {
   formData: {
     contact: string;
-    contactLink: string;
   };
   updateFormData: (field: string, value: string) => void;
 }
@@ -46,18 +45,6 @@ export function ContactInformationSection({
               onChange={e => updateFormData('contact', `+63${e.target.value}`)}
             />
           </div>
-        </div>
-        <div>
-          <label className="block text-base font-medium text-gray-700 mb-3">
-            Other Contact Link
-          </label>
-          <Input
-            placeholder="Messenger / Telegram /..."
-            className="w-full font-light text-sm"
-            style={{ backgroundColor: '#F3F5F9' }}
-            value={formData.contactLink}
-            onChange={e => updateFormData('contactLink', e.target.value)}
-          />
         </div>
       </div>
     </div>

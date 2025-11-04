@@ -87,7 +87,33 @@ export class ServiceRequestService {
       );
     }
 
-    return data;
+    // Fetch user profile data
+    const { data: userProfile } = await supabase
+      .from('profiles')
+      .select('full_name, email, phone, avatar_url, created_at')
+      .eq('id', data.client_id)
+      .single();
+
+    // Also fetch from users table as fallback
+    const { data: userData } = await supabase
+      .from('users')
+      .select('full_name, email, created_at')
+      .eq('id', data.client_id)
+      .single();
+
+    // Combine data, prioritizing profiles over users table
+    const combinedUserData = {
+      full_name: userProfile?.full_name || userData?.full_name || null,
+      email: userProfile?.email || userData?.email || null,
+      phone: userProfile?.phone || null,
+      avatar_url: userProfile?.avatar_url || null,
+      created_at: userProfile?.created_at || userData?.created_at || null,
+    };
+
+    return {
+      ...data,
+      users: combinedUserData,
+    };
   }
 
   async update(id: string, updateDto: UpdateServiceRequestDto) {
@@ -205,27 +231,38 @@ export class ServiceRequestService {
     // Get unique client IDs
     const clientIds = [...new Set(serviceRequests.map(sr => sr.client_id))];
 
-    // Fetch user data for all clients
-    const { data: users, error: usersError } = await supabase
-      .from('users')
-      .select('id, full_name')
+    // Fetch user profile data for all clients
+    const { data: profiles } = await supabase
+      .from('profiles')
+      .select('id, full_name, email, phone, avatar_url, created_at')
       .in('id', clientIds);
 
-    if (usersError) {
-      throw new HttpException(
-        `Failed to fetch user data: ${usersError.message}`,
-        HttpStatus.INTERNAL_SERVER_ERROR
-      );
-    }
+    // Fetch user data from users table as fallback
+    const { data: users } = await supabase
+      .from('users')
+      .select('id, full_name, email, created_at')
+      .in('id', clientIds);
 
-    // Create a map of user data
-    const userMap = new Map(users.map(user => [user.id, user]));
+    // Create maps for both data sources
+    const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
+    const userMap = new Map(users?.map(u => [u.id, u]) || []);
 
     // Combine the data
-    const result = serviceRequests.map(sr => ({
-      ...sr,
-      users: userMap.get(sr.client_id) || null,
-    }));
+    const result = serviceRequests.map(sr => {
+      const profile = profileMap.get(sr.client_id);
+      const user = userMap.get(sr.client_id);
+
+      return {
+        ...sr,
+        users: {
+          full_name: profile?.full_name || user?.full_name || null,
+          email: profile?.email || user?.email || null,
+          phone: profile?.phone || null,
+          avatar_url: profile?.avatar_url || null,
+          created_at: profile?.created_at || user?.created_at || null,
+        },
+      };
+    });
 
     return result;
   }
