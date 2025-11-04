@@ -50,7 +50,30 @@ export class UserService {
     }
 
     const normalizedPhone = this.normalizePhoneNumber(phone);
-    const otp = this.semaphoreService.generateOTP();
+
+    // Test mode: Use fixed OTP for testing (supports multiple test numbers)
+    const testPhone1 = process.env.TEST_PHONE_NUMBER;
+    const testPhone2 = process.env.TEST_PHONE_NUMBER_2;
+    const testOtp = process.env.TEST_OTP || '123456';
+
+    const isTestMode =
+      (testPhone1 &&
+        normalizedPhone === this.normalizePhoneNumber(testPhone1)) ||
+      (testPhone2 && normalizedPhone === this.normalizePhoneNumber(testPhone2));
+
+    // Debug: Show what's happening
+    if (testPhone1 || testPhone2) {
+      // eslint-disable-next-line no-console
+      console.log('Test Mode Check:', {
+        input: phone,
+        normalized: normalizedPhone,
+        testPhone1,
+        testPhone2,
+        matches: isTestMode,
+      });
+    }
+
+    const otp = isTestMode ? testOtp : this.semaphoreService.generateOTP();
 
     const expiresAt = new Date();
     expiresAt.setMinutes(expiresAt.getMinutes() + 5);
@@ -72,19 +95,23 @@ export class UserService {
       );
     }
 
-    // Send OTP via SMS
-    const smsResult = await this.semaphoreService.sendOTP(phone, otp);
+    // Send OTP via SMS (skip for test mode)
+    if (!isTestMode) {
+      const smsResult = await this.semaphoreService.sendOTP(phone, otp);
 
-    if (!smsResult.success) {
-      throw new HttpException(
-        smsResult.message || 'Failed to send OTP',
-        HttpStatus.INTERNAL_SERVER_ERROR
-      );
+      if (!smsResult.success) {
+        throw new HttpException(
+          smsResult.message || 'Failed to send OTP',
+          HttpStatus.INTERNAL_SERVER_ERROR
+        );
+      }
     }
 
     return {
       success: true,
-      message: 'OTP sent successfully',
+      message: isTestMode
+        ? 'OTP sent successfully (Test Mode)'
+        : 'OTP sent successfully',
     };
   }
 
