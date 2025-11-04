@@ -13,6 +13,7 @@ import {
   fetchServiceRequestById,
   ServiceRequest,
 } from '../../../../../lib/api/serviceRequests';
+import { useAuth } from '../../../../../lib/hooks/useAuth';
 
 // Category mapping
 const getCategoryName = (categoryId: number): string => {
@@ -42,6 +43,7 @@ export default function ProviderListingsRequestDetailsView() {
   const router = useRouter();
   const params = useParams();
   const jobId = params.jobId as string;
+  const { user, profile } = useAuth();
   const [status, setStatus] = useState<'pending' | 'accepted' | 'declined'>(
     'pending'
   );
@@ -80,7 +82,6 @@ export default function ProviderListingsRequestDetailsView() {
     fullAddress: '123 Main Street, Barangay Bagtas, Tanza, Cavite',
     estimatedDuration: '2 hours',
     pricing: '₱499',
-    paymentMethods: ['Cash', 'GCash', 'PayMaya'],
     description:
       'Need professional AC cleaning service for 2 split-type units. Units have not been cleaned for 6 months. Looking for thorough cleaning including filters, coils, and drainage.',
     qualifications: [
@@ -122,7 +123,6 @@ export default function ProviderListingsRequestDetailsView() {
         fullAddress: serviceRequest.job_location || fallbackRequest.fullAddress,
         estimatedDuration: fallbackRequest.estimatedDuration,
         pricing: `₱${serviceRequest.rate.toLocaleString()}`,
-        paymentMethods: fallbackRequest.paymentMethods,
         description: serviceRequest.description,
         qualifications: serviceRequest.additional_requirements
           ? serviceRequest.additional_requirements
@@ -180,6 +180,12 @@ export default function ProviderListingsRequestDetailsView() {
     router.push(`/chat/${serviceRequest.client_id}`);
   };
 
+  // Check if the current user is the owner of this listing
+  // Either by matching client_id OR by matching the provider/client name
+  const isOwnListing =
+    user?.id === serviceRequest?.client_id ||
+    profile?.full_name === serviceRequest?.users?.full_name;
+
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-8 max-w-7xl flex justify-center items-center min-h-[400px]">
@@ -201,7 +207,6 @@ export default function ProviderListingsRequestDetailsView() {
             time={request.time}
             location={request.fullAddress}
             pricing={request.pricing}
-            paymentMethods={request.paymentMethods}
           />
           <ProviderListingsQualificationsCard
             qualifications={request.qualifications}
@@ -218,6 +223,7 @@ export default function ProviderListingsRequestDetailsView() {
             status={status}
             onAccept={handleAccept}
             onMessageClient={handleMessageClient}
+            isOwnListing={isOwnListing}
           />
         </div>
       </div>
