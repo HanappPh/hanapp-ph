@@ -1,11 +1,24 @@
-import { Body, Controller, Post, Get, Patch, Param } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  Get,
+  Patch,
+  Param,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
   ApiResponse,
   ApiBody,
   ApiParam,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
+import type { User } from '@supabase/supabase-js';
+
+import { CurrentUser } from '../decorators/current-user.decorator';
+import { AuthGuard, Public } from '../guards/auth.guard';
 
 import {
   SendOtpDto,
@@ -18,13 +31,15 @@ import { UserService } from './user.service';
 
 @ApiTags('User')
 @Controller('user')
+@UseGuards(AuthGuard)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   // ============================================
-  // OTP ENDPOINTS
+  // OTP ENDPOINTS (Public - No Auth Required)
   // ============================================
 
+  @Public()
   @Post('send-otp')
   @ApiOperation({ summary: 'Send OTP verification code to phone' })
   @ApiBody({ type: SendOtpDto })
@@ -43,16 +58,31 @@ export class UserController {
     return this.userService.sendOtp(sendOtpDto.phone);
   }
 
+  @Public()
   @Post('verify-otp')
-  @ApiOperation({ summary: 'Verify OTP code' })
+  @ApiOperation({
+    summary: 'Verify OTP code and return bearer token for existing users',
+  })
   @ApiBody({ type: VerifyOtpDto })
   @ApiResponse({
     status: 200,
-    description: 'OTP verified successfully',
+    description:
+      'OTP verified successfully. Returns bearer token if user exists.',
     schema: {
       example: {
         success: true,
         message: 'OTP verified successfully',
+        userExists: true,
+        user: {
+          id: 'uuid',
+          email: 'user@example.com',
+          phone: '09171234567',
+        },
+        session: {
+          access_token:
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
+          refresh_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+        },
       },
     },
   })
@@ -62,15 +92,18 @@ export class UserController {
   }
 
   // ============================================
-  // AUTHENTICATION ENDPOINTS
+  // AUTHENTICATION ENDPOINTS (Public - No Auth Required)
   // ============================================
 
+  @Public()
   @Post('signup')
-  @ApiOperation({ summary: 'Register a new user account' })
+  @ApiOperation({
+    summary: 'Register a new user account and return bearer token',
+  })
   @ApiBody({ type: SignUpDto })
   @ApiResponse({
     status: 201,
-    description: 'Account created successfully',
+    description: 'Account created successfully with bearer token',
     schema: {
       example: {
         success: true,
@@ -79,6 +112,11 @@ export class UserController {
           id: 'uuid',
           email: 'user@example.com',
           phone: '09171234567',
+        },
+        session: {
+          access_token:
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
+          refresh_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
         },
       },
     },
@@ -91,18 +129,25 @@ export class UserController {
     return this.userService.signUp(signUpDto);
   }
 
+  @Public()
   @Post('login')
-  @ApiOperation({ summary: 'Login with email and password' })
+  @ApiOperation({
+    summary: 'Login with email and password and receive bearer token',
+  })
   @ApiBody({ type: LoginDto })
   @ApiResponse({
     status: 200,
-    description: 'Logged in successfully',
+    description: 'Logged in successfully with bearer token',
     schema: {
       example: {
         success: true,
         message: 'Logged in successfully',
         user: { id: 'uuid', email: 'user@example.com' },
-        session: { access_token: 'jwt_token', refresh_token: 'jwt_token' },
+        session: {
+          access_token:
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
+          refresh_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+        },
       },
     },
   })
@@ -111,8 +156,11 @@ export class UserController {
     return this.userService.login(loginDto);
   }
 
+  @Public()
   @Post('create-session')
-  @ApiOperation({ summary: 'Create session for OTP-verified user' })
+  @ApiOperation({
+    summary: 'Create session for OTP-verified user and return bearer token',
+  })
   @ApiBody({
     schema: {
       type: 'object',
@@ -125,7 +173,19 @@ export class UserController {
   })
   @ApiResponse({
     status: 200,
-    description: 'Session created successfully',
+    description: 'Session created successfully with bearer token',
+    schema: {
+      example: {
+        success: true,
+        message: 'Session created successfully',
+        session: {
+          access_token:
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
+          refresh_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+        },
+        user: { id: 'uuid', email: 'user@example.com' },
+      },
+    },
   })
   async createSession(
     @Body() body: { userId: string; email: string; password: string }
@@ -137,8 +197,9 @@ export class UserController {
     );
   }
 
+  @ApiBearerAuth('JWT-auth')
   @Post('logout')
-  @ApiOperation({ summary: 'Logout current user' })
+  @ApiOperation({ summary: 'Logout current user (requires authentication)' })
   @ApiResponse({
     status: 200,
     description: 'Logged out successfully',
@@ -149,38 +210,53 @@ export class UserController {
       },
     },
   })
-  async logout() {
-    return this.userService.logout();
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - No valid bearer token',
+  })
+  async logout(@CurrentUser() user: User) {
+    return this.userService.logout(user.id);
   }
 
   // ============================================
-  // USER PROFILE ENDPOINTS
+  // USER PROFILE ENDPOINTS (Protected - Auth Required)
   // ============================================
 
+  @ApiBearerAuth('JWT-auth')
   @Get('profile/:userId')
-  @ApiOperation({ summary: 'Get user profile by ID' })
+  @ApiOperation({ summary: 'Get user profile by ID (requires authentication)' })
   @ApiParam({ name: 'userId', description: 'User ID' })
   @ApiResponse({
     status: 200,
     description: 'User profile retrieved',
   })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - No valid bearer token',
+  })
   @ApiResponse({ status: 404, description: 'User not found' })
-  async getProfile(@Param('userId') userId: string) {
-    return this.userService.getProfile(userId);
+  async getProfile(@Param('userId') userId: string, @CurrentUser() user: User) {
+    return this.userService.getProfile(userId, user);
   }
 
+  @ApiBearerAuth('JWT-auth')
   @Patch('profile/:userId')
-  @ApiOperation({ summary: 'Update user profile' })
+  @ApiOperation({ summary: 'Update user profile (requires authentication)' })
   @ApiParam({ name: 'userId', description: 'User ID' })
   @ApiBody({ type: UpdateProfileDto })
   @ApiResponse({
     status: 200,
     description: 'Profile updated successfully',
   })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - No valid bearer token',
+  })
   async updateProfile(
     @Param('userId') userId: string,
-    @Body() updates: UpdateProfileDto
+    @Body() updates: UpdateProfileDto,
+    @CurrentUser() user: User
   ) {
-    return this.userService.updateProfile(userId, updates);
+    return this.userService.updateProfile(userId, updates, user);
   }
 }
