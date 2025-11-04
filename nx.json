@@ -22,9 +22,7 @@
     {
       "plugin": "@nx/js/typescript",
       "options": {
-        "typecheck": {
-          "targetName": "typecheck"
-        },
+        "typecheck": { "targetName": "typecheck" },
         "build": {
           "targetName": "build",
           "configName": "tsconfig.lib.json",
@@ -55,9 +53,7 @@
     },
     {
       "plugin": "@nx/jest/plugin",
-      "options": {
-        "targetName": "test"
-      },
+      "options": { "targetName": "test" },
       "exclude": ["apps/api-e2e/**/*"]
     },
     {
@@ -73,9 +69,7 @@
     },
     {
       "plugin": "@nx/eslint/plugin",
-      "options": {
-        "targetName": "eslint:lint"
-      }
+      "options": { "targetName": "eslint:lint" }
     },
     {
       "plugin": "@nx/react/router-plugin",
@@ -90,40 +84,18 @@
     }
   ],
   "targetDefaults": {
-    "test": {
-      "dependsOn": ["^build"],
-      "options": {
-        "passWithNoTests": true
-      }
-    },
+    "test": { "dependsOn": ["^build"], "options": { "passWithNoTests": true } },
     "typecheck": {
       "dependsOn": [
-        {
-          "target": "build",
-          "projects": "dependencies",
-          "params": "forward"
-        }
+        { "target": "build", "projects": "dependencies", "params": "forward" }
       ]
     },
-    "build": {
-      "dependsOn": ["^build"]
-    }
+    "build": { "dependsOn": ["^build"] }
   },
   "generators": {
-    "@nx/next": {
-      "application": {
-        "style": "tailwind",
-        "linter": "eslint"
-      }
-    },
-    "@nx/react": {
-      "library": {
-        "unitTestRunner": "jest"
-      }
-    }
+    "@nx/next": { "application": { "style": "tailwind", "linter": "eslint" } },
+    "@nx/react": { "library": { "unitTestRunner": "jest" } }
   },
-  "workspaceLayout": {
-    "appsDir": "apps",
-    "libsDir": "libs"
-  }
+  "workspaceLayout": { "appsDir": "apps", "libsDir": "libs" },
+  "nxCloudId": "68c72ce6c719da16ec2128ae"
 }
