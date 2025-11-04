@@ -3,12 +3,14 @@ import { ApiTags, ApiOperation, ApiOkResponse } from '@nestjs/swagger';
 
 import { AppService } from './app.service';
 import { AppDataResponseDto, HealthResponseDto } from './dto/app.dto';
+import { Public } from './guards/auth.guard';
 
 @ApiTags('hanapp')
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
+  @Public()
   @Get()
   @ApiOperation({ summary: 'Get application data' })
   @ApiOkResponse({
@@ -19,6 +21,7 @@ export class AppController {
     return this.appService.getData();
   }
 
+  @Public()
   @Get('health')
   @ApiTags('health')
   @ApiOperation({ summary: 'Health check endpoint' })

@@ -1,4 +1,10 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import {
+  Injectable,
+  HttpException,
+  HttpStatus,
+  ForbiddenException,
+} from '@nestjs/common';
+import { User } from '@supabase/supabase-js';
 
 import { SemaphoreService } from '../services/semaphore.service';
 import { SupabaseService } from '../services/supabase.service';
@@ -147,9 +153,11 @@ export class UserService {
         { email_confirm: true }
       );
 
+      // For existing users, return their information
+      // They should use the login endpoint with their password to get a session token
       return {
         success: true,
-        message: 'OTP verified successfully',
+        message: 'OTP verified successfully. Please login with your password.',
         userExists: true,
         user: existingUser,
       };
@@ -157,7 +165,7 @@ export class UserService {
 
     return {
       success: true,
-      message: 'OTP verified successfully',
+      message: 'OTP verified successfully. Please complete signup.',
       userExists: false,
       user: null,
     };
@@ -254,10 +262,27 @@ export class UserService {
         .eq('id', authData.user.id);
     }
 
+    // Sign in the user to get the session with bearer token
+    const { data: loginData, error: loginError } =
+      await this.supabaseService.auth.signInWithPassword({
+        email: signUpDto.email,
+        password: signUpDto.password,
+      });
+
+    if (loginError) {
+      // User created but login failed, still return success
+      return {
+        success: true,
+        message: 'Account created successfully. Please login.',
+        user: authData.user,
+      };
+    }
+
     return {
       success: true,
       message: 'Account created successfully',
-      user: authData.user,
+      user: loginData.user,
+      session: loginData.session,
     };
   }
 
@@ -279,11 +304,20 @@ export class UserService {
     };
   }
 
-  async logout() {
-    const { error } = await this.supabaseService.auth.signOut();
+  async logout(userId: string) {
+    // Supabase handles session invalidation automatically
+    // We can add additional cleanup here if needed
 
-    if (error) {
-      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    // Optional: Mark any user-specific data as logged out
+    // For example, update last_logout timestamp
+    try {
+      await this.supabaseService
+        .from('users')
+        .update({ updated_at: new Date().toISOString() })
+        .eq('id', userId);
+    } catch (error) {
+      // Log error but don't fail the logout
+      console.error('Error updating user logout timestamp:', error);
     }
 
     return {
@@ -296,7 +330,17 @@ export class UserService {
   // PROFILE MANAGEMENT
   // ============================================
 
-  async getProfile(userId: string) {
+  async getProfile(userId: string, authenticatedUser: User) {
+    // Users can only access their own profile or admins can access any profile
+    if (authenticatedUser.id !== userId) {
+      // Check if user is admin (you can add admin check logic here)
+      const isAdmin = authenticatedUser.user_metadata?.role === 'admin';
+
+      if (!isAdmin) {
+        throw new ForbiddenException('You can only access your own profile');
+      }
+    }
+
     const { data, error } = await this.supabaseService
       .from('users')
       .select('*')
@@ -313,7 +357,21 @@ export class UserService {
     return data;
   }
 
-  async updateProfile(userId: string, updates: UpdateProfileDto) {
+  async updateProfile(
+    userId: string,
+    updates: UpdateProfileDto,
+    authenticatedUser: User
+  ) {
+    // Users can only update their own profile or admins can update any profile
+    if (authenticatedUser.id !== userId) {
+      // Check if user is admin (you can add admin check logic here)
+      const isAdmin = authenticatedUser.user_metadata?.role === 'admin';
+
+      if (!isAdmin) {
+        throw new ForbiddenException('You can only update your own profile');
+      }
+    }
+
     const { data, error } = await this.supabaseService
       .from('users')
       .update(updates)
