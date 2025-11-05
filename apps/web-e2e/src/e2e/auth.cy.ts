@@ -5,10 +5,6 @@
  * Tests the OTP login flow using test credentials
  */
 describe('Authentication Flow', () => {
-  beforeEach(() => {
-    cy.visit('/');
-  });
-
   it('should login successfully with test OTP', () => {
     // Get test credentials from environment variables
     const testPhone = Cypress.env('TEST_PHONE_NUMBER');
@@ -17,9 +13,9 @@ describe('Authentication Flow', () => {
     cy.log('Test Phone:', testPhone);
     cy.log('Test OTP:', testOtp);
 
-    // Navigate to login page
-    cy.contains('Login').click();
-    cy.url().should('include', '/login');
+    // Navigate directly to login page (since app uses middleware-based auth)
+    cy.visit('/auth/signin');
+    cy.url().should('include', '/auth/signin');
 
     // Enter phone number
     cy.get('input[type="tel"]').type(testPhone);
@@ -42,7 +38,8 @@ describe('Authentication Flow', () => {
   it('should show error for invalid OTP', () => {
     const testPhone = Cypress.env('TEST_PHONE_NUMBER');
 
-    cy.contains('Login').click();
+    // Navigate directly to login page
+    cy.visit('/auth/signin');
     cy.get('input[type="tel"]').type(testPhone);
     cy.contains('button', 'Send OTP').click();
 
@@ -58,8 +55,9 @@ describe('Authentication Flow', () => {
     const testPhone = Cypress.env('TEST_PHONE_NUMBER');
     const testOtp = Cypress.env('TEST_OTP');
 
-    cy.contains('Sign Up').click();
-    cy.url().should('include', '/signup');
+    // Navigate directly to signup page (mode=signup query parameter)
+    cy.visit('/auth/signin?mode=signup');
+    cy.url().should('include', '/auth/signin');
 
     // Fill in signup form
     cy.get('input[name="fullName"]').type('Test User');
@@ -77,7 +75,7 @@ describe('Authentication Flow', () => {
     cy.get('input[placeholder*="OTP"]').type(testOtp);
     cy.contains('button', 'Sign Up').click();
 
-    // Should be logged in after signup
-    cy.url().should('not.include', '/signup');
+    // Should be logged in after signup and redirected away from signin page
+    cy.url().should('not.include', '/auth/signin');
   });
 });
