@@ -124,21 +124,36 @@ describe('UserService', () => {
 
   describe('logout', () => {
     it('should successfully log out user', async () => {
-      mockSupabaseService.auth.signOut.mockResolvedValue({ error: null });
+      // Mock the users table update chain used in logout
+      mockSupabaseService.from.mockReturnValue({
+        update: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockResolvedValue({ data: null, error: null }),
+      });
 
-      const result = await service.logout();
+      const result = await service.logout('1');
       expect(result.success).toBe(true);
       expect(result.message).toBe('Logged out successfully');
     });
 
-    it('should throw error if logout fails', async () => {
-      mockSupabaseService.auth.signOut.mockResolvedValue({
-        error: { message: 'Logout failed' },
+    it('should still return success even if update fails', async () => {
+      // Make the update chain throw to simulate internal failure; logout should catch it
+      mockSupabaseService.from.mockImplementation(() => {
+        return {
+          update: jest.fn(() => {
+            throw new Error('update failure');
+          }),
+        } as any;
       });
 
-      await expect(service.logout()).rejects.toThrow(
-        new HttpException('Logout failed', HttpStatus.BAD_REQUEST)
-      );
+      // Spy on console.error to assert the error was logged (optional)
+      const spy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+      const result = await service.logout('1');
+      expect(result.success).toBe(true);
+      expect(result.message).toBe('Logged out successfully');
+
+      expect(spy).toHaveBeenCalled();
+      spy.mockRestore();
     });
   });
 
@@ -186,6 +201,12 @@ describe('UserService', () => {
 
       mockSupabaseService.auth.signUp.mockResolvedValue({
         data: { user: mockUser },
+        error: null,
+      });
+
+      // Ensure subsequent signIn after signup succeeds so service returns the logged in user
+      mockSupabaseService.auth.signInWithPassword.mockResolvedValue({
+        data: { user: mockUser, session: {} },
         error: null,
       });
 
@@ -252,7 +273,8 @@ describe('UserService', () => {
         single: jest.fn().mockResolvedValue({ data: mockProfile, error: null }),
       });
 
-      const result = await service.getProfile('1');
+      const mockAuthUser = { id: '1', user_metadata: {} } as any;
+      const result = await service.getProfile('1', mockAuthUser);
       expect(result).toEqual(mockProfile);
     });
 
@@ -265,7 +287,8 @@ describe('UserService', () => {
           .mockResolvedValue({ data: null, error: { message: 'Not found' } }),
       });
 
-      await expect(service.getProfile('1')).rejects.toThrow(
+      const mockAuthUser = { id: '1', user_metadata: {} } as any;
+      await expect(service.getProfile('1', mockAuthUser)).rejects.toThrow(
         new HttpException('Failed to fetch user profile', HttpStatus.NOT_FOUND)
       );
     });
@@ -294,7 +317,8 @@ describe('UserService', () => {
           .mockResolvedValue({ data: mockUpdatedProfile, error: null }),
       });
 
-      const result = await service.updateProfile('1', updateDto);
+      const mockAuthUser = { id: '1', user_metadata: {} } as any;
+      const result = await service.updateProfile('1', updateDto, mockAuthUser);
 
       expect(result.success).toBe(true);
       expect(result.message).toBe('Profile updated successfully');
@@ -315,7 +339,10 @@ describe('UserService', () => {
         }),
       });
 
-      await expect(service.updateProfile('1', updateDto)).rejects.toThrow(
+      const mockAuthUser = { id: '1', user_metadata: {} } as any;
+      await expect(
+        service.updateProfile('1', updateDto, mockAuthUser)
+      ).rejects.toThrow(
         new HttpException('Failed to update profile', HttpStatus.BAD_REQUEST)
       );
     });
