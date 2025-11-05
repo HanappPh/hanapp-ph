@@ -158,26 +158,50 @@ CREATE POLICY "Clients can create reviews for their bookings"
   ON public.reviews FOR INSERT 
   WITH CHECK (auth.uid() = client_id);
 
--- Messages table (for chat functionality)
+-- Messages table (simple chat functionality)
 CREATE TABLE public.messages (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  sender_id UUID REFERENCES public.users(id),
-  receiver_id UUID REFERENCES public.users(id),
-  booking_id UUID REFERENCES public.bookings(id),
+  sender_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
+  receiver_id UUID REFERENCES public.users(id) ON DELETE CASCADE,
   content TEXT NOT NULL,
-  is_read BOOLEAN DEFAULT false,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- Enable Row Level Security
 ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Users can view their own messages" 
-  ON public.messages FOR SELECT 
-  USING (auth.uid() = sender_id OR auth.uid() = receiver_id);
+-- RLS Policies (simple - users can view and send messages)
+-- Using DO block to create policies only if they don't exist
+DO $$ 
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'messages' 
+    AND policyname = 'Users can view their own messages'
+  ) THEN
+    CREATE POLICY "Users can view their own messages" 
+      ON public.messages FOR SELECT 
+      USING (auth.uid() = sender_id OR auth.uid() = receiver_id);
+  END IF;
 
-CREATE POLICY "Users can send messages" 
-  ON public.messages FOR INSERT 
-  WITH CHECK (auth.uid() = sender_id);
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'messages' 
+    AND policyname = 'Users can send messages'
+  ) THEN
+    CREATE POLICY "Users can send messages" 
+      ON public.messages FOR INSERT 
+      WITH CHECK (auth.uid() = sender_id);
+  END IF;
+END $$;
+
+-- Indexes for better performance
+CREATE INDEX idx_messages_sender_id ON public.messages(sender_id);
+CREATE INDEX idx_messages_receiver_id ON public.messages(receiver_id);
+CREATE INDEX idx_messages_created_at ON public.messages(created_at DESC);
+
+-- Enable Realtime for messages table
+ALTER PUBLICATION supabase_realtime ADD TABLE messages;
 
 -- Function to update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -233,3 +257,87 @@ BEGIN
   WHERE expires_at < NOW() - INTERVAL '1 day';
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Service Requests table
+CREATE TABLE public.service_requests (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  client_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  category_id INTEGER NOT NULL CHECK (category_id IN (1, 2, 3, 4)), -- 1=Cleaning, 2=Tutoring, 3=Repair, 4=Delivery
+  title TEXT NOT NULL,
+  description TEXT NOT NULL,
+  additional_requirements TEXT,
+  rate DECIMAL(10, 2) NOT NULL,
+  contact TEXT NOT NULL,
+  contact_link TEXT,
+  job_location TEXT NOT NULL,
+  date DATE NOT NULL,
+  time TIME NOT NULL,
+  time_2 TIME,
+  images TEXT[],
+  status TEXT CHECK (status IN ('pending', 'approved', 'rejected', 'cancelled')) DEFAULT 'pending',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Enable RLS
+ALTER TABLE public.service_requests ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policies
+CREATE POLICY "Users can view their own service requests"
+  ON public.service_requests FOR SELECT
+  USING (auth.uid() = client_id);
+
+CREATE POLICY "Users can create their own service requests"
+  ON public.service_requests FOR INSERT
+  WITH CHECK (auth.uid() = client_id);
+
+CREATE POLICY "Users can update their own service requests"
+  ON public.service_requests FOR UPDATE
+  USING (auth.uid() = client_id);
+
+CREATE POLICY "Users can delete their own service requests"
+  ON public.service_requests FOR DELETE
+  USING (auth.uid() = client_id);
+
+-- Indexes
+CREATE INDEX idx_service_requests_client_id ON public.service_requests(client_id);
+CREATE INDEX idx_service_requests_category_id ON public.service_requests(category_id);
+CREATE INDEX idx_service_requests_status ON public.service_requests(status);
+CREATE INDEX idx_service_requests_created_at ON public.service_requests(created_at DESC);
+
+-- Trigger for updated_at
+CREATE TRIGGER update_service_requests_updated_at
+  BEFORE UPDATE ON public.service_requests
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at_column();
+
+-- Storage bucket for service request images
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('service-images', 'service-images', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- Storage policies for service-images bucket
+CREATE POLICY "Anyone can view service images"
+  ON storage.objects FOR SELECT
+  USING (bucket_id = 'service-images');
+
+CREATE POLICY "Authenticated users can upload service images"
+  ON storage.objects FOR INSERT
+  WITH CHECK (
+    bucket_id = 'service-images' AND
+    auth.role() = 'authenticated'
+  );
+
+CREATE POLICY "Users can update their own service images"
+  ON storage.objects FOR UPDATE
+  USING (
+    bucket_id = 'service-images' AND
+    auth.uid()::text = (storage.foldername(name))[1]
+  );
+
+CREATE POLICY "Users can delete their own service images"
+  ON storage.objects FOR DELETE
+  USING (
+    bucket_id = 'service-images' AND
+    auth.uid()::text = (storage.foldername(name))[1]
+  );

@@ -6,6 +6,7 @@ import {
   DollarSign,
   Shield,
   CreditCard,
+  LogOut,
 } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -38,8 +39,9 @@ export function Sidebar({
   const [selected, setSelected] = React.useState<'Provider' | 'Client'>(
     initialSelected ?? 'Client'
   );
+  const [isLoggingOut, setIsLoggingOut] = React.useState(false);
   const router = useRouter();
-  const { switchRole, activeRole } = useAuth();
+  const { switchRole, activeRole, signOut } = useAuth();
 
   // Sync local state with prop changes (when user navigates back to profile)
   React.useEffect(() => {
@@ -63,6 +65,27 @@ export function Sidebar({
         router.push('/profile');
       }
     }, 0);
+  };
+
+  const handleLogout = async () => {
+    if (isLoggingOut) {
+      return;
+    }
+
+    setIsLoggingOut(true);
+    try {
+      const { error } = await signOut();
+      if (error) {
+        console.error('Logout error:', error);
+        alert('Failed to logout. Please try again.');
+        setIsLoggingOut(false);
+      }
+      // signOut handles redirect to home page
+    } catch (err) {
+      console.error('Logout error:', err);
+      alert('Failed to logout. Please try again.');
+      setIsLoggingOut(false);
+    }
   };
 
   const displayName = profile?.full_name || 'User';
@@ -210,6 +233,19 @@ export function Sidebar({
             Payment Settings
           </Button>
         </nav>
+      </div>
+
+      {/* Logout Section */}
+      <div className="pt-4 border-t border-gray-200">
+        <Button
+          variant="ghost"
+          className="flex items-center gap-3 w-full justify-start text-red-600 pl-2 rounded-md hover:bg-red-50"
+          onClick={handleLogout}
+          disabled={isLoggingOut}
+        >
+          <LogOut className="w-5 h-5" />
+          {isLoggingOut ? 'Logging out...' : 'Logout'}
+        </Button>
       </div>
     </aside>
   );

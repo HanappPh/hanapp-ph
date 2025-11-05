@@ -3,10 +3,16 @@
  * This is only a minimal backend to get started.
  */
 
-// Load environment variables before any other imports
-require('dotenv').config({
-  path: require('path').resolve(__dirname, '../.env'),
-});
+/* eslint-disable @typescript-eslint/no-var-requires, import/order, import/first */
+// Load environment variables before anything else
+const dotenv = require('dotenv');
+const path = require('path');
+
+// When running from dist folder (npm start), go up one level to find .env
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
+// Also try from process.cwd() for nx serve
+dotenv.config({ path: path.resolve(process.cwd(), 'apps/api/.env') });
+/* eslint-enable @typescript-eslint/no-var-requires, import/order, import/first */
 
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
@@ -33,7 +39,7 @@ async function bootstrap() {
     origin: ['http://localhost:3000', 'http://localhost:4200'], // Add your frontend URLs
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-user-id'],
   });
 
   const config = new DocumentBuilder()
