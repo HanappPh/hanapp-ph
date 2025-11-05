@@ -5,22 +5,37 @@ import React from 'react';
 interface ActionButtonsProps {
   status: 'pending' | 'accepted' | 'declined';
   onAccept: () => void;
+  onMessageClient?: () => void;
 }
 
 export const ProviderListingsActionButtons: React.FC<ActionButtonsProps> = ({
   status,
   onAccept,
+  onMessageClient,
 }) => {
   if (status === 'pending') {
     return (
-      <Button
-        onClick={onAccept}
-        className="w-full text-black font-semibold hover:opacity-90"
-        size="lg"
-        style={{ backgroundColor: '#F5C45E' }}
-      >
-        Apply Now
-      </Button>
+      <div className="space-y-3">
+        <Button
+          onClick={onAccept}
+          className="w-full text-black font-semibold hover:opacity-90"
+          size="lg"
+          style={{ backgroundColor: '#F5C45E' }}
+        >
+          Apply Now
+        </Button>
+        {onMessageClient && (
+          <Button
+            onClick={onMessageClient}
+            variant="outline"
+            className="w-full"
+            size="lg"
+          >
+            <MessageSquare className="h-5 w-5 mr-2" />
+            Message Client
+          </Button>
+        )}
+      </div>
     );
   }
 

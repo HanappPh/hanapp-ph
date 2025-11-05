@@ -77,3 +77,7 @@ test-output
 !.env.example
 !.env.template
 !*.env.template
+
+# Cypress environment files (contains test credentials)
+**/cypress.env.json
+cypress.env.json
