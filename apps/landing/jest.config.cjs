@@ -10,9 +10,6 @@ const config = {
   transform: {
     '^(?!.*\\.(js|jsx|ts|tsx|css|json)$)': '@nx/react/plugins/jest',
   },
-  moduleNameMapper: {
-    '^gsap$': '<rootDir>/__mocks__/gsap.js',
-  },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
   coverageDirectory: '../../coverage/apps/landing',
   testEnvironment: 'jsdom',
