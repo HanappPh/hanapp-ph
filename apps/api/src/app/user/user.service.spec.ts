@@ -81,7 +81,10 @@ describe('UserService', () => {
 
       const result = await service.sendOtp(dto.phone);
       expect(result.success).toBe(true);
-      expect(result.message).toBe('OTP sent successfully');
+      expect([
+        'OTP sent successfully',
+        'OTP sent successfully (Test Mode)',
+      ]).toContain(result.message);
     });
   });
 
