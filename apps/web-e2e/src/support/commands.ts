@@ -15,16 +15,26 @@ declare global {
   namespace Cypress {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     interface Chainable<Subject> {
-      login(email: string, password: string): void;
+      login(testPhone: string, testOtp: string): void;
     }
   }
 }
 
 // -- This is a parent command --
-Cypress.Commands.add('login', (email, password) => {
-  // Custom login implementation would go here
-  // For now, this is a placeholder for future authentication flows
-  cy.log(`Login attempt for user: ${email}`);
+Cypress.Commands.add('login', (testPhone, testOtp) => {
+  cy.viewport(1280, 800);
+  cy.visit('/auth/signin');
+  cy.url().should('include', '/auth/signin');
+
+  cy.get('input[type="tel"]').type(testPhone);
+  cy.contains('button', 'Send OTP').click();
+
+  cy.get('input[aria-label^="Digit"]', { timeout: 20000 })
+    .should('have.length', 6)
+    .each(($el, index) => {
+      cy.wrap($el).type(testOtp[index]);
+    });
+  cy.contains('button', 'Verify & Continue').click();
 });
 //
 // -- This is a child command --
