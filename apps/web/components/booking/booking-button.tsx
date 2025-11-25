@@ -14,6 +14,7 @@ import { useState } from 'react';
 
 import { useAuth } from '../../lib/hooks/useAuth';
 
+import ReviewModal from './review-modal';
 interface BookingActionButtonProps {
   status: string;
   bookingId: number;
@@ -29,7 +30,50 @@ export default function BookingActionButton({
 }: BookingActionButtonProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isReviewOpen, setIsReviewOpen] = useState(false);
   const { session } = useAuth();
+
+  const handleSubmitReview = async (review: {
+    rating: number;
+    comment: string;
+  }) => {
+    if (!session?.access_token) {
+      console.error('No access token available');
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/reviews`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({
+            booking_id: bookingId,
+            rating: review.rating,
+            comment: review.comment,
+          }),
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        console.error(result);
+        alert('Failed to submit review');
+        return;
+      }
+
+      console.log('Review submitted successfully:', result);
+      alert('Thank you for your review!');
+    } catch (error) {
+      console.error('Error submitting review:', error);
+      alert('Something went wrong. Please try again.');
+    }
+  };
 
   const handleDelete = async () => {
     if (!session?.access_token) {
@@ -165,9 +209,15 @@ export default function BookingActionButton({
           <Button
             size="sm"
             className="bg-hanapp-accent hover:bg-yellow-500 text-hanapp-secondary"
+            onClick={() => setIsReviewOpen(true)}
           >
             Rate Service
           </Button>
+          <ReviewModal
+            isOpen={isReviewOpen}
+            onClose={() => setIsReviewOpen(false)}
+            onSubmit={handleSubmitReview}
+          />
           <Button
             size="sm"
             variant="outline"
