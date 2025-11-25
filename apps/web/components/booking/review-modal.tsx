@@ -41,7 +41,11 @@ export default function ReviewModal({
         <div className="flex items-center justify-between border-b border-border px-6 py-4">
           <h2 className="text-xl font-semibold">Rate Service</h2>
           <button
-            onClick={onClose}
+            onClick={() => {
+              onClose();
+              setRating(0);
+              setComment('');
+            }}
             className="text-muted-foreground hover:text-foreground"
           >
             <X className="h-5 w-5" />
@@ -91,7 +95,15 @@ export default function ReviewModal({
 
         {/* Footer */}
         <div className="flex gap-3 px-6 pb-6">
-          <Button variant="outline" onClick={onClose} className="flex-1">
+          <Button
+            variant="outline"
+            onClick={() => {
+              onClose();
+              setRating(0);
+              setComment('');
+            }}
+            className="flex-1"
+          >
             Cancel
           </Button>
           <Button
