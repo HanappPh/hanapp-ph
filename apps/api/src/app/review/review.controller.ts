@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Post,
   Patch,
   Param,
@@ -83,5 +84,31 @@ export class ReviewsController {
     @CurrentUser() user: User
   ) {
     return this.reviewsService.deleteReview(reviewId, user.id);
+  }
+
+  // ===============================
+  // GET REVIEWS BY SERVICE ID
+  // ===============================
+  @Get('service/:serviceId')
+  @ApiOperation({ summary: 'Get reviews by service ID (public)' })
+  @ApiResponse({
+    status: 200,
+    description: 'Reviews retrieved successfully',
+  })
+  async getReviewsByServiceId(@Param('serviceId') serviceId: string) {
+    return this.reviewsService.getReviewsByServiceId(serviceId);
+  }
+
+  // ===============================
+  // GET REVIEWS BY PROVIDER ID
+  // ===============================
+  @Get('provider/:providerId') // temp route
+  @ApiOperation({ summary: 'Get reviews by provider ID (public)' })
+  @ApiResponse({
+    status: 200,
+    description: 'Reviews retrieved successfully',
+  })
+  async getReviewsByProviderId(@Param('providerId') providerId: string) {
+    return this.reviewsService.getReviewsByServiceId(providerId);
   }
 }

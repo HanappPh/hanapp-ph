@@ -149,4 +149,48 @@ export class ReviewsService {
       message: 'Review deleted successfully',
     };
   }
+
+  // ======================================
+  // GET REVIEWS BY SERVICE ID
+  // ======================================
+  async getReviewsByServiceId(serviceId: string) {
+    const { data, error } = await this.supabaseService
+      .from('reviews')
+      .select('*')
+      .eq('service_id', serviceId)
+      .order('created_at', { ascending: false }); // newest first
+
+    if (error) {
+      throw new HttpException(
+        `Failed to fetch reviews: ${error.message}`,
+        HttpStatus.BAD_REQUEST
+      );
+    }
+    return {
+      success: true,
+      reviews: data,
+    };
+  }
+
+  // ======================================
+  // GET REVIEWS BY PROVIDER ID
+  // ======================================
+  async getReviewsByProviderId(providerId: string) {
+    const { data, error } = await this.supabaseService
+      .from('reviews')
+      .select('*')
+      .eq('provider_id', providerId)
+      .order('created_at', { ascending: false }); // newest first
+
+    if (error) {
+      throw new HttpException(
+        `Failed to fetch reviews: ${error.message}`,
+        HttpStatus.BAD_REQUEST
+      );
+    }
+    return {
+      success: true,
+      reviews: data,
+    };
+  }
 }
