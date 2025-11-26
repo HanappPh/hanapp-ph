@@ -12,6 +12,8 @@ import {
 import { X, MapPin, Upload, ImageIcon } from 'lucide-react';
 import React, { useState, useRef, useCallback } from 'react';
 
+import { Availability } from '../../app/(protected)/provider/jobs/create/page';
+
 import { AvailabilityForm } from './post-availability';
 import { ContactInfoForm } from './post-contact';
 
@@ -113,7 +115,7 @@ export function CreateListingForm(props?: { onListingChange?: Function }) {
   );
 
   const handleAvailabilityChange = useCallback(
-    (avail: Record<string, boolean>) => {
+    (avail: Availability) => {
       updateParent({ availability: avail });
     },
     [updateParent]
@@ -193,7 +195,7 @@ export function CreateListingForm(props?: { onListingChange?: Function }) {
                 setDescription(e.target.value);
                 updateParent({ description: e.target.value });
               }}
-              placeholder="Describe the service you need in detail"
+              placeholder="Describe the service you are offering in detail"
               className="w-full font-light resize-none text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
               style={
                 {

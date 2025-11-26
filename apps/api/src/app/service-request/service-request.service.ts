@@ -159,12 +159,12 @@ export class ServiceRequestService {
   async remove(id: string) {
     const supabase = this.supabaseService.getClient();
 
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('service_requests')
       .delete()
       .eq('id', id);
 
-    if (error) {
+    if (error || !data) {
       throw new HttpException(
         'Service request not found',
         HttpStatus.NOT_FOUND

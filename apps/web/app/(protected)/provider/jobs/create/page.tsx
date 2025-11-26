@@ -2,12 +2,39 @@
 
 import { Button, Checkbox } from '@hanapp-ph/commons';
 import { Plus } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 import { ServiceCard } from '../../../../../components/post-job-listing/post-service-card';
 import { CreateListingForm } from '../../../../../components/post-job-listing/post-service-create';
 import { ServiceForm } from '../../../../../components/post-job-listing/post-service-form';
+
+interface DayAvailability {
+  available: boolean;
+  start: string; // e.g. "08:00"
+  end: string; // e.g. "17:00"
+}
+
+export interface Availability {
+  date_range_start?: string;
+  date_range_end?: string;
+  monday: DayAvailability;
+  tuesday: DayAvailability;
+  wednesday: DayAvailability;
+  thursday: DayAvailability;
+  friday: DayAvailability;
+  saturday: DayAvailability;
+  sunday: DayAvailability;
+}
+
+interface Listing {
+  service_title: string;
+  category: string;
+  description: string;
+  contact_number: string;
+  availability: Availability;
+  images: File[];
+  locations: string[];
+}
 
 interface ServiceType {
   service_name: string;
@@ -24,8 +51,24 @@ function App() {
   const [services, setServices] = useState<ServiceType[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  // const [listingData, setListingData] = useState<Record<string, unknown>>({});
-  const router = useRouter();
+  const [listingData, setListingData] = useState<Listing>({
+    service_title: '',
+    category: '',
+    description: '',
+    contact_number: '',
+    availability: {
+      monday: { available: false, start: '08:00', end: '17:00' },
+      tuesday: { available: false, start: '08:00', end: '17:00' },
+      wednesday: { available: false, start: '08:00', end: '17:00' },
+      thursday: { available: false, start: '08:00', end: '17:00' },
+      friday: { available: false, start: '08:00', end: '17:00' },
+      saturday: { available: false, start: '08:00', end: '17:00' },
+      sunday: { available: false, start: '08:00', end: '17:00' },
+    },
+    images: [] as File[],
+    locations: [] as string[],
+  });
+  // const router = useRouter();
 
   const handleAddService = (service: ServiceType) => {
     if (editingIndex !== null) {
@@ -57,34 +100,100 @@ function App() {
     setEditingIndex(null);
   };
 
-  const handlePostAll = () => {
-    // if (
-    //   !listingData.service_title ||
-    //   !listingData.category ||
-    //   !listingData.description
-    // ) {
-    //   alert('Please fill in all required listing information');
-    //   return;
-    // }
+  const handleListingChange = (updatedData: Partial<Listing>) => {
+    setListingData(prevData => ({ ...prevData, ...updatedData }));
+  };
 
-    // if (!listingData.contact_number) {
-    //   alert('Please fill in contact information');
-    //   return;
-    // }
+  const handlePostListing = async (listingData: Listing) => {
+    if (
+      !listingData.service_title ||
+      !listingData.category ||
+      !listingData.description
+    ) {
+      throw new Error('Please fill in all required listing information');
+    }
 
-    // if (!listingData.availability) {
-    //   alert('Please fill in availability information');
-    //   return;
-    // }
+    if (!listingData.contact_number) {
+      throw new Error('Please fill in contact information');
+    }
+
+    if (!listingData.availability) {
+      throw new Error('Please fill in availability information');
+    }
 
     // if (services.length === 0) {
-    //   alert('Please add at least one service');
-    //   return;
+    //   throw new Error('Please add at least one service');
     // }
 
+    try {
+      const response = await fetch('/api/service', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(listingData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create service listing');
+      }
+
+      const createdListing = await response.json();
+      return createdListing;
+    } catch (error) {
+      console.error('Error creating listing:', error);
+      alert('There was an error creating your listing. Please try again.');
+      throw error;
+    }
     // setServices([]);
-    // setListingData({});
-    router.push('/');
+  };
+
+  const handlePostServices = async (
+    listingId: string,
+    services: ServiceType[]
+  ) => {
+    if (services.length === 0 || !Array.isArray(services)) {
+      throw new Error('Please add at least one service');
+    }
+    if (!listingId) {
+      throw new Error('Invalid listing ID');
+    }
+    try {
+      for (const service of services) {
+        const response = await fetch('/api/service/services', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ ...service, listing_id: listingId }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to create service');
+        }
+      }
+    } catch (error) {
+      console.error('Error creating services:', error);
+      alert('There was an error creating your services. Please try again.');
+      throw error;
+    }
+  };
+
+  const handlePost = async () => {
+    try {
+      if (viewMode === 'listing') {
+        await handlePostListing(listingData); // assuming you have listingData state
+      } else if (viewMode === 'services') {
+        await handlePostServices('1', services); // or the real listing id once available
+      }
+    } catch (error: unknown) {
+      // Narrow error type to Error to safely access message
+      if (error instanceof Error) {
+        alert(error.message);
+      } else {
+        alert('Failed to post');
+      }
+    }
   };
 
   return (
@@ -126,8 +235,7 @@ function App() {
 
         <div className="max-w-4xl mx-auto">
           {viewMode === 'listing' ? (
-            // <CreateListingForm onListingChange={setListingData} />
-            <CreateListingForm />
+            <CreateListingForm onListingChange={handleListingChange} />
           ) : (
             <div className="space-y-6">
               <div>
@@ -198,11 +306,9 @@ function App() {
           </div>
 
           <Button
-            onClick={handlePostAll}
-            className="w-full text-white py-3 text-lg font-medium border-0"
-            style={{
-              background: 'linear-gradient(to bottom, #FFDD8E, #F5C45E)',
-            }}
+            onClick={handlePost}
+            className="w-full text-white py-3 text-lg font-medium border-0 bg-gradient-to-b from-[#FFDD8E] to-[#F5C45E] hover:bg-gradient-to-b hover:from-yellow-400 hover:to-yellow-600
+             transition-colors"
           >
             Post
           </Button>
