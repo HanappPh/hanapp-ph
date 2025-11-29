@@ -46,6 +46,7 @@ interface ServiceType {
   rate_type: string;
   is_addon: boolean;
   images?: string[];
+  isNew?: boolean;
 }
 
 export default function CreateServicePage() {
@@ -87,7 +88,7 @@ export default function CreateServicePage() {
       setServices(updatedServices);
       setEditingIndex(null);
     } else {
-      setServices([...services, service]);
+      setServices([...services, { ...service, isNew: true }]);
     }
     setShowForm(false);
   };
@@ -197,8 +198,18 @@ export default function CreateServicePage() {
     if (!listingId) {
       throw new Error('Invalid listing ID');
     }
+
+    const newServices = services.filter(service => service.isNew);
+    if (newServices.length === 0) {
+      throw new Error('No new services to add');
+    }
+
     try {
       for (const service of services) {
+        if (!service.isNew) {
+          continue;
+        }
+
         const payload = {
           title: service.service_name,
           description: service.description,
@@ -228,8 +239,9 @@ export default function CreateServicePage() {
           throw new Error('Failed to create service');
         }
 
-        setServiceDialogOpen(true);
+        service.isNew = false;
       }
+      setServiceDialogOpen(true);
     } catch (error) {
       console.error('Error creating services:', error);
       alert('There was an error creating your services. Please try again.');
