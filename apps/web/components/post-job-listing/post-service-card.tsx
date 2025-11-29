@@ -7,7 +7,6 @@ interface ServiceType {
   description: string;
   rate: number;
   rate_type: string;
-  category: string;
   is_addon: boolean;
   images?: string[];
 }
