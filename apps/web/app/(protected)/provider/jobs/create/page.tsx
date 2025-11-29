@@ -32,7 +32,7 @@ interface Listing {
   service_title: string;
   category: string;
   description: string;
-  contact_number: string;
+  // contact_number: string;
   availability: Availability;
   images: string[];
   locations: string[];
@@ -48,19 +48,21 @@ interface ServiceType {
   images?: string[];
 }
 
-function App() {
+export default function CreateServicePage() {
   const [viewMode, setViewMode] = useState('listing');
   const [services, setServices] = useState<ServiceType[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [resetTrigger, setResetTrigger] = useState(0);
+  const [listingId, setListingId] = useState<string | null>(null);
+  // for resetting the form (unused for now)
+  // const [resetTrigger, setResetTrigger] = useState(0);
   const [listingData, setListingData] = useState<Listing>({
     service_title: '',
     category: '',
     description: '',
-    contact_number: '',
+    // contact_number: '',
     availability: {
       monday: { available: false, start: '08:00', end: '17:00' },
       tuesday: { available: false, start: '08:00', end: '17:00' },
@@ -111,7 +113,10 @@ function App() {
     setListingData(prevData => ({ ...prevData, ...updatedData }));
   };
 
-  const handlePostListing = async (listingData: Listing) => {
+  const handlePostListing = async (
+    listingData: Listing,
+    accessToken: string
+  ) => {
     if (
       !listingData.service_title ||
       !listingData.category ||
@@ -120,9 +125,9 @@ function App() {
       throw new Error('Please fill in all required listing information');
     }
 
-    if (!listingData.contact_number) {
-      throw new Error('Please fill in contact information');
-    }
+    // if (!listingData.contact_number) {
+    //   throw new Error('Please fill in contact information');
+    // }
 
     if (!listingData.availability) {
       throw new Error('Please fill in availability information');
@@ -130,17 +135,6 @@ function App() {
 
     if (!listingData.locations || listingData.locations.length === 0) {
       throw new Error('Please add at least one service location');
-    }
-
-    // get auth session
-    const {
-      data: { session },
-    } = await (
-      await import('../../../../../lib/supabase/client')
-    ).supabase.auth.getSession();
-
-    if (!session?.access_token) {
-      throw new Error('No valid session found');
     }
 
     if (!user?.id) {
@@ -151,7 +145,7 @@ function App() {
 
     const payload = {
       providerId: user.id, // must exist
-      categoryId: '6e51140f-6299-49f3-b7a3-a6d034398cff', // must be a UUID
+      categoryId: '6e51140f-6299-49f3-b7a3-a6d034398cff', // hardcoded for now
       title: listingData.service_title,
       description: listingData.description,
       availabilitySchedule: JSON.stringify(listingData.availability),
@@ -168,7 +162,7 @@ function App() {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${session.access_token}`,
+            Authorization: `Bearer ${accessToken}`,
           },
           body: JSON.stringify(payload),
         }
@@ -182,19 +176,19 @@ function App() {
 
       const createdListing = await response.json();
       setDialogOpen(true);
-      setResetTrigger(prev => prev + 1);
+      setListingId(createdListing.id);
+      // setResetTrigger(prev => prev + 1);
       return createdListing;
     } catch (error) {
       console.error('Error creating listing:', error);
       alert('There was an error creating your listing. Please try again.');
       throw error;
     }
-    // setServices([]);
   };
 
   const handlePostServices = async (
-    listingId: string,
-    services: ServiceType[]
+    services: ServiceType[],
+    accessToken: string
   ) => {
     if (services.length === 0 || !Array.isArray(services)) {
       throw new Error('Please add at least one service');
@@ -204,15 +198,32 @@ function App() {
     }
     try {
       for (const service of services) {
-        const response = await fetch('/api/service/services', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ ...service, listing_id: listingId }),
-        });
+        const payload = {
+          title: service.service_name,
+          description: service.description,
+          rate: Number(service.rate),
+          charge: service.rate_type,
+          isAddon: service.is_addon,
+          listingId,
+        };
+
+        console.log('Service payload to submit:', payload);
+
+        const response = await fetch(
+          `${env.NEXT_PUBLIC_API_URL}/api/services`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${accessToken}`,
+            },
+            body: JSON.stringify(payload),
+          }
+        );
 
         if (!response.ok) {
+          const errorText = await response.text();
+          console.error('Error response:', errorText);
           throw new Error('Failed to create service');
         }
       }
@@ -224,11 +235,22 @@ function App() {
   };
 
   const handlePost = async () => {
+    const {
+      data: { session },
+    } = await (
+      await import('../../../../../lib/supabase/client')
+    ).supabase.auth.getSession();
+
+    if (!session?.access_token) {
+      alert('No valid session found.');
+      return;
+    }
+    console.log('auth uid:', session.user.id);
     try {
       if (viewMode === 'listing') {
-        await handlePostListing(listingData); // assuming you have listingData state
+        await handlePostListing(listingData, session.access_token);
       } else if (viewMode === 'services') {
-        await handlePostServices('1', services); // or the real listing id once available
+        await handlePostServices(services, session.access_token);
       }
     } catch (error: unknown) {
       // Narrow error type to Error to safely access message
@@ -281,7 +303,7 @@ function App() {
           {viewMode === 'listing' ? (
             <CreateListingForm
               onListingChange={handleListingChange}
-              resetTrigger={resetTrigger}
+              // resetTrigger={resetTrigger}
             />
           ) : (
             <div className="space-y-6">
@@ -372,5 +394,3 @@ function App() {
     </div>
   );
 }
-
-export default App;
