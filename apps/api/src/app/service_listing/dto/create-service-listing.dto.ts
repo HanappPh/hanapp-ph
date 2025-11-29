@@ -1,4 +1,13 @@
-import { Min, IsUUID, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import {
+  Min,
+  IsUUID,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  IsArray,
+  ArrayNotEmpty,
+  IsOptional,
+} from 'class-validator';
 
 export class CreateServiceListingDto {
   @IsUUID()
@@ -7,7 +16,7 @@ export class CreateServiceListingDto {
 
   @IsUUID()
   @IsNotEmpty()
-  categoryId!: number;
+  categoryId!: string;
 
   @IsString()
   @IsNotEmpty()
@@ -18,24 +27,20 @@ export class CreateServiceListingDto {
   description!: string;
 
   @IsNumber()
-  @IsNotEmpty()
+  @IsOptional()
   @Min(0)
-  priceFrom!: number;
-
-  @IsNumber()
-  @IsNotEmpty()
-  @Min(0)
-  priceTo!: number;
-
-  @IsString()
-  @IsNotEmpty()
-  currency!: string;
+  priceFrom?: number;
 
   @IsString()
   @IsNotEmpty()
   availabilitySchedule!: string;
 
-  @IsString()
-  @IsNotEmpty()
-  serviceAreas!: string;
+  @IsArray()
+  @ArrayNotEmpty()
+  @IsString({ each: true })
+  serviceAreas!: string[];
+
+  @IsArray()
+  @IsOptional()
+  images?: string[];
 }

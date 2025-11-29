@@ -10,4 +10,4 @@ import { ServiceService } from './service.service';
   providers: [ServiceService, SupabaseService],
   exports: [ServiceService],
 })
-export class ServiceListingModule {}
+export class ServiceModule {}

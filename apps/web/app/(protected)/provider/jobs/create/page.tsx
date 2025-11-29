@@ -7,6 +7,8 @@ import { useState } from 'react';
 import { ServiceCard } from '../../../../../components/post-job-listing/post-service-card';
 import { CreateListingForm } from '../../../../../components/post-job-listing/post-service-create';
 import { ServiceForm } from '../../../../../components/post-job-listing/post-service-form';
+import { PostServiceSuccessDialog } from '../../../../../components/post-job-listing/post-service-success-dialog';
+import { useAuth } from '../../../../../lib/hooks/useAuth';
 
 interface DayAvailability {
   available: boolean;
@@ -32,7 +34,7 @@ interface Listing {
   description: string;
   contact_number: string;
   availability: Availability;
-  images: File[];
+  images: string[];
   locations: string[];
 }
 
@@ -51,6 +53,9 @@ function App() {
   const [services, setServices] = useState<ServiceType[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [resetTrigger, setResetTrigger] = useState(0);
   const [listingData, setListingData] = useState<Listing>({
     service_title: '',
     category: '',
@@ -65,10 +70,12 @@ function App() {
       saturday: { available: false, start: '08:00', end: '17:00' },
       sunday: { available: false, start: '08:00', end: '17:00' },
     },
-    images: [] as File[],
+    images: [] as string[],
     locations: [] as string[],
   });
   // const router = useRouter();
+  const { user } = useAuth();
+  const env = process.env;
 
   const handleAddService = (service: ServiceType) => {
     if (editingIndex !== null) {
@@ -121,24 +128,61 @@ function App() {
       throw new Error('Please fill in availability information');
     }
 
-    // if (services.length === 0) {
-    //   throw new Error('Please add at least one service');
-    // }
+    if (!listingData.locations || listingData.locations.length === 0) {
+      throw new Error('Please add at least one service location');
+    }
+
+    // get auth session
+    const {
+      data: { session },
+    } = await (
+      await import('../../../../../lib/supabase/client')
+    ).supabase.auth.getSession();
+
+    if (!session?.access_token) {
+      throw new Error('No valid session found');
+    }
+
+    if (!user?.id) {
+      throw new Error('You must be logged in to create a service listing');
+    }
+
+    // Map category name to ID - in real app, fetch from API or use a constant map
+
+    const payload = {
+      providerId: user.id, // must exist
+      categoryId: '6e51140f-6299-49f3-b7a3-a6d034398cff', // must be a UUID
+      title: listingData.service_title,
+      description: listingData.description,
+      availabilitySchedule: JSON.stringify(listingData.availability),
+      serviceAreas: listingData.locations,
+      images: listingData.images, // array of uploaded image URLs
+    };
+
+    console.log('Payload to submit:', payload);
 
     try {
-      const response = await fetch('/api/service', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(listingData),
-      });
+      const response = await fetch(
+        `${env.NEXT_PUBLIC_API_URL}/api/service-listings`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify(payload),
+        }
+      );
 
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
         throw new Error('Failed to create service listing');
       }
 
       const createdListing = await response.json();
+      setDialogOpen(true);
+      setResetTrigger(prev => prev + 1);
       return createdListing;
     } catch (error) {
       console.error('Error creating listing:', error);
@@ -235,7 +279,10 @@ function App() {
 
         <div className="max-w-4xl mx-auto">
           {viewMode === 'listing' ? (
-            <CreateListingForm onListingChange={handleListingChange} />
+            <CreateListingForm
+              onListingChange={handleListingChange}
+              resetTrigger={resetTrigger}
+            />
           ) : (
             <div className="space-y-6">
               <div>
@@ -291,6 +338,8 @@ function App() {
             <Checkbox
               id="terms"
               className="mt-1 border-yellow-500 data-[state=checked]:bg-yellow-500"
+              checked={agreedToTerms}
+              onCheckedChange={checked => setAgreedToTerms(checked === true)}
             />
             <label
               htmlFor="terms"
@@ -307,11 +356,17 @@ function App() {
 
           <Button
             onClick={handlePost}
+            disabled={!agreedToTerms}
             className="w-full text-white py-3 text-lg font-medium border-0 bg-gradient-to-b from-[#FFDD8E] to-[#F5C45E] hover:bg-gradient-to-b hover:from-yellow-400 hover:to-yellow-600
              transition-colors"
           >
             Post
           </Button>
+
+          <PostServiceSuccessDialog
+            open={dialogOpen}
+            onOpenChange={setDialogOpen}
+          />
         </div>
       </div>
     </div>
