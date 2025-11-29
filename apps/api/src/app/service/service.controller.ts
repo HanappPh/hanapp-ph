@@ -23,12 +23,11 @@ export class ServiceController {
   @HttpCode(HttpStatus.CREATED)
   create(
     @Body() createDto: CreateServiceDto,
-    @Body('providerId') providerId: string,
     @Headers('authorization') authHeader?: string
   ) {
     // Extract token from "Bearer <token>"
     const token = authHeader?.replace('Bearer ', '');
-    return this.serviceService.create(createDto, providerId, token);
+    return this.serviceService.create(createDto, createDto.listingId, token);
   }
   @Get()
   findAll(@Query('listingId') listingId?: string) {

@@ -18,8 +18,9 @@ export class ServiceService {
         title: createDto.title,
         description: createDto.description,
         rate: createDto.rate,
-        currency: createDto.currency,
+        charge: createDto.charge,
         listing_id: listingId,
+        is_addon: createDto.isAddon,
       })
       .select()
       .single();

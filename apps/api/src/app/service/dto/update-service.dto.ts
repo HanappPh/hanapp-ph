@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsNumber } from 'class-validator';
+import { IsString, IsOptional, IsNumber, IsBoolean } from 'class-validator';
 
 export class UpdateServiceDto {
   @IsString()
@@ -15,5 +15,9 @@ export class UpdateServiceDto {
 
   @IsString()
   @IsOptional()
-  currency?: string;
+  charge?: string;
+
+  @IsBoolean()
+  @IsOptional()
+  isAddon?: boolean;
 }
