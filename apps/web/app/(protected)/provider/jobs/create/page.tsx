@@ -299,12 +299,14 @@ export default function CreateServicePage() {
         </div>
 
         <div className="max-w-4xl mx-auto">
-          {viewMode === 'listing' ? (
+          <div className={viewMode === 'listing' ? 'block' : 'hidden'}>
             <CreateListingForm
               onListingChange={handleListingChange}
               // resetTrigger={resetTrigger}
             />
-          ) : (
+          </div>
+
+          <div className={viewMode === 'services' ? 'block' : 'hidden'}>
             <div className="space-y-6">
               <div>
                 <div className="flex items-center justify-between mb-4">
@@ -351,7 +353,7 @@ export default function CreateServicePage() {
                 )}
               </div>
             </div>
-          )}
+          </div>
         </div>
 
         <div className="max-w-4xl mx-auto mt-8 space-y-4">
