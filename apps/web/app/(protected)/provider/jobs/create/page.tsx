@@ -4,6 +4,7 @@ import { Button, Checkbox } from '@hanapp-ph/commons';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 
+import { PostListingSuccessDialog } from '../../../../../components/post-job-listing/post-listing-success-dialog';
 import { ServiceCard } from '../../../../../components/post-job-listing/post-service-card';
 import { CreateListingForm } from '../../../../../components/post-job-listing/post-service-create';
 import { ServiceForm } from '../../../../../components/post-job-listing/post-service-form';
@@ -54,6 +55,7 @@ export default function CreateServicePage() {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [serviceDialogOpen, setServiceDialogOpen] = useState(false);
   const [listingId, setListingId] = useState<string | null>(null);
   // for resetting the form (unused for now)
   // const [resetTrigger, setResetTrigger] = useState(0);
@@ -225,6 +227,8 @@ export default function CreateServicePage() {
           console.error('Error response:', errorText);
           throw new Error('Failed to create service');
         }
+
+        setServiceDialogOpen(true);
       }
     } catch (error) {
       console.error('Error creating services:', error);
@@ -386,9 +390,14 @@ export default function CreateServicePage() {
             Post
           </Button>
 
-          <PostServiceSuccessDialog
+          <PostListingSuccessDialog
             open={dialogOpen}
             onOpenChange={setDialogOpen}
+          />
+
+          <PostServiceSuccessDialog
+            open={serviceDialogOpen}
+            onOpenChange={setServiceDialogOpen}
           />
         </div>
       </div>
