@@ -1,4 +1,4 @@
-import { Min, IsNumber, IsString, IsOptional } from 'class-validator';
+import { Min, IsNumber, IsString, IsOptional, IsArray } from 'class-validator';
 
 export class UpdateServiceListingDto {
   @IsString()
@@ -14,20 +14,16 @@ export class UpdateServiceListingDto {
   @Min(0)
   priceFrom?: number;
 
-  @IsNumber()
-  @IsOptional()
-  @Min(0)
-  priceTo?: number;
-
-  @IsString()
-  @IsOptional()
-  currency?: string;
-
   @IsString()
   @IsOptional()
   availabilitySchedule?: string;
 
-  @IsString()
+  @IsArray()
   @IsOptional()
-  serviceAreas?: string;
+  @IsString({ each: true })
+  serviceAreas?: string[];
+
+  @IsArray()
+  @IsOptional()
+  images?: string[];
 }

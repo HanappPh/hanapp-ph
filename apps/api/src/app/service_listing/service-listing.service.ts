@@ -27,10 +27,9 @@ export class ServiceListingService {
         description: createDto.description,
         category_id: createDto.categoryId,
         price_from: createDto.priceFrom,
-        price_to: createDto.priceTo,
-        currency: createDto.currency,
         availability_schedule: createDto.availabilitySchedule,
         service_areas: createDto.serviceAreas,
+        images: createDto.images || [],
       })
       .select()
       .single();

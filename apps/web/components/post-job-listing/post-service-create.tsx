@@ -13,20 +13,37 @@ import { X, MapPin, Upload, ImageIcon } from 'lucide-react';
 import React, { useState, useRef, useCallback } from 'react';
 
 import { Availability } from '../../app/(protected)/provider/jobs/create/page';
+import { supabase } from '../../lib/supabase/client';
 
 import { AvailabilityForm } from './post-availability';
-import { ContactInfoForm } from './post-contact';
+// import { ContactInfoForm } from './post-contact';
 
-export function CreateListingForm(props?: { onListingChange?: Function }) {
-  const { onListingChange } = props || {};
+export function CreateListingForm(props: {
+  onListingChange?: Function;
+  resetTrigger?: number;
+}) {
+  const { onListingChange, resetTrigger = 0 } = props;
   const [serviceTitle, setServiceTitle] = useState<string>('');
   const [category, setCategory] = useState<string>('Transport');
   const [description, setDescription] = useState<string>('');
-  const [images, setImages] = useState<File[]>([]);
   const [dragActive, setDragActive] = useState(false);
   const [locations, setLocations] = useState<string[]>([]);
   const [currentLocation, setCurrentLocation] = useState<string>('');
+  const [files, setFiles] = useState<File[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const [uploadedUrls, setUploadedUrls] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  React.useEffect(() => {
+    // Reset all form states when resetTrigger changes
+    setServiceTitle('');
+    setCategory('');
+    setDescription('');
+    setFiles([]);
+    setUploadedUrls([]);
+    setLocations([]);
+    setCurrentLocation('');
+  }, [resetTrigger]);
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
@@ -38,7 +55,7 @@ export function CreateListingForm(props?: { onListingChange?: Function }) {
     }
   };
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
@@ -47,28 +64,95 @@ export function CreateListingForm(props?: { onListingChange?: Function }) {
       const newFiles = Array.from(e.dataTransfer.files).filter(file =>
         file.type.startsWith('image/')
       );
-      const updatedImages = [...images, ...newFiles];
-      setImages(updatedImages);
-      updateParent({ images: updatedImages });
+      // const updatedImages = [...images, ...newFiles];
+      // setImages(updatedImages);
+      // updateParent({ images: updatedImages });
+      setFiles(prev => [...prev, ...newFiles]);
+      const newUrls = await uploadFiles(newFiles);
+      const updatedUrls = [...uploadedUrls, ...newUrls];
+      setUploadedUrls(updatedUrls);
+      updateParent({ images: updatedUrls });
     }
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     if (e.target.files && e.target.files[0]) {
       const newFiles = Array.from(e.target.files).filter(file =>
         file.type.startsWith('image/')
       );
-      const updatedImages = [...images, ...newFiles];
-      setImages(updatedImages);
-      updateParent({ images: updatedImages });
+      setFiles(prev => [...prev, ...newFiles]);
+      const newUrls = await uploadFiles(newFiles);
+      const updatedUrls = [...uploadedUrls, ...newUrls];
+      setUploadedUrls(updatedUrls);
+      updateParent({ images: updatedUrls });
     }
   };
+  const uploadFiles = async (filesToUpload: File[]) => {
+    setUploading(true);
+    const newUrls: string[] = [];
 
-  const handleRemoveImage = (index: number) => {
-    const newImages = images.filter((_, i) => i !== index);
-    setImages(newImages);
-    updateParent({ images: newImages });
+    try {
+      for (const file of filesToUpload) {
+        // Generate unique filename
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+        const filePath = `${fileName}`;
+
+        // Upload to Supabase storage
+        const { data, error } = await supabase.storage
+          .from('service-images')
+          .upload(filePath, file, {
+            cacheControl: '3600',
+            upsert: false,
+          });
+
+        if (error) {
+          console.error('Error uploading file:', error);
+          continue;
+        }
+
+        // Get public URL
+        const { data: urlData } = supabase.storage
+          .from('service-images')
+          .getPublicUrl(data.path);
+
+        newUrls.push(urlData.publicUrl);
+      }
+
+      // Update state and parent form data
+      const allUrls = [...uploadedUrls, ...newUrls];
+      setUploadedUrls(allUrls);
+      updateParent({ images: allUrls });
+    } catch (error) {
+      console.error('Error uploading files:', error);
+    } finally {
+      setUploading(false);
+    }
+
+    return newUrls;
+  };
+
+  const handleRemoveImage = async (index: number) => {
+    const urlToRemove = uploadedUrls[index];
+
+    setFiles(prev => prev.filter((_, i) => i !== index));
+
+    const newUrls = uploadedUrls.filter((_, i) => i !== index);
+    setUploadedUrls(newUrls);
+    updateParent({ images: newUrls });
+
+    // remove from supabase storage
+    if (urlToRemove) {
+      try {
+        const path = urlToRemove.split('/service-images/')[1];
+        if (path) {
+          await supabase.storage.from('service-images').remove([path]);
+        }
+      } catch (error) {
+        console.error('Error removing file from storage:', error);
+      }
+    }
   };
 
   const onButtonClick = () => {
@@ -96,23 +180,30 @@ export function CreateListingForm(props?: { onListingChange?: Function }) {
         service_title: serviceTitle,
         category,
         description,
-        images,
+        images: uploadedUrls,
         locations,
         ...updates,
       });
     },
-    [serviceTitle, category, description, images, locations, onListingChange]
+    [
+      serviceTitle,
+      category,
+      description,
+      uploadedUrls,
+      locations,
+      onListingChange,
+    ]
   );
 
-  const handleContactInfoChange = useCallback(
-    (provider: { contact_number: string; other_contact_link: string }) => {
-      updateParent({
-        contact_number: provider.contact_number,
-        other_contact_link: provider.other_contact_link,
-      });
-    },
-    [updateParent]
-  );
+  // const handleContactInfoChange = useCallback(
+  //   (provider: { contact_number: string; other_contact_link: string }) => {
+  //     updateParent({
+  //       contact_number: provider.contact_number,
+  //       other_contact_link: provider.other_contact_link,
+  //     });
+  //   },
+  //   [updateParent]
+  // );
 
   const handleAvailabilityChange = useCallback(
     (avail: Availability) => {
@@ -317,18 +408,33 @@ export function CreateListingForm(props?: { onListingChange?: Function }) {
           </div>
         </div>
 
-        {images.length > 0 && (
+        {uploading && (
+          <div className="mt-4 text-center">
+            <p className="text-sm text-blue-600">Uploading images...</p>
+          </div>
+        )}
+
+        {files.length > 0 && (
           <div className="mt-4 space-y-2">
             <p className="text-sm font-medium text-slate-600">
               Uploaded Images:
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              {images.map((file, index) => (
+              {files.map((file, index) => (
                 <div key={index} className="relative group">
                   <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
-                    <div className="w-full h-full flex items-center justify-center">
-                      <ImageIcon className="w-8 h-8 text-gray-400" />
-                    </div>
+                    {uploadedUrls[index] ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={uploadedUrls[index]}
+                        alt={file.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <ImageIcon className="w-8 h-8 text-gray-400" />
+                      </div>
+                    )}
                   </div>
                   <button
                     type="button"
@@ -352,9 +458,9 @@ export function CreateListingForm(props?: { onListingChange?: Function }) {
 
       <AvailabilityForm onAvailabilityChange={handleAvailabilityChange} />
 
-      <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+      {/* <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
         <ContactInfoForm onChange={handleContactInfoChange} />
-      </div>
+      </div> */}
     </div>
   );
 }

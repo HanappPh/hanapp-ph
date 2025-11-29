@@ -9,6 +9,7 @@ import {
   Headers,
   Patch,
   Param,
+  Query,
 } from '@nestjs/common';
 
 import { CreateServiceListingDto } from './dto/create-service-listing.dto';
@@ -31,17 +32,17 @@ export class ServiceListingController {
   }
 
   @Get()
-  findAll(@Body('providerId') providerId?: string) {
+  findAll(@Query('providerId') providerId?: string) {
     return this.serviceListingService.findAll(providerId);
   }
 
   @Get('category/:categoryId')
-  findByCategory(@Body('categoryId') categoryId: string) {
+  findByCategory(@Query('categoryId') categoryId: string) {
     return this.serviceListingService.findByCategory(categoryId);
   }
 
   @Get(':id')
-  findOne(@Body('id') id: string) {
+  findOne(@Query('id') id: string) {
     return this.serviceListingService.findOne(id);
   }
 
