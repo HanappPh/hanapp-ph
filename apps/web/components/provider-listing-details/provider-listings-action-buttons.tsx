@@ -6,25 +6,29 @@ interface ActionButtonsProps {
   status: 'pending' | 'accepted' | 'declined';
   onAccept: () => void;
   onMessageClient?: () => void;
+  isOwnListing?: boolean;
 }
 
 export const ProviderListingsActionButtons: React.FC<ActionButtonsProps> = ({
   status,
   onAccept,
   onMessageClient,
+  isOwnListing = false,
 }) => {
   if (status === 'pending') {
     return (
       <div className="space-y-3">
         <Button
           onClick={onAccept}
-          className="w-full text-black font-semibold hover:opacity-90"
+          disabled={isOwnListing}
+          className="w-full text-black font-semibold hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
           size="lg"
           style={{ backgroundColor: '#F5C45E' }}
+          title={isOwnListing ? 'You cannot apply to your own job listing' : ''}
         >
-          Apply Now
+          {isOwnListing ? 'Your Own Listing' : 'Apply Now'}
         </Button>
-        {onMessageClient && (
+        {onMessageClient && !isOwnListing && (
           <Button
             onClick={onMessageClient}
             variant="outline"
