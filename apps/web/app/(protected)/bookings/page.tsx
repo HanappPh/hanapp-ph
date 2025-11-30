@@ -18,6 +18,7 @@ import { supabase } from '../../../lib/supabase/client';
 
 interface BookingDetails {
   id: number;
+  serviceId: number;
   serviceName: string;
   providerName: string;
   rating: number;
@@ -42,6 +43,7 @@ const hardcodedBookings = {
   sent: [
     {
       id: 8,
+      serviceId: 1,
       serviceName: 'Garden Maintenance',
       providerName: 'Green Thumb Services',
       providerImage: '/landscaper-cutting-grass.jpg',
@@ -56,6 +58,7 @@ const hardcodedBookings = {
     },
     {
       id: 9,
+      serviceId: 2,
       serviceName: 'Computer Repair',
       providerName: 'Tech Solutions',
       providerImage: '/phone-and-tablet-repair.png',
@@ -72,6 +75,7 @@ const hardcodedBookings = {
   received: [
     {
       id: 10,
+      serviceId: 3,
       serviceName: 'Photography Session',
       providerName: 'Capture Moments',
       providerImage: '/woman-using-phone.jpg',
@@ -86,6 +90,7 @@ const hardcodedBookings = {
     },
     {
       id: 11,
+      serviceId: 4,
       serviceName: 'Massage Therapy',
       providerName: 'Relax & Heal Spa',
       providerImage: '/nanny-with-child.jpg',
@@ -102,6 +107,7 @@ const hardcodedBookings = {
   ongoing: [
     {
       id: 1,
+      serviceId: 5,
       serviceName: 'House Cleaning',
       providerName: 'Joven Salon',
       providerImage: '/cleaning-service-provider.jpg',
@@ -116,6 +122,7 @@ const hardcodedBookings = {
     },
     {
       id: 2,
+      serviceId: 6,
       serviceName: 'Tutoring Session',
       providerName: 'Maria Santos',
       providerImage: '/tutor-teacher.jpg',
@@ -130,6 +137,7 @@ const hardcodedBookings = {
     },
     {
       id: 3,
+      serviceId: 6,
       serviceName: 'Tutoring Session',
       providerName: 'Maria Santos',
       providerImage: '/tutor-teacher.jpg',
@@ -146,6 +154,7 @@ const hardcodedBookings = {
   past: [
     {
       id: 4,
+      serviceId: 7,
       serviceName: 'Laundry Service',
       providerName: 'Clean Express',
       providerImage: '/laundry-service.png',
@@ -160,6 +169,7 @@ const hardcodedBookings = {
     },
     {
       id: 5,
+      serviceId: 8,
       serviceName: 'Home Repair',
       providerName: 'Fix It Pro',
       providerImage: '/handyman-repair.jpg',
@@ -176,6 +186,7 @@ const hardcodedBookings = {
   cancelled: [
     {
       id: 6,
+      serviceId: 9,
       serviceName: 'Pet Grooming',
       providerName: 'Paws & Claws',
       providerImage: '/pet-grooming.png',
@@ -190,6 +201,7 @@ const hardcodedBookings = {
     },
     {
       id: 7,
+      serviceId: 9,
       serviceName: 'Pet Grooming',
       providerName: 'Paws & Claws',
       providerImage: '/pet-grooming.png',
