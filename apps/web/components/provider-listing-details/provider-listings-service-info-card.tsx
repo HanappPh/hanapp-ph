@@ -15,21 +15,11 @@ interface ServiceInfoCardProps {
   time: string;
   location: string;
   pricing: string;
-  paymentMethods: string[];
 }
 
 export const ProviderListingsServiceInfoCard: React.FC<
   ServiceInfoCardProps
-> = ({
-  service,
-  category,
-  description,
-  date,
-  time,
-  location,
-  pricing,
-  paymentMethods,
-}) => (
+> = ({ service, category, description, date, time, location, pricing }) => (
   <Card className="p-6">
     {/* Service Header */}
     <div className="mb-4">
@@ -72,22 +62,10 @@ export const ProviderListingsServiceInfoCard: React.FC<
       </div>
     </div>
 
-    {/* Pricing & Payment Methods */}
-    <div className="grid sm:grid-cols-2 gap-4 p-4 bg-muted rounded-lg">
-      <div>
-        <p className="text-sm text-muted-foreground mb-1">Pricing</p>
-        <p className="text-2xl font-bold text-black">{pricing}</p>
-      </div>
-      <div>
-        <p className="text-sm text-muted-foreground mb-1">Payment Methods</p>
-        <div className="flex flex-wrap gap-2 mt-1">
-          {paymentMethods.map(method => (
-            <Badge key={method} variant="outline" className="text-xs">
-              {method}
-            </Badge>
-          ))}
-        </div>
-      </div>
+    {/* Pricing */}
+    <div className="p-4 bg-muted rounded-lg">
+      <p className="text-sm text-muted-foreground mb-1">Pricing</p>
+      <p className="text-2xl font-bold text-black">{pricing}</p>
     </div>
   </Card>
 );
