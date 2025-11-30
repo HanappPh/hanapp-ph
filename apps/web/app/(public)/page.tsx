@@ -176,7 +176,7 @@ export default function HomePage() {
               title: listing.title,
               provider: listing.provider?.full_name || 'Unknown Provider',
               location: listing.service_areas?.[0] || 'Location not specified',
-              rating: 4.5, // Default rating since it's not in DB yet
+              rating: listing.rating || 0,
               price: listing.price_from
                 ? `₱${listing.price_from.toLocaleString()}`
                 : 'Contact for pricing',

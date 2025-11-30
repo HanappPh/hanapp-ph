@@ -6,6 +6,8 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
+import { supabase } from '../../lib/supabase/client';
+
 const PLACEHOLDER_IMAGE_URL = '/img-carousel-placeholder_2.png'; // You might want to replace this with a real placeholder image path
 
 interface Review {
@@ -31,6 +33,9 @@ interface SellerProfile {
 interface ReviewsSectionProps {
   reviews: Review[];
   sellerProfile?: SellerProfile;
+  serviceListingId?: string;
+  onReviewSubmitted?: () => void;
+  providerId?: string;
 }
 
 function ReviewItem({
@@ -97,11 +102,21 @@ function ReviewItem({
   );
 }
 
-function SellerProfileCard({ profile }: { profile: SellerProfile }) {
+function SellerProfileCard({
+  profile,
+  providerId,
+}: {
+  profile: SellerProfile;
+  providerId?: string;
+}) {
   const router = useRouter();
 
   const handleViewProfile = () => {
-    router.push('/profile');
+    if (providerId) {
+      router.push(`/provider/${providerId}`);
+    } else {
+      router.push('/profile');
+    }
   };
 
   return (
@@ -193,6 +208,9 @@ function SellerProfileCard({ profile }: { profile: SellerProfile }) {
 export function ReviewsSection({
   reviews,
   sellerProfile,
+  serviceListingId,
+  onReviewSubmitted,
+  providerId,
 }: ReviewsSectionProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedRating, setSelectedRating] = useState(0);
@@ -200,6 +218,7 @@ export function ReviewsSection({
   const [userRating, setUserRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [reviewComment, setReviewComment] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const reviewsPerPage = 5;
   const columns = 1;
 
@@ -251,16 +270,73 @@ export function ReviewsSection({
 
   const ratingCounts = getRatingCounts();
 
-  const handleSubmitRating = () => {
+  const handleSubmitRating = async () => {
     if (userRating === 0) {
       return;
     }
-    // TODO: Submit rating to API
-    // Reset and close
-    setUserRating(0);
-    setHoverRating(0);
-    setReviewComment('');
-    setShowRatingModal(false);
+
+    if (!serviceListingId) {
+      alert('Service listing ID is required to submit a review');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Get authentication token from Supabase session
+      const {
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession();
+
+      if (sessionError || !session?.access_token) {
+        alert('Please login to submit a review');
+        setIsSubmitting(false);
+        return;
+      }
+
+      const token = session.access_token;
+
+      const response = await fetch('http://localhost:3001/api/reviews', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          service_listing_id: serviceListingId,
+          rating: userRating,
+          comment: reviewComment || undefined,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to submit review');
+      }
+
+      // Reset and close
+      setUserRating(0);
+      setHoverRating(0);
+      setReviewComment('');
+      setShowRatingModal(false);
+
+      // Notify parent to refresh reviews
+      if (onReviewSubmitted) {
+        onReviewSubmitted();
+      }
+
+      alert('Review submitted successfully!');
+    } catch (error) {
+      console.error('Error submitting review:', error);
+      alert(
+        error instanceof Error
+          ? error.message
+          : 'Failed to submit review. Please try again.'
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleCancelRating = () => {
@@ -277,7 +353,10 @@ export function ReviewsSection({
         {/* Left Column - Seller Profile */}
         {sellerProfile && (
           <div className="w-full lg:w-[400px] xl:w-[450px] flex-shrink-0">
-            <SellerProfileCard profile={sellerProfile} />
+            <SellerProfileCard
+              profile={sellerProfile}
+              providerId={providerId}
+            />
           </div>
         )}
 
@@ -497,9 +576,9 @@ export function ReviewsSection({
                 <Button
                   className="flex-1 px-4 py-2.5 bg-[#102E50] text-white rounded-md hover:bg-[#0a1f35] font-semibold transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
                   onClick={handleSubmitRating}
-                  disabled={userRating === 0}
+                  disabled={userRating === 0 || isSubmitting}
                 >
-                  Submit Rating
+                  {isSubmitting ? 'Submitting...' : 'Submit Rating'}
                 </Button>
               </div>
             </CardContent>
