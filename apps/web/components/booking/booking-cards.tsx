@@ -12,7 +12,7 @@ import BookingActionButton from './booking-button';
 import BookingStatusBadge from './booking-status';
 
 interface BookingCardProps {
-  id: number;
+  id: number | string; // Allow both for job applications
   serviceName: string;
   providerName: string;
   rating: number;
@@ -30,8 +30,9 @@ interface BookingCardProps {
     | 'Cancelled';
   serviceImage?: string;
   providerImage?: string;
-  tabContext?: 'sent' | 'received' | 'ongoing' | 'past' | 'cancelled';
+  tabContext?: 'requested' | 'received' | 'ongoing' | 'past' | 'cancelled';
   onDelete?: () => void;
+  onConfirm?: () => void;
 }
 
 export default function BookingCard(booking: BookingCardProps) {
@@ -102,8 +103,10 @@ export default function BookingCard(booking: BookingCardProps) {
               <BookingActionButton
                 status={booking.status}
                 bookingId={booking.id}
+                serviceName={booking.serviceName}
                 tabContext={booking.tabContext}
                 onDelete={booking.onDelete}
+                onConfirm={booking.onConfirm}
               ></BookingActionButton>
             </div>
           </div>
