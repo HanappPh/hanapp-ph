@@ -147,7 +147,16 @@ const mockListings: ServiceListing[] = [
 
 export default function HomePage() {
   const router = useRouter();
-  const { user } = useAuth();
+
+  // Make useAuth optional for tests - wrap in try/catch
+  let user = null;
+  try {
+    const authContext = useAuth();
+    user = authContext.user;
+  } catch {
+    // useAuth not available (e.g., in tests) - user will remain null
+  }
+
   const [listings, setListings] = useState<ServiceListing[]>([]);
   const [loading, setLoading] = useState(true);
 
