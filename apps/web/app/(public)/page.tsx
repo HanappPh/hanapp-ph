@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 import { ClientBanner } from '../../components/client-home/client-home-banner';
 import { ClientHomeCategories } from '../../components/client-home/client-home-categories';
@@ -14,9 +15,182 @@ import {
   ClientHomeServiceListings,
   type ServiceListing,
 } from '../../components/client-home/client-home-service-listings';
+import {
+  fetchServiceListings,
+  type ServiceListingResponse,
+} from '../../lib/api/serviceListings';
+import { useAuth } from '../../lib/hooks/useAuth';
+
+// Mock data for fallback - kept outside component to avoid re-creation on every render
+const mockListings: ServiceListing[] = [
+  {
+    id: '1',
+    title: 'Labada per kilo',
+    provider: 'Martin Santos',
+    location: 'Balingog, Bulacan',
+    rating: 4.9,
+    price: '₱28',
+    category: 'Laundry',
+    image: '/laundry-service.png',
+  },
+  {
+    id: '2',
+    title: 'Lipat bahay Luzon area only',
+    provider: 'Transport Co',
+    location: 'Balingog, Bulacan',
+    rating: 4.9,
+    price: '₱2.5K',
+    category: 'Transport',
+    image: '/img-carousel-placeholder_2.png',
+  },
+  {
+    id: '3',
+    title: 'Stay out yaya daily rate',
+    provider: 'Nanny Services',
+    location: 'Balingog, Bulacan',
+    rating: 4.9,
+    price: '₱650',
+    category: 'Babysitting',
+    image: '/house-cleaning-service.png',
+  },
+  {
+    id: '4',
+    title: 'Delivery rider baliuag area',
+    provider: 'Virguelio Mart',
+    location: 'Balingog, Bulacan',
+    rating: 4.9,
+    price: '₱300',
+    category: 'Errands',
+    image: '/delivery-person-parcel.jpg',
+  },
+  {
+    id: '5',
+    title: 'Home service dog grooming',
+    provider: 'Chonky Boi Pet Services',
+    location: 'Angat, Bulacan',
+    rating: 4.9,
+    price: '₱2.5K',
+    category: 'Pet care',
+    image: '/pet-grooming-dog.jpg',
+  },
+  {
+    id: '6',
+    title: 'Catering services for events',
+    provider: 'Oca Catering',
+    location: 'San Fernando, Pampanga',
+    rating: 4.6,
+    price: '₱50K',
+    category: 'Catering',
+    image: '/catering-buffet-food-service.jpg',
+  },
+  {
+    id: '7',
+    title: 'House cleaning service',
+    provider: 'Sparkle Home Services',
+    location: 'Balingog, Bulacan',
+    rating: 4.8,
+    price: '₱650',
+    category: 'Cleaning',
+    image: '/cleaning-service-provider.jpg',
+  },
+  {
+    id: '8',
+    title: 'Auto repair home service',
+    provider: "Mike's Auto Shop",
+    location: 'Malolos, Bulacan',
+    rating: 4.7,
+    price: '₱850',
+    category: 'Auto Repair',
+    image: '/mechanic-repairing-car.jpg',
+  },
+  {
+    id: '9',
+    title: 'Plumbing and drain service',
+    provider: 'Quick Fix Plumbing',
+    location: 'Balingog, Bulacan',
+    rating: 4.5,
+    price: '₱450',
+    category: 'Plumbing',
+    image: '/plumber-fixing-drain.png',
+  },
+  {
+    id: '10',
+    title: 'Landscaping and gardening',
+    provider: 'Green Thumb Services',
+    location: 'Angat, Bulacan',
+    rating: 4.9,
+    price: '₱800',
+    category: 'Landscaping',
+    image: '/landscaper-cutting-grass.jpg',
+  },
+  {
+    id: '11',
+    title: 'Construction handyman',
+    provider: 'Build Right Construction',
+    location: 'Balingog, Bulacan',
+    rating: 4.8,
+    price: '₱700',
+    category: 'Construction',
+    image: '/construction-worker-tools.jpg',
+  },
+  {
+    id: '12',
+    title: 'Tutor for elementary students',
+    provider: 'Smart Learning Center',
+    location: 'Malolos, Bulacan',
+    rating: 4.9,
+    price: '₱350',
+    category: 'Education',
+    image: '/tutor-teacher.jpg',
+  },
+];
 
 export default function HomePage() {
   const router = useRouter();
+  const { user } = useAuth();
+  const [listings, setListings] = useState<ServiceListing[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch service listings on component mount
+  useEffect(() => {
+    const loadListings = async () => {
+      try {
+        setLoading(true);
+        // Exclude current user's listings from the feed
+        const dbListings = await fetchServiceListings(user?.id);
+
+        // Transform database listings to match UI format
+        const transformedListings: ServiceListing[] = dbListings.map(
+          (listing: ServiceListingResponse) => {
+            return {
+              id: listing.id,
+              title: listing.title,
+              provider: listing.provider?.full_name || 'Unknown Provider',
+              location: listing.service_areas?.[0] || 'Location not specified',
+              rating: 4.5, // Default rating since it's not in DB yet
+              price: listing.price_from
+                ? `₱${listing.price_from.toLocaleString()}`
+                : 'Contact for pricing',
+              category: listing.category?.name || 'General',
+              image: listing.images?.[0] || '/placeholder.svg',
+            };
+          }
+        );
+
+        // Combine database listings with mock listings
+        const combinedListings = [...transformedListings, ...mockListings];
+        setListings(combinedListings);
+      } catch (error) {
+        console.error('❌ Failed to load service listings:', error);
+        // Fallback to mock listings on error
+        setListings(mockListings);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadListings();
+  }, [user?.id]);
 
   const mockProviders: Provider[] = [
     {
@@ -77,129 +251,6 @@ export default function HomePage() {
     },
   ];
 
-  const mockListings: ServiceListing[] = [
-    {
-      id: '1',
-      title: 'Labada per kilo',
-      provider: 'Martin Santos',
-      location: 'Balingog, Bulacan',
-      rating: 4.9,
-      price: '₱28',
-      category: 'Laundry',
-      image: '/laundry-service.png',
-    },
-    {
-      id: '2',
-      title: 'Lipat bahay Luzon area only',
-      provider: 'Transport Co',
-      location: 'Balingog, Bulacan',
-      rating: 4.9,
-      price: '₱2.5K',
-      category: 'Transport',
-      image: '/img-carousel-placeholder_2.png',
-    },
-    {
-      id: '3',
-      title: 'Stay out yaya daily rate',
-      provider: 'Nanny Services',
-      location: 'Balingog, Bulacan',
-      rating: 4.9,
-      price: '₱650',
-      category: 'Babysitting',
-      image: '/house-cleaning-service.png',
-    },
-    {
-      id: '4',
-      title: 'Delivery rider baliuag area',
-      provider: 'Virguelio Mart',
-      location: 'Balingog, Bulacan',
-      rating: 4.9,
-      price: '₱300',
-      category: 'Errands',
-      image: '/delivery-person-parcel.jpg',
-    },
-    {
-      id: '5',
-      title: 'Home service dog grooming',
-      provider: 'Chonky Boi Pet Services',
-      location: 'Angat, Bulacan',
-      rating: 4.9,
-      price: '₱2.5K',
-      category: 'Pet care',
-      image: '/pet-grooming-dog.jpg',
-    },
-    {
-      id: '6',
-      title: 'Catering services for events',
-      provider: 'Oca Catering',
-      location: 'San Fernando, Pampanga',
-      rating: 4.6,
-      price: '₱50K',
-      category: 'Catering',
-      image: '/catering-buffet-food-service.jpg',
-    },
-    {
-      id: '7',
-      title: 'House cleaning service',
-      provider: 'Sparkle Home Services',
-      location: 'Balingog, Bulacan',
-      rating: 4.8,
-      price: '₱650',
-      category: 'Cleaning',
-      image: '/cleaning-service-provider.jpg',
-    },
-    {
-      id: '8',
-      title: 'Auto repair home service',
-      provider: "Mike's Auto Shop",
-      location: 'Malolos, Bulacan',
-      rating: 4.7,
-      price: '₱850',
-      category: 'Auto Repair',
-      image: '/mechanic-repairing-car.jpg',
-    },
-    {
-      id: '9',
-      title: 'Plumbing and drain service',
-      provider: 'Quick Fix Plumbing',
-      location: 'Balingog, Bulacan',
-      rating: 4.5,
-      price: '₱450',
-      category: 'Plumbing',
-      image: '/plumber-fixing-drain.png',
-    },
-    {
-      id: '10',
-      title: 'Landscaping and gardening',
-      provider: 'Green Thumb Services',
-      location: 'Angat, Bulacan',
-      rating: 4.9,
-      price: '₱800',
-      category: 'Landscaping',
-      image: '/landscaper-cutting-grass.jpg',
-    },
-    {
-      id: '11',
-      title: 'Construction handyman',
-      provider: 'Build Right Construction',
-      location: 'Balingog, Bulacan',
-      rating: 4.8,
-      price: '₱700',
-      category: 'Construction',
-      image: '/construction-worker-tools.jpg',
-    },
-    {
-      id: '12',
-      title: 'Tutor for elementary students',
-      provider: 'Smart Learning Center',
-      location: 'Malolos, Bulacan',
-      rating: 4.9,
-      price: '₱350',
-      category: 'Education',
-      image: '/tutor-teacher.jpg',
-    },
-  ];
-
   const handleCategoryClick = (categoryId: string) => {
     router.push(`/services?category=${categoryId}`);
   };
@@ -249,7 +300,8 @@ export default function HomePage() {
       />
 
       <ClientHomeServiceListings
-        listings={mockListings}
+        listings={listings}
+        loading={loading}
         // onFilterChange={handleFilterChange}
         onViewListing={handleViewListing}
         onViewAll={handleViewAllListings}

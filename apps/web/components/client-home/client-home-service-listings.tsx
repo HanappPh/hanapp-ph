@@ -23,6 +23,7 @@ interface ClientHomeServiceListingsProps {
   onFilterChange?: (filter: string) => void;
   onViewListing?: (listingId: string) => void;
   onViewAll?: () => void;
+  loading?: boolean;
 }
 
 const defaultFilters = ['Trending', 'Near Me', 'Top Picks', 'Book Again'];
@@ -34,6 +35,7 @@ export function ClientHomeServiceListings({
   onFilterChange,
   onViewListing,
   onViewAll,
+  loading = false,
 }: ClientHomeServiceListingsProps) {
   const router = useRouter();
   const [activeFilter, setActiveFilter] = useState(filters[0]);
@@ -116,72 +118,78 @@ export function ClientHomeServiceListings({
 
       {/* Listings Grid */}
       <div className="space-y-5">
-        {paginatedListings.map(listing => (
-          <div
-            key={listing.id}
-            className="flex gap-4 rounded-lg bg-white shadow-sm transition-all duration-200 ease-in-out hover:shadow-md hover:-translate-y-1 hover:scale-[1.01] cursor-pointer"
-            onClick={() => {
-              onViewListing?.(listing.id);
-              router.push(`/jobs/${listing.id}`);
-            }}
-          >
-            {/* Image */}
-            <div className="hidden md:block relative h-[155px] w-[155px] rounded-l-lg overflow-hidden">
-              <Image
-                src={listing.image || '/placeholder.svg'}
-                alt={listing.title}
-                fill
-                className="object-cover"
-              />
-            </div>
-
-            {/* Content */}
-            <div className="flex flex-1 flex-col justify-between p-4">
-              <div>
-                <div className="mb-1 flex items-start justify-between">
-                  <h3 className="text-xl sm:text-2xl font-semibold text-[#102e50]">
-                    {listing.title}
-                  </h3>
-                  <Badge
-                    variant="outline"
-                    className="ml-2 border-gray-300 bg-white text-sm md:text-md text-[#102e50] hover:bg-gray-100 text-center"
-                  >
-                    {listing.category}
-                  </Badge>
-                </div>
-                <p className="mb-4 text-md text-[#014182FC]">
-                  {listing.provider}
-                </p>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-1 text-xs sm:text-sm text-[#102e50]">
-                    <MapPin className="h-3.5 w-3.5 text-[#102e50]" />
-                    <span>{listing.location}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className="h-2.5 w-2.5 md:h-3.5 md:w-3.5 fill-amber-400 text-amber-400"
-                      />
-                    ))}
-                    <span className="ml-1 text-xs sm:text-sm text-[#102e50]">
-                      {listing.rating}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#102e50]">
-                  {listing.price}
-                </div>
-              </div>
-            </div>
+        {loading ? (
+          <div className="flex justify-center items-center py-10">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-hanapp-primary"></div>
           </div>
-        ))}
+        ) : (
+          paginatedListings.map(listing => (
+            <div
+              key={listing.id}
+              className="flex gap-4 rounded-lg bg-white shadow-sm transition-all duration-200 ease-in-out hover:shadow-md hover:-translate-y-1 hover:scale-[1.01] cursor-pointer"
+              onClick={() => {
+                onViewListing?.(listing.id);
+                router.push(`/jobs/${listing.id}`);
+              }}
+            >
+              {/* Image */}
+              <div className="hidden md:block relative h-[155px] w-[155px] rounded-l-lg overflow-hidden">
+                <Image
+                  src={listing.image || '/placeholder.svg'}
+                  alt={listing.title}
+                  fill
+                  className="object-cover"
+                />
+              </div>
 
-        {paginatedListings.length === 0 && (
+              {/* Content */}
+              <div className="flex flex-1 flex-col justify-between p-4">
+                <div>
+                  <div className="mb-1 flex items-start justify-between">
+                    <h3 className="text-xl sm:text-2xl font-semibold text-[#102e50]">
+                      {listing.title}
+                    </h3>
+                    <Badge
+                      variant="outline"
+                      className="ml-2 border-gray-300 bg-white text-sm md:text-md text-[#102e50] hover:bg-gray-100 text-center"
+                    >
+                      {listing.category}
+                    </Badge>
+                  </div>
+                  <p className="mb-4 text-md text-[#014182FC]">
+                    {listing.provider}
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-1 text-xs sm:text-sm text-[#102e50]">
+                      <MapPin className="h-3.5 w-3.5 text-[#102e50]" />
+                      <span>{listing.location}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          className="h-2.5 w-2.5 md:h-3.5 md:w-3.5 fill-amber-400 text-amber-400"
+                        />
+                      ))}
+                      <span className="ml-1 text-xs sm:text-sm text-[#102e50]">
+                        {listing.rating}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#102e50]">
+                    {listing.price}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+
+        {!loading && paginatedListings.length === 0 && (
           <p className="text-center text-gray-500 mt-10">No listings found.</p>
         )}
 

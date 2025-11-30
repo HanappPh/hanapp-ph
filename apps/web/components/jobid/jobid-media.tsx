@@ -7,12 +7,16 @@ interface PhotosMediaProps {
   images?: string[];
 }
 
-export function PhotosMedia({ images: _images = [] }: PhotosMediaProps) {
-  const imageFiles = [
-    '/img-carousel-placeholder_1.png',
-    '/img-carousel-placeholder_2.png',
-    '/img-carousel-placeholder_3.png',
-  ];
+export function PhotosMedia({ images = [] }: PhotosMediaProps) {
+  // Use provided images or fall back to placeholders
+  const imageFiles =
+    images && images.length > 0
+      ? images
+      : [
+          '/img-carousel-placeholder_1.png',
+          '/img-carousel-placeholder_2.png',
+          '/img-carousel-placeholder_3.png',
+        ];
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
