@@ -42,17 +42,6 @@ function ReviewItem({
   imageUrl,
 }: Review) {
   const [showImageModal, setShowImageModal] = useState(false);
-  const [showReplyModal, setShowReplyModal] = useState(false);
-  const [replyText, setReplyText] = useState('');
-
-  const handleReplyClick = () => {
-    setShowReplyModal(true);
-  };
-
-  const handleSubmitReply = () => {
-    setReplyText('');
-    setShowReplyModal(false);
-  };
 
   return (
     <Card
@@ -82,27 +71,18 @@ function ReviewItem({
             {date}
           </div>
         )}
-        <div className="flex items-center justify-between w-full mt-4">
-          {(imageUrl || PLACEHOLDER_IMAGE_URL) && (
-            <div className="flex flex-wrap gap-2">
-              <Image
-                src={imageUrl || PLACEHOLDER_IMAGE_URL}
-                alt="Review image"
-                width={60}
-                height={60}
-                className="rounded-md object-cover cursor-pointer border border-gray-200"
-                onClick={() => setShowImageModal(true)}
-              />
-            </div>
-          )}
-
-          <Button
-            className="text-sm bg-[#102E50] text-white rounded-md hover:bg-[#0a1f35] self-end"
-            onClick={handleReplyClick}
-          >
-            Reply
-          </Button>
-        </div>
+        {(imageUrl || PLACEHOLDER_IMAGE_URL) && (
+          <div className="flex flex-wrap gap-2 mt-4">
+            <Image
+              src={imageUrl || PLACEHOLDER_IMAGE_URL}
+              alt="Review image"
+              width={60}
+              height={60}
+              className="rounded-md object-cover cursor-pointer border border-gray-200"
+              onClick={() => setShowImageModal(true)}
+            />
+          </div>
+        )}
       </CardContent>
 
       {showImageModal && (
@@ -111,42 +91,6 @@ function ReviewItem({
           onClick={() => setShowImageModal(false)}
         >
           <div className="relative max-w-3xl max-h-full p-2 bg-white rounded-lg"></div>
-        </div>
-      )}
-
-      {showReplyModal && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4"
-          onClick={() => setShowReplyModal(false)}
-        >
-          <Card
-            className="p-6 w-full max-w-md mx-auto"
-            onClick={e => e.stopPropagation()}
-          >
-            <h3 className="text-xl font-bold mb-4">Reply to Review</h3>
-            <textarea
-              className="w-full p-2 border border-gray-300 rounded-md mb-4"
-              rows={4}
-              placeholder="Write your reply here..."
-              value={replyText}
-              onChange={e => setReplyText(e.target.value)}
-            ></textarea>
-            <div className="flex justify-end gap-2">
-              <Button
-                className="px-4 py-2 bg-[#102E50] text-white rounded-md hover:bg-[#0a1f35]"
-                onClick={() => setShowReplyModal(false)}
-              >
-                Cancel
-              </Button>
-              <Button
-                className="px-4 py-2 bg-[#102E50] text-white rounded-md hover:bg-[#0a1f35]"
-                onClick={handleSubmitReply}
-                disabled={!replyText.trim()}
-              >
-                Submit Reply
-              </Button>
-            </div>
-          </Card>
         </div>
       )}
     </Card>
@@ -252,6 +196,10 @@ export function ReviewsSection({
 }: ReviewsSectionProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedRating, setSelectedRating] = useState(0);
+  const [showRatingModal, setShowRatingModal] = useState(false);
+  const [userRating, setUserRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [reviewComment, setReviewComment] = useState('');
   const reviewsPerPage = 5;
   const columns = 1;
 
@@ -303,6 +251,25 @@ export function ReviewsSection({
 
   const ratingCounts = getRatingCounts();
 
+  const handleSubmitRating = () => {
+    if (userRating === 0) {
+      return;
+    }
+    // TODO: Submit rating to API
+    // Reset and close
+    setUserRating(0);
+    setHoverRating(0);
+    setReviewComment('');
+    setShowRatingModal(false);
+  };
+
+  const handleCancelRating = () => {
+    setUserRating(0);
+    setHoverRating(0);
+    setReviewComment('');
+    setShowRatingModal(false);
+  };
+
   return (
     <div className="w-full xl:max-w-screen-xl 2xl:max-w-screen-2xl mx-auto pr-4 sm:pr-6 lg:pr-8 pb-5 sm:pb-6 lg:pb-8 overflow-hidden">
       {/* Two Column Layout - Profile + Review Filters */}
@@ -317,9 +284,17 @@ export function ReviewsSection({
         {/* Right Column - Review Header and Filters */}
         <div className="flex-1 min-w-0 space-y-4 sm:space-y-4">
           <div className="mb-5 sm:mb-6 w-full text-left">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#102E50] break-words">
-              Reviews
-            </h2>
+            <div className="flex items-center justify-between gap-4 mb-2">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#102E50] break-words">
+                Reviews
+              </h2>
+              <Button
+                className="bg-[#102E50] hover:bg-[#0a1f35] text-white font-semibold px-4 sm:px-6 py-2 sm:py-2.5 rounded-md transition-colors duration-200 whitespace-nowrap"
+                onClick={() => setShowRatingModal(true)}
+              >
+                Rate Service
+              </Button>
+            </div>
             <p className="text-gray-600 text-lg sm:text-xl">
               {totalReviewsCount} reviews for this service
             </p>
@@ -440,6 +415,97 @@ export function ReviewsSection({
           </Card>
         )}
       </div>
+
+      {/* Rating Modal */}
+      {showRatingModal && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4"
+          onClick={handleCancelRating}
+        >
+          <Card
+            className="p-6 sm:p-8 w-full max-w-md mx-auto"
+            onClick={e => e.stopPropagation()}
+          >
+            <CardContent className="p-0 space-y-6">
+              <h3 className="text-2xl font-bold text-[#102E50] text-center">
+                Rate This Service
+              </h3>
+
+              {/* Star Rating */}
+              <div className="flex justify-center gap-2">
+                {[1, 2, 3, 4, 5].map(star => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => setUserRating(star)}
+                    onMouseEnter={() => setHoverRating(star)}
+                    onMouseLeave={() => setHoverRating(0)}
+                    className="transition-transform hover:scale-110"
+                  >
+                    <Star
+                      className={`w-10 h-10 sm:w-12 sm:h-12 transition-colors ${
+                        star <= (hoverRating || userRating)
+                          ? 'fill-[#102E50] text-[#102E50]'
+                          : 'text-gray-300'
+                      }`}
+                    />
+                  </button>
+                ))}
+              </div>
+
+              {/* Rating Text */}
+              {userRating > 0 && (
+                <p className="text-center text-lg font-semibold text-[#102E50]">
+                  {userRating === 5 && 'Excellent!'}
+                  {userRating === 4 && 'Very Good!'}
+                  {userRating === 3 && 'Good'}
+                  {userRating === 2 && 'Fair'}
+                  {userRating === 1 && 'Poor'}
+                </p>
+              )}
+
+              {/* Comment Textarea */}
+              <div>
+                <label
+                  htmlFor="review-comment"
+                  className="block text-sm font-semibold text-[#102E50] mb-2"
+                >
+                  Your Review (Optional)
+                </label>
+                <textarea
+                  id="review-comment"
+                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#102E50] focus:border-transparent resize-none"
+                  rows={4}
+                  placeholder="Share your experience with this service..."
+                  value={reviewComment}
+                  onChange={e => setReviewComment(e.target.value)}
+                  maxLength={500}
+                />
+                <p className="text-xs text-gray-500 mt-1 text-right">
+                  {reviewComment.length}/500
+                </p>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3 pt-2">
+                <Button
+                  className="flex-1 px-4 py-2.5 bg-white text-[#102E50] border-2 border-[#102E50] rounded-md hover:bg-gray-50 font-semibold transition-colors"
+                  onClick={handleCancelRating}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  className="flex-1 px-4 py-2.5 bg-[#102E50] text-white rounded-md hover:bg-[#0a1f35] font-semibold transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+                  onClick={handleSubmitRating}
+                  disabled={userRating === 0}
+                >
+                  Submit Rating
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }

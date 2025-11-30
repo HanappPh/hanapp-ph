@@ -12,6 +12,8 @@ import {
   Query,
 } from '@nestjs/common';
 
+import { Public } from '../guards/auth.guard';
+
 import { CreateServiceListingDto } from './dto/create-service-listing.dto';
 import { UpdateServiceListingDto } from './dto/update-service-listing.dto';
 import { ServiceListingService } from './service-listing.service';
@@ -32,8 +34,12 @@ export class ServiceListingController {
   }
 
   @Get()
-  findAll(@Query('providerId') providerId?: string) {
-    return this.serviceListingService.findAll(providerId);
+  @Public()
+  findAll(
+    @Query('providerId') providerId?: string,
+    @Query('excludeProviderId') excludeProviderId?: string
+  ) {
+    return this.serviceListingService.findAll(providerId, excludeProviderId);
   }
 
   @Get('category/:categoryId')
@@ -42,8 +48,15 @@ export class ServiceListingController {
   }
 
   @Get(':id')
-  findOne(@Query('id') id: string) {
+  @Public()
+  findOne(@Param('id') id: string) {
     return this.serviceListingService.findOne(id);
+  }
+
+  @Get(':id/details')
+  @Public()
+  findOneWithDetails(@Param('id') id: string) {
+    return this.serviceListingService.findOneWithDetails(id);
   }
 
   @Patch(':id')

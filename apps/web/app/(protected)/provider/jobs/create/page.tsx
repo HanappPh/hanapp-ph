@@ -155,8 +155,6 @@ export default function CreateServicePage() {
       images: listingData.images, // array of uploaded image URLs
     };
 
-    console.log('Payload to submit:', payload);
-
     try {
       const response = await fetch(
         `${env.NEXT_PUBLIC_API_URL}/api/service-listings`,
@@ -171,8 +169,6 @@ export default function CreateServicePage() {
       );
 
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Error response:', errorText);
         throw new Error('Failed to create service listing');
       }
 
@@ -260,13 +256,42 @@ export default function CreateServicePage() {
       alert('No valid session found.');
       return;
     }
+
+    // Validate that both listing data and services are ready
+    if (
+      !listingData.service_title ||
+      !listingData.category ||
+      !listingData.description
+    ) {
+      alert('Please complete the listing information first.');
+      setViewMode('listing');
+      return;
+    }
+
+    if (services.length === 0) {
+      alert('Please add at least one service before posting.');
+      setViewMode('services');
+      return;
+    }
+
     console.log('auth uid:', session.user.id);
+
     try {
-      if (viewMode === 'listing') {
-        await handlePostListing(listingData, session.access_token);
-      } else if (viewMode === 'services') {
-        await handlePostServices(services, session.access_token);
+      // Step 1: Create the listing (if not already created)
+      let currentListingId = listingId;
+      if (!currentListingId) {
+        const createdListing = await handlePostListing(
+          listingData,
+          session.access_token
+        );
+        currentListingId = createdListing.id;
       }
+
+      // Step 2: Post all services
+      await handlePostServices(services, session.access_token);
+
+      // Success - both listing and services posted
+      alert('Your service listing has been posted successfully!');
     } catch (error: unknown) {
       // Narrow error type to Error to safely access message
       if (error instanceof Error) {
@@ -299,20 +324,62 @@ export default function CreateServicePage() {
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              Create Listing
+              Create Listing {listingData.service_title && '✓'}
             </button>
             <button
-              onClick={() => setViewMode('services')}
+              onClick={() => {
+                if (
+                  !listingData.service_title ||
+                  !listingData.category ||
+                  !listingData.description
+                ) {
+                  alert('Please fill in the listing details first');
+                  return;
+                }
+                setViewMode('services');
+              }}
               className={`px-6 py-2 rounded-full font-medium transition-colors ${
                 viewMode === 'services'
                   ? 'bg-amber-400 text-gray-900'
-                  : 'text-gray-600 hover:text-gray-900'
+                  : listingData.service_title &&
+                      listingData.category &&
+                      listingData.description
+                    ? 'text-gray-600 hover:text-gray-900'
+                    : 'text-gray-400 cursor-not-allowed'
               }`}
+              disabled={
+                !listingData.service_title ||
+                !listingData.category ||
+                !listingData.description
+              }
             >
-              Create Service
+              Create Service {services.length > 0 && `(${services.length})`}
             </button>
           </div>
         </div>
+
+        {!listingData.service_title && viewMode === 'listing' && (
+          <div className="max-w-4xl mx-auto mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-800">
+            <strong>Step 1:</strong> Fill in your service listing details, then
+            add services. Both are required before posting.
+          </div>
+        )}
+
+        {viewMode === 'services' && services.length === 0 && (
+          <div className="max-w-4xl mx-auto mb-4 p-4 bg-green-50 border border-green-200 rounded-lg text-sm text-green-800">
+            <strong>Step 2:</strong> Add at least one service. Once you have
+            both listing info and services, click Post Complete Listing to
+            publish.
+          </div>
+        )}
+
+        {services.length > 0 && listingData.service_title && (
+          <div className="max-w-4xl mx-auto mb-4 p-4 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800">
+            <strong>Ready to post!</strong> You have {services.length} service
+            {services.length > 1 ? 's' : ''} added. Check the terms and click
+            &quot;Post Complete Listing&quot; to publish.
+          </div>
+        )}
 
         <div className="max-w-4xl mx-auto">
           <div className={viewMode === 'listing' ? 'block' : 'hidden'}>
@@ -395,11 +462,19 @@ export default function CreateServicePage() {
 
           <Button
             onClick={handlePost}
-            disabled={!agreedToTerms}
+            disabled={
+              !agreedToTerms ||
+              !listingData.service_title ||
+              !listingData.category ||
+              !listingData.description ||
+              !listingData.locations ||
+              listingData.locations.length === 0 ||
+              services.length === 0
+            }
             className="w-full text-white py-3 text-lg font-medium border-0 bg-gradient-to-b from-[#FFDD8E] to-[#F5C45E] hover:bg-gradient-to-b hover:from-yellow-400 hover:to-yellow-600
-             transition-colors"
+             transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Post
+            Post Complete Listing
           </Button>
 
           <PostListingSuccessDialog

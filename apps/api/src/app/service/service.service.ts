@@ -13,7 +13,7 @@ export class ServiceService {
       ? this.supabaseService.createUserClient(token)
       : this.supabaseService.getClient();
     const { data, error } = await supabase
-      .from('services')
+      .from('service_listing_details')
       .insert({
         title: createDto.title,
         description: createDto.description,
@@ -37,7 +37,7 @@ export class ServiceService {
     const supabase = this.supabaseService.getClient();
 
     let query = supabase
-      .from('services')
+      .from('service_listing_details')
       .select(`*`)
       .order('created_at', { ascending: false });
     if (listingId) {
@@ -57,7 +57,7 @@ export class ServiceService {
     const supabase = this.supabaseService.getClient();
 
     const { data, error } = await supabase
-      .from('services')
+      .from('service_listing_details')
       .select(`*`)
       .eq('id', id)
       .single();
@@ -73,7 +73,7 @@ export class ServiceService {
     const supabase = this.supabaseService.getClient();
 
     const { data, error } = await supabase
-      .from('services')
+      .from('service_listing_details')
       .update(updateDto)
       .eq('id', id)
       .select()
@@ -92,7 +92,10 @@ export class ServiceService {
   async remove(id: string) {
     const supabase = this.supabaseService.getClient();
 
-    const { error } = await supabase.from('services').delete().eq('id', id);
+    const { error } = await supabase
+      .from('service_listing_details')
+      .delete()
+      .eq('id', id);
     if (error) {
       throw new HttpException(
         `Failed to delete service: ${error.message}`,
