@@ -283,18 +283,14 @@ describe('ServiceRequestService', () => {
   describe('remove', () => {
     it('deletes successfully', async () => {
       const client = {
-        from: jest.fn((table: string) => ({
+        from: jest.fn(() => ({
           delete: jest.fn().mockReturnThis(),
-          eq: jest.fn().mockReturnThis(),
-          then: (cb: any) => cb({ error: null }),
+          eq: jest.fn().mockResolvedValue({
+            data: { id: 'sr1' },
+            error: null,
+          }),
         })),
       };
-      // adapt to await pattern
-      client.from = jest.fn((table: string) => ({
-        delete: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockReturnThis(),
-        then: (resolve: any) => resolve({ error: null }),
-      }));
       mockSupabaseService.getClient.mockReturnValue(client);
 
       const result = await service.remove('sr1');
@@ -305,10 +301,12 @@ describe('ServiceRequestService', () => {
 
     it('throws when delete fails', async () => {
       const client = {
-        from: jest.fn((table: string) => ({
+        from: jest.fn(() => ({
           delete: jest.fn().mockReturnThis(),
-          eq: jest.fn().mockReturnThis(),
-          then: (resolve: any) => resolve({ error: { message: 'bad' } }),
+          eq: jest.fn().mockResolvedValue({
+            data: null,
+            error: { message: 'bad' },
+          }),
         })),
       };
       mockSupabaseService.getClient.mockReturnValue(client);
