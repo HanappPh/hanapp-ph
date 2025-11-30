@@ -4,6 +4,7 @@ import { MsgModule } from '../msg/msg.module';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { JobApplicationModule } from './job-application/job-application.module';
 import { ReviewsModule } from './review/review.module';
 import { ServiceModule } from './service/service.module';
 import { ServiceRequestModule } from './service-request/service-request.module';
@@ -18,6 +19,7 @@ import { UserModule } from './user/user.module';
     ServiceListingModule,
     ServiceModule,
     ReviewsModule,
+    JobApplicationModule, // Job application management
   ],
   controllers: [AppController],
   providers: [AppService],

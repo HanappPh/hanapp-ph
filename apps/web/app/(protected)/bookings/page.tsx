@@ -13,11 +13,15 @@ import { useSearchParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 
 import BookingCard from '../../../components/booking/booking-cards';
+import {
+  fetchSentApplications,
+  fetchReceivedApplications,
+} from '../../../lib/api/jobApplications';
 import { useAuth } from '../../../lib/hooks/useAuth';
 import { supabase } from '../../../lib/supabase/client';
 
 interface BookingDetails {
-  id: number;
+  id: number | string;
   serviceId: number;
   serviceName: string;
   providerName: string;
@@ -40,7 +44,7 @@ interface BookingDetails {
 
 // Hardcoded data as fallback
 const hardcodedBookings = {
-  sent: [
+  requested: [
     {
       id: 8,
       serviceId: 1,
@@ -222,7 +226,7 @@ export default function BookingsPage() {
   const { user } = useAuth();
   const searchParams = useSearchParams();
   const [bookingsData, setBookingsData] = useState<{
-    sent: BookingDetails[];
+    requested: BookingDetails[];
     received: BookingDetails[];
     ongoing: BookingDetails[];
     past: BookingDetails[];
@@ -231,9 +235,15 @@ export default function BookingsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  // Check if we need to refresh data
+  // Check if we need to refresh data and set active tab
   useEffect(() => {
     const shouldRefresh = searchParams.get('refresh');
+    const tabParam = searchParams.get('tab');
+
+    if (tabParam) {
+      setActiveTab(tabParam);
+    }
+
     if (shouldRefresh === 'true') {
       setRefreshTrigger(prev => prev + 1);
     }
@@ -242,6 +252,52 @@ export default function BookingsPage() {
   // Function to trigger data refresh
   const handleDelete = () => {
     setRefreshTrigger(prev => prev + 1);
+  };
+
+  // Function to handle confirming a booking (moves from received to ongoing)
+  const handleConfirm = (bookingId: number | string) => {
+    setBookingsData(prev => {
+      // Find the booking in received
+      const bookingToConfirm = prev.received.find(b => b.id === bookingId);
+      if (!bookingToConfirm) {
+        return prev;
+      }
+
+      // Update status to Accepted
+      const confirmedBooking = {
+        ...bookingToConfirm,
+        status: 'Accepted' as const,
+      };
+
+      return {
+        ...prev,
+        received: prev.received.filter(b => b.id !== bookingId),
+        ongoing: [confirmedBooking, ...prev.ongoing],
+      };
+    });
+  };
+
+  // Function to handle deleting a booking (moves from received to cancelled)
+  const handleDeleteFromReceived = (bookingId: number | string) => {
+    setBookingsData(prev => {
+      // Find the booking in received
+      const bookingToDelete = prev.received.find(b => b.id === bookingId);
+      if (!bookingToDelete) {
+        return prev;
+      }
+
+      // Update status to Cancelled
+      const cancelledBooking = {
+        ...bookingToDelete,
+        status: 'Cancelled' as const,
+      };
+
+      return {
+        ...prev,
+        received: prev.received.filter(b => b.id !== bookingId),
+        cancelled: [cancelledBooking, ...prev.cancelled],
+      };
+    });
   };
 
   // Fetch service requests from the API and merge with hardcoded data
@@ -259,7 +315,6 @@ export default function BookingsPage() {
         } = await supabase.auth.getSession();
 
         if (!session?.access_token) {
-          console.error('No session token available');
           setIsLoading(false);
           return;
         }
@@ -280,69 +335,156 @@ export default function BookingsPage() {
 
         const serviceRequests = await response.json();
 
-        // Transform API data to BookingDetails format
-        const transformedBookings: BookingDetails[] = serviceRequests.map(
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (request: any) => {
-            // Map lowercase database status to capitalized UI status
-            const statusMap: Record<string, BookingDetails['status']> = {
-              pending: 'Pending',
-              approved: 'Accepted',
-              accepted: 'Accepted',
-              paid: 'Paid',
-              completed: 'Completed',
-              rejected: 'Rejected',
-              cancelled: 'Cancelled',
-            };
+        // Fetch job applications sent by the user (as provider)
+        const sentApplications = await fetchSentApplications(user.id);
 
-            return {
-              id: request.id,
-              serviceName: request.title,
-              providerName: request.users?.full_name || 'Unknown',
-              rating: 0, // Default for now
-              reviewCount: 0, // Default for now
-              price: request.rate,
-              date: request.date,
-              time: `${request.time} - ${request.time_2}`,
-              location: request.job_location,
-              status: statusMap[request.status?.toLowerCase()] || 'Pending',
-              serviceImage:
-                request.images?.[0] || '/cleaning-service-provider.jpg',
-              providerImage:
-                request.users?.avatar_url || '/cleaning-service-provider.jpg',
-            };
-          }
-        );
+        // Fetch job applications received by the user (as client)
+        const receivedApplications = await fetchReceivedApplications(user.id);
 
-        // Categorize fetched bookings by status
-        const fetchedCategorized = {
-          sent: transformedBookings.filter(b => b.status === 'Pending'),
-          ongoing: transformedBookings.filter(
+        // Transform service requests to BookingDetails format
+        const transformedServiceRequests: BookingDetails[] =
+          serviceRequests.map(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (request: any) => {
+              // Map lowercase database status to capitalized UI status
+              const statusMap: Record<string, BookingDetails['status']> = {
+                pending: 'Pending',
+                approved: 'Accepted',
+                accepted: 'Accepted',
+                paid: 'Paid',
+                completed: 'Completed',
+                rejected: 'Rejected',
+                cancelled: 'Cancelled',
+              };
+
+              return {
+                id: request.id,
+                serviceName: request.title,
+                providerName: request.users?.full_name || 'Unknown',
+                rating: 0, // Default for now
+                reviewCount: 0, // Default for now
+                price: request.rate,
+                date: request.date,
+                time: `${request.time} - ${request.time_2}`,
+                location: request.job_location,
+                status: statusMap[request.status?.toLowerCase()] || 'Pending',
+                serviceImage:
+                  request.images?.[0] || '/cleaning-service-provider.jpg',
+                providerImage:
+                  request.users?.avatar_url || '/cleaning-service-provider.jpg',
+              };
+            }
+          );
+
+        // Transform sent job applications to BookingDetails format
+        const transformedSentApplications: BookingDetails[] =
+          sentApplications.map(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (application: any) => {
+              const statusMap: Record<string, BookingDetails['status']> = {
+                pending: 'Pending',
+                accepted: 'Accepted',
+                rejected: 'Rejected',
+                withdrawn: 'Cancelled',
+              };
+
+              const serviceRequest = application.service_requests;
+
+              return {
+                id: `app-${application.id}`,
+                serviceId: serviceRequest?.id || 0,
+                serviceName: serviceRequest?.title || 'Unknown Service',
+                providerName: 'Client', // Will show client name, we don't have it in the query
+                rating: 0,
+                reviewCount: 0,
+                price: serviceRequest?.rate || 0,
+                date: serviceRequest?.date || 'N/A',
+                time:
+                  serviceRequest?.time && serviceRequest?.time_2
+                    ? `${serviceRequest.time} - ${serviceRequest.time_2}`
+                    : serviceRequest?.time || 'N/A',
+                location: serviceRequest?.job_location || 'Unknown',
+                status: statusMap[application.status] || 'Pending',
+                serviceImage:
+                  serviceRequest?.images?.[0] ||
+                  '/cleaning-service-provider.jpg',
+                providerImage: '/cleaning-service-provider.jpg',
+              };
+            }
+          );
+
+        // Transform received job applications to BookingDetails format
+        const transformedReceivedApplications: BookingDetails[] =
+          receivedApplications.map(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (application: any) => {
+              const statusMap: Record<string, BookingDetails['status']> = {
+                pending: 'Pending',
+                accepted: 'Accepted',
+                rejected: 'Rejected',
+                withdrawn: 'Cancelled',
+              };
+
+              const serviceRequest = application.service_requests;
+
+              return {
+                id: `app-${application.id}`,
+                serviceId: serviceRequest?.id || 0,
+                serviceName: serviceRequest?.title || 'Unknown Service',
+                providerName: 'Provider', // We don't have provider info in simplified query
+                rating: 0,
+                reviewCount: 0,
+                price: serviceRequest?.rate || 0,
+                date: serviceRequest?.date || 'N/A',
+                time:
+                  serviceRequest?.time && serviceRequest?.time_2
+                    ? `${serviceRequest.time} - ${serviceRequest.time_2}`
+                    : serviceRequest?.time || 'N/A',
+                location: serviceRequest?.job_location || 'Unknown',
+                status: statusMap[application.status] || 'Pending',
+                serviceImage:
+                  serviceRequest?.images?.[0] ||
+                  '/cleaning-service-provider.jpg',
+                providerImage: '/cleaning-service-provider.jpg',
+              };
+            }
+          );
+
+        // Categorize service requests by status
+        const categorizedServiceRequests = {
+          ongoing: transformedServiceRequests.filter(
             b => b.status === 'Accepted' || b.status === 'Paid'
           ),
-          past: transformedBookings.filter(b => b.status === 'Completed'),
-          cancelled: transformedBookings.filter(
+          past: transformedServiceRequests.filter(
+            b => b.status === 'Completed'
+          ),
+          cancelled: transformedServiceRequests.filter(
             b => b.status === 'Cancelled' || b.status === 'Rejected'
           ),
         };
 
-        // Merge with hardcoded data
         setBookingsData({
-          sent: [...fetchedCategorized.sent, ...hardcodedBookings.sent],
-          received: hardcodedBookings.received, // Keep hardcoded for received
+          requested: [
+            ...transformedSentApplications,
+            ...hardcodedBookings.requested,
+          ],
+          received: [
+            ...transformedReceivedApplications,
+            ...hardcodedBookings.received,
+          ],
           ongoing: [
-            ...fetchedCategorized.ongoing,
+            ...categorizedServiceRequests.ongoing,
             ...hardcodedBookings.ongoing,
           ],
-          past: [...fetchedCategorized.past, ...hardcodedBookings.past],
+          past: [...categorizedServiceRequests.past, ...hardcodedBookings.past],
           cancelled: [
-            ...fetchedCategorized.cancelled,
+            ...categorizedServiceRequests.cancelled,
             ...hardcodedBookings.cancelled,
           ],
         });
       } catch (error) {
-        console.error('Error fetching bookings:', error);
         // Keep hardcoded data on error
+        console.error('Error fetching bookings:', error);
         setBookingsData(hardcodedBookings);
       } finally {
         setIsLoading(false);
@@ -390,19 +532,19 @@ export default function BookingsPage() {
           >
             <TabsList className="grid w-full h-full grid-cols-5 mb-8 bg-gray-100 rounded-lg p-2 text-base">
               <TabsTrigger
-                value="sent"
+                value="requested"
                 className="data-[state=active]:text-white relative rounded-md transition-all py-3 px-4 text-base font-medium"
                 style={{
                   background:
-                    activeTab === 'sent'
+                    activeTab === 'requested'
                       ? 'linear-gradient(135deg, #102E50 0%, #014182 100%)'
                       : 'transparent',
                 }}
               >
-                Sent
-                {bookingsData.sent.length > 0 && (
+                Requested
+                {bookingsData.requested.length > 0 && (
                   <Badge className="ml-2 bg-hanapp-accent text-hanapp-secondary text-sm rounded-full tabular-nums pointer-events-none">
-                    {bookingsData.sent.length}
+                    {bookingsData.requested.length}
                   </Badge>
                 )}
               </TabsTrigger>
@@ -471,13 +613,13 @@ export default function BookingsPage() {
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="sent" className="space-y-4">
-              {bookingsData.sent.length > 0 ? (
-                bookingsData.sent.map(booking => (
+            <TabsContent value="requested" className="space-y-4">
+              {bookingsData.requested.length > 0 ? (
+                bookingsData.requested.map(booking => (
                   <BookingCard
                     key={booking.id}
                     {...booking}
-                    tabContext="sent"
+                    tabContext="requested"
                     onDelete={handleDelete}
                   ></BookingCard>
                 ))
@@ -487,7 +629,7 @@ export default function BookingsPage() {
                     <Calendar className="w-14 h-14 text-gray-400" />
                   </div>
                   <h3 className="text-xl font-semibold text-gray-600 mb-3">
-                    No bookings sent
+                    No bookings requested
                   </h3>
                   <p className="text-lg text-gray-500 mb-6">
                     Book a service to see your pending requests here
@@ -506,6 +648,8 @@ export default function BookingsPage() {
                     key={booking.id}
                     {...booking}
                     tabContext="received"
+                    onConfirm={() => handleConfirm(booking.id)}
+                    onDelete={() => handleDeleteFromReceived(booking.id)}
                   ></BookingCard>
                 ))
               ) : (

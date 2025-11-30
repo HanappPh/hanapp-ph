@@ -14,21 +14,29 @@ import { useState } from 'react';
 
 import { useAuth } from '../../lib/hooks/useAuth';
 
+import BookingActionModal from './booking-action-modal';
 import ReviewModal from './review-modal';
+
 interface BookingActionButtonProps {
   status: string;
-  bookingId: number;
-  tabContext?: 'sent' | 'received' | 'ongoing' | 'past' | 'cancelled';
+  bookingId: number | string; // Allow both for job applications
+  serviceName: string;
+  tabContext?: 'requested' | 'received' | 'ongoing' | 'past' | 'cancelled';
   onDelete?: () => void;
+  onConfirm?: () => void;
 }
 
 export default function BookingActionButton({
   status,
   bookingId,
+  serviceName,
   tabContext,
   onDelete,
+  onConfirm,
 }: BookingActionButtonProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isReviewOpen, setIsReviewOpen] = useState(false);
   const { session } = useAuth();
@@ -67,7 +75,6 @@ export default function BookingActionButton({
         return;
       }
 
-      console.log('Review submitted successfully:', result);
       alert('Thank you for your review!');
     } catch (error) {
       console.error('Error submitting review:', error);
@@ -104,13 +111,12 @@ export default function BookingActionButton({
       }
     } catch (error) {
       console.error('Error deleting booking:', error);
-      alert('Failed to delete booking. Please try again.');
     } finally {
       setIsDeleting(false);
     }
   };
   // Handle different tab contexts
-  if (tabContext === 'sent') {
+  if (tabContext === 'requested') {
     return (
       <>
         <div className="flex gap-2 mt-3">
@@ -158,23 +164,45 @@ export default function BookingActionButton({
 
   if (tabContext === 'received') {
     return (
-      <div className="flex gap-2 mt-3">
-        <Button
-          size="sm"
-          className="bg-green-600 hover:bg-green-700 text-white"
-        >
-          <Check className="w-4 h-4 mr-1" />
-          Confirm
-        </Button>
-        <Button
-          size="sm"
-          variant="outline"
-          className="border-red-500 text-red-500 hover:bg-red-50"
-        >
-          <Trash2 className="w-4 h-4 mr-1" />
-          Delete
-        </Button>
-      </div>
+      <>
+        <div className="flex gap-2 mt-3">
+          <Button
+            size="sm"
+            className="bg-green-600 hover:bg-green-700 text-white"
+            onClick={() => setShowConfirmModal(true)}
+          >
+            <Check className="w-4 h-4 mr-1" />
+            Confirm
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            className="border-red-500 text-red-500 hover:bg-red-50"
+            onClick={() => setShowDeleteModal(true)}
+          >
+            <Trash2 className="w-4 h-4 mr-1" />
+            Delete
+          </Button>
+        </div>
+
+        <BookingActionModal
+          isOpen={showConfirmModal}
+          onClose={() => setShowConfirmModal(false)}
+          action="confirm"
+          bookingId={bookingId}
+          serviceName={serviceName}
+          onSuccess={onConfirm}
+        />
+
+        <BookingActionModal
+          isOpen={showDeleteModal}
+          onClose={() => setShowDeleteModal(false)}
+          action="delete"
+          bookingId={bookingId}
+          serviceName={serviceName}
+          onSuccess={onDelete}
+        />
+      </>
     );
   }
 

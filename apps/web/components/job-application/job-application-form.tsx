@@ -12,25 +12,19 @@ import React, { useState } from 'react';
 
 interface JobApplicationFormProps {
   onSubmit: (qualifications: string, experience: string) => void;
+  isSubmitting?: boolean;
 }
 
 export default function JobApplicationForm({
   onSubmit,
+  isSubmitting = false,
 }: JobApplicationFormProps) {
   const [qualifications, setQualifications] = useState('');
   const [experience, setExperience] = useState('');
-  const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
     onSubmit(qualifications, experience);
-    // Optionally reset form after submission
-    setTimeout(() => {
-      setQualifications('');
-      setExperience('');
-      setSubmitted(false);
-    }, 2000);
   };
   return (
     <>
@@ -40,8 +34,8 @@ export default function JobApplicationForm({
             Make the Application
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <form onSubmit={handleSubmit} className="space-y-6 mb-4">
+        <form onSubmit={handleSubmit}>
+          <CardContent className="space-y-4">
             <div>
               <Label className="block text-lg text-hanapp-secondary font-semibold mb-3">
                 What are your qualifications for the job?
@@ -67,20 +61,25 @@ export default function JobApplicationForm({
                 required
               />
             </div>
-          </form>
-          <Button
-            type="submit"
-            className="w-full bg-hanapp-accent hover:bg-hanapp-secondary transition-colors text-hanapp-secondary hover:text-hanapp-accent font-semibold py-3 rounded-full text-lg"
-          >
-            {submitted ? 'Application Submitted!' : 'Submit'}
-          </Button>
-        </CardContent>
-        <CardFooter>
-          <p className="text-xs text-muted-foreground text-center mt-6">
-            There is no guarantee that your application will be accepted. Be
-            honest in your responses for a better chance to qualify for the job.
-          </p>
-        </CardFooter>
+
+            <Button
+              type="submit"
+              disabled={
+                isSubmitting || !qualifications.trim() || !experience.trim()
+              }
+              className="w-full bg-hanapp-accent hover:bg-hanapp-secondary transition-colors text-hanapp-secondary hover:text-hanapp-accent font-semibold py-3 rounded-full text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isSubmitting ? 'Submitting...' : 'Submit Application'}
+            </Button>
+          </CardContent>
+          <CardFooter>
+            <p className="text-xs text-muted-foreground text-center mt-6">
+              There is no guarantee that your application will be accepted. Be
+              honest in your responses for a better chance to qualify for the
+              job.
+            </p>
+          </CardFooter>
+        </form>
       </Card>
     </>
   );
