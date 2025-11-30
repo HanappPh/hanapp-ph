@@ -16,13 +16,8 @@
 // Import commands.ts using ES2015 syntax:
 import './commands';
 
-// Professional server health check before tests
+// Global configuration for tests
 beforeEach(() => {
-  cy.task('checkServerHealth').then(isHealthy => {
-    if (!isHealthy) {
-      cy.log('WARNING: Web server is not responding. Skipping test.');
-      // In a real scenario, you might want to skip the test
-      // For now, we'll let Cypress handle the connection error gracefully
-    }
-  });
+  // Set default viewport for consistency
+  cy.viewport(1280, 720);
 });
