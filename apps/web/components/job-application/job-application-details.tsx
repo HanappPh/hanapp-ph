@@ -1,7 +1,7 @@
 'use client';
 
 import { Button, Card } from '@hanapp-ph/commons';
-import { MapPin, Clock, CheckCircle2, HandCoins } from 'lucide-react';
+import { MapPin, Clock, CheckCircle2 } from 'lucide-react';
 import Image from 'next/image';
 import React, { useState } from 'react';
 
@@ -14,7 +14,6 @@ interface JobDetailsCardProps {
     location: string;
     date: string;
     time: string;
-    paymentMethods: string[];
     qualifications: string[];
     attachedPhotos: string[];
   };
@@ -113,34 +112,26 @@ export default function JobDetailsCard({ job }: JobDetailsCardProps) {
               </p>
             </div>
           </div>
+        </div>
 
-          <div className="flex items-start gap-3 text-hanapp-primary">
-            <HandCoins className="w-5 h-5 flex-shrink-0 mt-1" />
-            <div>
-              <p className="font-semibold">Payment Methods</p>
-              <p className="text-hanapp-secondary">
-                {job.paymentMethods.join(', ')}
-              </p>
-            </div>
+        {job.qualifications.length > 0 && (
+          <div>
+            <h3 className="font-semibold text-lg text-hanapp-primary mb-4">
+              Additional Requirements
+            </h3>
+            <ul className="space-y-3">
+              {job.qualifications.map((req, idx) => (
+                <li
+                  key={idx}
+                  className="flex items-start gap-3 text-hanapp-secondary"
+                >
+                  <CheckCircle2 className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                  <span>{req}</span>
+                </li>
+              ))}
+            </ul>
           </div>
-        </div>
-
-        <div>
-          <h3 className="font-semibold text-lg text-hanapp-primary mb-4">
-            What we&apos;re looking for
-          </h3>
-          <ul className="space-y-3">
-            {job.qualifications.map((req, idx) => (
-              <li
-                key={idx}
-                className="flex items-start gap-3 text-hanapp-secondary"
-              >
-                <CheckCircle2 className="w-5 h-5 flex-shrink-0 mt-0.5" />
-                <span>{req}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
+        )}
       </div>
     </Card>
   );
