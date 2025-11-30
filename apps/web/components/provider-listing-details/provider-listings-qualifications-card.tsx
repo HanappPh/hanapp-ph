@@ -12,7 +12,7 @@ export const ProviderListingsQualificationsCard: React.FC<
   <Card className="p-6">
     <div className="flex items-center gap-2 mb-4">
       <AlertCircle className="h-5 w-5" style={{ color: '#FFDD8E' }} />
-      <h3 className="text-lg font-semibold">Qualifications</h3>
+      <h3 className="text-lg font-semibold">Additional Requirements</h3>
     </div>
     <ul className="space-y-2">
       {qualifications.map((req, index) => (

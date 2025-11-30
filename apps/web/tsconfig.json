@@ -40,6 +40,8 @@
     "app/**/*.tsx",
     ".next/types/**/*.ts",
     "components/**/*",
+    "hooks/**/*",
+    "lib/**/*",
     "types/**/*"
   ],
   "exclude": [

@@ -46,5 +46,89 @@
 
   body {
     @apply bg-background text-foreground;
+    overflow-x: hidden;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+  }
+
+  /* Shine animation for Hanapp text */
+  .shine-animation {
+    position: relative;
+    background: linear-gradient(
+      90deg,
+      #f5c45e 0%,
+      #ffd700 25%,
+      #ffdd8e 50%,
+      #ffd700 75%,
+      #f5c45e 100%
+    );
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shine 10s ease-in-out infinite;
+  }
+
+  @keyframes shine {
+    0% {
+      background-position: -200% 0;
+    }
+    50% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
+  }
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0px) scale(1);
+    }
+    50% {
+      transform: translateY(-20px) scale(1.1);
+    }
+  }
+}
+
+@layer utilities {
+  .text-hanapp-primary {
+    color: #014182;
+  }
+
+  .text-hanapp-secondary {
+    color: #102e50;
+  }
+
+  .text-hanapp-accent {
+    color: #f5c45e;
+  }
+
+  .bg-hanapp-primary {
+    background-color: #014182;
+  }
+
+  .bg-hanapp-secondary {
+    background-color: #102e50;
+  }
+
+  .bg-hanapp-accent {
+    background-color: #ffc13a;
+  }
+
+  .border-hanapp-accent {
+    border-color: #f5c45e;
+  }
+
+  .hover\:bg-hanapp-primary:hover {
+    background-color: #014182;
+  }
+
+  .hover\:bg-hanapp-secondary:hover {
+    background-color: #102e50;
   }
 }

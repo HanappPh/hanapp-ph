@@ -40,9 +40,19 @@ const providers = [
 
 export function MainContent({
   initialSelected,
+  profile,
 }: {
   initialSelected?: 'Provider' | 'Client';
+  profile: {
+    full_name?: string;
+    email?: string;
+    phone_number?: string;
+  } | null;
 }) {
+  const displayName = profile?.full_name || 'User';
+  const displayEmail = profile?.email || 'Not provided';
+  const displayPhone = profile?.phone_number || 'Not provided';
+
   return (
     <main className="flex-1 p-6">
       <div className="grid grid-cols-3 gap-6">
@@ -68,21 +78,21 @@ export function MainContent({
                   <label className="text-sm text-gray-600 mb-1 block">
                     Full Name
                   </label>
-                  <p className="text-gray-900 font-medium">Mario M. Garcia</p>
+                  <p className="text-gray-900 font-medium">{displayName}</p>
                 </div>
                 <div className="mb-4">
                   <label className="text-sm text-gray-600 mb-1 block flex items-center">
                     <Mail className="w-4 h-4 mr-2" />
                     Email
                   </label>
-                  <p className="text-gray-900">andrevel@gmail.com</p>
+                  <p className="text-gray-900">{displayEmail}</p>
                 </div>
                 <div>
                   <label className="text-sm text-gray-600 mb-1 block flex items-center">
                     <Phone className="w-4 h-4 mr-2" />
                     Phone
                   </label>
-                  <p className="text-gray-900">+63 0956 056 0560</p>
+                  <p className="text-gray-900">{displayPhone}</p>
                 </div>
               </div>
 

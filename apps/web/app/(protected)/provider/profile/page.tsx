@@ -11,10 +11,13 @@ import { MobileProfileInfo } from '../../../../components/profile-mobile/mobile-
 import { MobileServicePreferences } from '../../../../components/profile-mobile/mobile-service-preference';
 import { MobileProfileStats } from '../../../../components/profile-mobile/mobile-stats';
 import { MobileProfileTabs } from '../../../../components/profile-mobile/mobile-tabs';
+import { useAuth } from '../../../../lib/hooks/useAuth';
 
 export default function ProfilePage() {
   const [showDropdown, setShowDropdown] = React.useState(false);
   const [selectedTab, setSelectedTab] = React.useState('Profile');
+  const { profile } = useAuth();
+
   return (
     <div className="bg-[#F3F5F9] flex flex-col">
       {/* Desktop layout */}
@@ -36,8 +39,9 @@ export default function ProfilePage() {
             accentColorDark="#F5C45E"
             accentColorLight="#FFDD8E"
             clickedColor="#f5c45e"
+            profile={profile}
           />
-          <MainContent initialSelected="Provider" />
+          <MainContent initialSelected="Provider" profile={profile} />
         </div>
       </div>
       {/* Mobile layout*/}
@@ -45,7 +49,7 @@ export default function ProfilePage() {
         {/* Mobile modular layout */}
         <MobileProfileHeader fromColor="#FFDD8E" toColor="#F5C45E" />
         <MobileProfileImage />
-        <MobileProfileInfo />
+        <MobileProfileInfo profile={profile} />
         <MobileProfileStats />
         <MobileProfileDivider />
         <MobileProfileTabs

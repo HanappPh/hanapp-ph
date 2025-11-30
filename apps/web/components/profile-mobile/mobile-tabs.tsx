@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { useAuth } from '../../lib/hooks/useAuth';
+
 type MobileProfileTabsProps = {
   selectedTab: string;
   setSelectedTab: (tab: string) => void;
@@ -21,6 +23,31 @@ export function MobileProfileTabs({
   tabSelectedBg,
   tabSelectedTextColor,
 }: MobileProfileTabsProps) {
+  const { signOut } = useAuth();
+  const [isLoggingOut, setIsLoggingOut] = React.useState(false);
+
+  const handleLogout = async () => {
+    if (isLoggingOut) {
+      return;
+    }
+
+    setIsLoggingOut(true);
+    try {
+      const { error } = await signOut();
+      if (error) {
+        console.error('Logout error:', error);
+        alert('Failed to logout. Please try again.');
+        setIsLoggingOut(false);
+      }
+      // signOut handles redirect to home page
+    } catch (err) {
+      console.error('Logout error:', err);
+      alert('Failed to logout. Please try again.');
+      setIsLoggingOut(false);
+    } finally {
+      setShowDropdown(false);
+    }
+  };
   return (
     <div className="w-full max-w-md mt-2 px-5">
       <div className="flex items-center justify-between border-b border-gray-100 pb-1">
@@ -84,6 +111,16 @@ export function MobileProfileTabs({
                   </button>
                 );
               })}
+              {/* Logout Button */}
+              <div className="border-t border-gray-200 mt-1 pt-1">
+                <button
+                  className="w-full text-left px-4 py-2 transition-colors duration-150 font-semibold text-red-600 hover:bg-red-50"
+                  onClick={handleLogout}
+                  disabled={isLoggingOut}
+                >
+                  {isLoggingOut ? 'Logging out...' : 'Logout'}
+                </button>
+              </div>
             </div>
           )}
         </div>

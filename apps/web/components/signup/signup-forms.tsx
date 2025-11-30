@@ -10,12 +10,31 @@ import {
 } from '../../types/signupinterface';
 
 const SignUpForm = forwardRef<SignUpFormRef, SignUpFormProps>(
-  ({ onSubmit }, ref) => {
+  ({ onSubmit, initialPhone }, ref) => {
+    // Parse the initial phone to extract just the number part
+    const parseInitialPhone = (phone: string | undefined) => {
+      if (!phone) {
+        return '';
+      }
+      // Remove country code and leading zeros
+      // If phone is like '0912345678', return '912345678'
+      // If phone is like '+639123456789', return '9123456789'
+      const cleanNumber = phone.replace(/\D/g, ''); // Remove non-digits
+      if (cleanNumber.startsWith('639')) {
+        return cleanNumber.substring(2); // Remove '63'
+      } else if (cleanNumber.startsWith('09')) {
+        return cleanNumber.substring(1); // Remove leading '0'
+      } else if (cleanNumber.startsWith('9')) {
+        return cleanNumber; // Already in correct format
+      }
+      return cleanNumber;
+    };
+
     const [formData, setFormData] = useState<FormData>({
       firstName: '',
       lastName: '',
       displayName: '',
-      phoneNumber: '',
+      phoneNumber: parseInitialPhone(initialPhone), // Use parsed phone
       email: '',
     });
 
@@ -75,26 +94,30 @@ const SignUpForm = forwardRef<SignUpFormRef, SignUpFormProps>(
       } else if (!validateEmail(formData.email)) {
         newErrors.email = 'Please enter a valid email address';
       }
-      if (!formData.phoneNumber.trim()) {
-        newErrors.phoneNumber = 'Input is required';
-      } else if (
-        !validatePhoneNumber(formData.phoneNumber, selectedCountryCode)
-      ) {
-        switch (selectedCountryCode) {
-          case '+63':
-            newErrors.phoneNumber =
-              'Please enter a valid Philippine mobile number (9XX XXX XXXX)';
-            break;
-          case '+1':
-            newErrors.phoneNumber =
-              'Please enter a valid US/Canadian phone number (10 digits)';
-            break;
-          case '+44':
-            newErrors.phoneNumber =
-              'Please enter a valid UK phone number (10-11 digits)';
-            break;
-          default:
-            newErrors.phoneNumber = 'Please enter a valid phone number';
+
+      // Skip phone validation if it's a pre-filled verified phone
+      if (!initialPhone) {
+        if (!formData.phoneNumber.trim()) {
+          newErrors.phoneNumber = 'Input is required';
+        } else if (
+          !validatePhoneNumber(formData.phoneNumber, selectedCountryCode)
+        ) {
+          switch (selectedCountryCode) {
+            case '+63':
+              newErrors.phoneNumber =
+                'Please enter a valid Philippine mobile number (9XX XXX XXXX)';
+              break;
+            case '+1':
+              newErrors.phoneNumber =
+                'Please enter a valid US/Canadian phone number (10 digits)';
+              break;
+            case '+44':
+              newErrors.phoneNumber =
+                'Please enter a valid UK phone number (10-11 digits)';
+              break;
+            default:
+              newErrors.phoneNumber = 'Please enter a valid phone number';
+          }
         }
       }
 
@@ -303,7 +326,10 @@ const SignUpForm = forwardRef<SignUpFormRef, SignUpFormProps>(
             htmlFor="phoneNumber"
             className="text-sm font-medium text-[#102E50]"
           >
-            Phone Number
+            Phone Number{' '}
+            {initialPhone && (
+              <span className="text-xs text-green-600">(Verified ✓)</span>
+            )}
           </Label>
           <div className="flex mt-1">
             <select
@@ -313,6 +339,7 @@ const SignUpForm = forwardRef<SignUpFormRef, SignUpFormProps>(
                 handleCountryCodeChange(e.target.value)
               }
               aria-label="Country code selection"
+              disabled={!!initialPhone}
             >
               <option value="+63">🇵🇭 +63</option>
               <option value="+1">🇺🇸 +1</option>
@@ -329,13 +356,20 @@ const SignUpForm = forwardRef<SignUpFormRef, SignUpFormProps>(
               }
               className={`flex-1 bg-gray-50/70 border-gray-300 rounded-l-none border-l-0 focus:border-[#102E50] focus:ring-[#102E50]/20 ${
                 errors.phoneNumber ? 'border-red-500 focus:border-red-500' : ''
-              }`}
+              } ${initialPhone ? 'bg-green-50/50 cursor-not-allowed' : ''}`}
               placeholder="Enter phone number"
               required
+              readOnly={!!initialPhone}
+              disabled={!!initialPhone}
             />
           </div>
           {errors.phoneNumber && (
             <p className="mt-1 text-sm text-red-600">{errors.phoneNumber}</p>
+          )}
+          {initialPhone && (
+            <p className="mt-1 text-xs text-green-600">
+              This phone number has been verified and cannot be changed
+            </p>
           )}
         </div>
       </form>

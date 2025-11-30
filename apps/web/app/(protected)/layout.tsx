@@ -1,10 +1,11 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import React from 'react';
+import React, { Suspense } from 'react';
 
 import { ClientHomeFooter } from '../../components/client-home/client-home-footer';
 import { ClientHomeNavbar } from '../../components/client-home/client-home-navbar';
+import { ProtectedRoute } from '../../lib/components/ProtectedRoute';
 
 /**
  * Layout for authenticated app routes (bookings, chat, jobs, profile, provider)
@@ -34,16 +35,26 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <ClientHomeNavbar
-        onProfileClick={handleProfileClick}
-        notificationCount={3}
-      />
-      <main className="flex-1">{children}</main>
-      <ClientHomeFooter
-        onNavigate={handleNavigate}
-        onSubmitContact={handleSubmitContact}
-      />
-    </div>
+    <ProtectedRoute>
+      <div className="min-h-screen flex flex-col page-transition">
+        <ClientHomeNavbar
+          onProfileClick={handleProfileClick}
+          notificationCount={3}
+        />
+        <Suspense
+          fallback={
+            <div className="flex-1 flex items-center justify-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-hanapp-primary"></div>
+            </div>
+          }
+        >
+          <main className="flex-1 content-transition">{children}</main>
+        </Suspense>
+        <ClientHomeFooter
+          onNavigate={handleNavigate}
+          onSubmitContact={handleSubmitContact}
+        />
+      </div>
+    </ProtectedRoute>
   );
 }

@@ -6,10 +6,13 @@ import {
   DollarSign,
   Shield,
   CreditCard,
+  LogOut,
 } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React from 'react';
+
+import { useAuth } from '../../lib/hooks/useAuth';
 
 export function Sidebar({
   initialSelected,
@@ -19,6 +22,7 @@ export function Sidebar({
   accentColorDark,
   accentColorLight,
   clickedColor,
+  profile,
 }: {
   initialSelected?: 'Provider' | 'Client';
   mainColorDark?: string;
@@ -27,18 +31,64 @@ export function Sidebar({
   accentColorDark?: string;
   accentColorLight?: string;
   clickedColor?: string;
+  profile: {
+    full_name?: string;
+    email?: string;
+  } | null;
 }) {
   const [selected, setSelected] = React.useState<'Provider' | 'Client'>(
     initialSelected ?? 'Client'
   );
+  const [isLoggingOut, setIsLoggingOut] = React.useState(false);
   const router = useRouter();
-  const handlePageChange = () => {
-    if (selected === 'Provider') {
-      router.push('/profile');
-    } else {
-      router.push('/provider/profile');
+  const { switchRole, activeRole, signOut } = useAuth();
+
+  // Sync local state with prop changes (when user navigates back to profile)
+  React.useEffect(() => {
+    if (initialSelected) {
+      setSelected(initialSelected);
+    }
+  }, [initialSelected]);
+
+  const handleRoleSwitch = (role: 'Provider' | 'Client') => {
+    const newRole = role.toLowerCase() as 'provider' | 'client';
+
+    // First update the auth state
+    switchRole(newRole);
+    setSelected(role);
+
+    // Use setTimeout to ensure state updates propagate before navigation
+    setTimeout(() => {
+      if (role === 'Provider') {
+        router.push('/provider/profile');
+      } else {
+        router.push('/profile');
+      }
+    }, 0);
+  };
+
+  const handleLogout = async () => {
+    if (isLoggingOut) {
+      return;
+    }
+
+    setIsLoggingOut(true);
+    try {
+      const { error } = await signOut();
+      if (error) {
+        console.error('Logout error:', error);
+        alert('Failed to logout. Please try again.');
+        setIsLoggingOut(false);
+      }
+      // signOut handles redirect to home page
+    } catch (err) {
+      console.error('Logout error:', err);
+      alert('Failed to logout. Please try again.');
+      setIsLoggingOut(false);
     }
   };
+
+  const displayName = profile?.full_name || 'User';
 
   return (
     <aside className="w-80 bg-white p-6">
@@ -57,7 +107,7 @@ export function Sidebar({
             />
           </div>
           <h3 className="text-xl font-semibold text-gray-900 mb-2">
-            Mario Garcia
+            {displayName}
           </h3>
           <div className="flex items-center justify-center space-x-2 mb-4">
             <div className="w-2 h-2 bg-green-500 rounded-full"></div>
@@ -80,10 +130,7 @@ export function Sidebar({
                 }
               : {}
           }
-          onClick={() => {
-            setSelected('Provider');
-            handlePageChange();
-          }}
+          onClick={() => handleRoleSwitch('Provider')}
         >
           Provider
         </Button>
@@ -98,10 +145,7 @@ export function Sidebar({
                 }
               : {}
           }
-          onClick={() => {
-            setSelected('Client');
-            handlePageChange();
-          }}
+          onClick={() => handleRoleSwitch('Client')}
         >
           Client
         </Button>
@@ -119,7 +163,11 @@ export function Sidebar({
           <Button
             variant="ghost"
             className="flex items-center gap-3 w-full justify-start pl-2 rounded-md"
-            style={{ background: clickedColor, color: '#fff' }}
+            style={{
+              background:
+                activeRole === 'provider' ? accentColorDark : clickedColor,
+              color: '#fff',
+            }}
           >
             <User className="w-5 h-5" />
             Profile
@@ -185,6 +233,19 @@ export function Sidebar({
             Payment Settings
           </Button>
         </nav>
+      </div>
+
+      {/* Logout Section */}
+      <div className="pt-4 border-t border-gray-200">
+        <Button
+          variant="ghost"
+          className="flex items-center gap-3 w-full justify-start text-red-600 pl-2 rounded-md hover:bg-red-50"
+          onClick={handleLogout}
+          disabled={isLoggingOut}
+        >
+          <LogOut className="w-5 h-5" />
+          {isLoggingOut ? 'Logging out...' : 'Logout'}
+        </Button>
       </div>
     </aside>
   );
