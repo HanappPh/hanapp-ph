@@ -7,6 +7,7 @@ import { SemaphoreService } from '../services/semaphore.service';
 describe('UserService', () => {
   let service: UserService;
   let supabaseService: SupabaseService;
+  let semaphoreService: SemaphoreService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -36,6 +37,7 @@ describe('UserService', () => {
 
     service = module.get<UserService>(UserService);
     supabaseService = module.get<SupabaseService>(SupabaseService);
+    semaphoreService = module.get<SemaphoreService>(SemaphoreService);
   });
 
   it('should be defined', () => {
@@ -44,7 +46,6 @@ describe('UserService', () => {
 
   describe('sendOtp', () => {
     it('should throw error for invalid phone number', async () => {
-      const semaphoreService = service['semaphoreService'];
       jest
         .spyOn(semaphoreService, 'validatePhoneNumber')
         .mockReturnValue(false);
@@ -57,7 +58,6 @@ describe('UserService', () => {
       process.env.TEST_PHONE_NUMBER = '+639123456789';
       process.env.TEST_OTP = '123456';
 
-      const semaphoreService = service['semaphoreService'];
       jest.spyOn(semaphoreService, 'validatePhoneNumber').mockReturnValue(true);
 
       const mockFrom = jest.fn().mockReturnValue({
@@ -77,7 +77,6 @@ describe('UserService', () => {
       // Clear test environment variables
       delete process.env.TEST_PHONE_NUMBER;
 
-      const semaphoreService = service['semaphoreService'];
       jest.spyOn(semaphoreService, 'validatePhoneNumber').mockReturnValue(true);
       jest.spyOn(semaphoreService, 'generateOTP').mockReturnValue('654321');
       jest.spyOn(semaphoreService, 'sendOTP').mockResolvedValue({
