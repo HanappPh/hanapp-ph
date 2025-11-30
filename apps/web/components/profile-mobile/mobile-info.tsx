@@ -1,10 +1,19 @@
 import React from 'react';
 
-export function MobileProfileInfo() {
+interface MobileProfileInfoProps {
+  profile: {
+    full_name?: string;
+    email?: string;
+  } | null;
+}
+
+export function MobileProfileInfo({ profile }: MobileProfileInfoProps) {
+  const displayName = profile?.full_name || 'User';
+
   return (
     <div className="mt-20 flex flex-col items-center">
       <h2 className="text-2xl font-bold bg-gradient-to-r from-[#102E50] to-[#F5C45E] bg-clip-text text-transparent">
-        Mario Garcia
+        {displayName}
       </h2>
       <div className="flex items-center gap-2 mt-1 mb-1">
         <span className="w-3 h-3 rounded-full bg-green-500 inline-block"></span>

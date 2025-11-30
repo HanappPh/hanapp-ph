@@ -31,6 +31,7 @@ interface BookingCardProps {
   serviceImage?: string;
   providerImage?: string;
   tabContext?: 'sent' | 'received' | 'ongoing' | 'past' | 'cancelled';
+  onDelete?: () => void;
 }
 
 export default function BookingCard(booking: BookingCardProps) {
@@ -102,6 +103,7 @@ export default function BookingCard(booking: BookingCardProps) {
                 status={booking.status}
                 bookingId={booking.id}
                 tabContext={booking.tabContext}
+                onDelete={booking.onDelete}
               ></BookingActionButton>
             </div>
           </div>

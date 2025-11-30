@@ -47,4 +47,37 @@ Thumbs.db
 .next
 out
 
+# Environment files
+.env
+.env.local
+.env.development
+.env.production
+.env.*.local
+**/.env
+**/.env.local
+**/.env.development
+**/.env.production
+
+# Keep template files
+!.env.example
+!.env.template
+!**/.env.template
+!**/.env.example
+
 test-output
+
+# Environment files
+.env
+.env*.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Keep env templates and examples
+!.env.example
+!.env.template
+!*.env.template
+
+# Cypress environment files (contains test credentials)
+**/cypress.env.json
+cypress.env.json

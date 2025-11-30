@@ -38,6 +38,7 @@ interface SidebarProps {
   responseTime: string;
   location: string;
   schedule: string;
+  jobId?: string;
 }
 
 export function Sidebar({
@@ -50,6 +51,7 @@ export function Sidebar({
   totalReviews,
   responseTime,
   location,
+  jobId,
 }: SidebarProps) {
   const router = useRouter();
 
@@ -58,6 +60,14 @@ export function Sidebar({
     router.push('/chat?userId=1');
   };
 
+  const handleBookNow = () => {
+    if (onBookNow) {
+      onBookNow(); // still support external override
+    } else {
+      // route to /book or /book/[jobId]
+      router.push(jobId ? `/jobs/${jobId}/book` : '/book');
+    }
+  };
   return (
     <div
       className="w-full"
@@ -121,7 +131,7 @@ export function Sidebar({
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 lg:gap-4 mb-2 sm:mb-3 lg:mb-4 w-full">
             <Button
               className="flex-1 bg-[#102E50] text-white hover:bg-[#102E50]/90 text-xs sm:text-sm lg:text-base min-w-0 h-8 sm:h-10 lg:h-12"
-              onClick={onBookNow}
+              onClick={handleBookNow}
               aria-label="Book this service now"
             >
               Book Now

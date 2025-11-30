@@ -12,10 +12,16 @@ import { MobileProfileInfo } from '../../../components/profile-mobile/mobile-inf
 import { MobileServicePreferences } from '../../../components/profile-mobile/mobile-service-preference';
 import { MobileProfileStats } from '../../../components/profile-mobile/mobile-stats';
 import { MobileProfileTabs } from '../../../components/profile-mobile/mobile-tabs';
+import { useAuth } from '../../../lib/hooks/useAuth';
 
 export default function ProfilePage() {
   const [showDropdown, setShowDropdown] = React.useState(false);
   const [selectedTab, setSelectedTab] = React.useState('Profile');
+  const { profile, activeRole } = useAuth();
+
+  // Convert activeRole to the format expected by Sidebar
+  const initialSelected = activeRole === 'provider' ? 'Provider' : 'Client';
+
   return (
     <div className="min-h-screen bg-[#F3F5F9] flex flex-col">
       {/* Desktop layout */}
@@ -30,15 +36,16 @@ export default function ProfilePage() {
         /> */}
         <div className="flex">
           <Sidebar
-            initialSelected="Client"
+            initialSelected={initialSelected}
             mainColorDark="#102E50"
             mainColorLight="#014182"
             hoverColor="#DEEFFF"
             accentColorDark="#F5C45E"
             accentColorLight="#FFDD8E"
             clickedColor="#102E50"
+            profile={profile}
           />
-          <MainContent initialSelected="Client" />
+          <MainContent initialSelected={initialSelected} profile={profile} />
         </div>
       </div>
       {/* Mobile layout*/}
@@ -46,7 +53,7 @@ export default function ProfilePage() {
         {/* Mobile modular layout */}
         <MobileProfileHeader fromColor="#014182" toColor="#102E50" />
         <MobileProfileImage />
-        <MobileProfileInfo />
+        <MobileProfileInfo profile={profile} />
         <MobileProfileStats />
         <MobileProfileDivider />
         <MobileProfileTabs

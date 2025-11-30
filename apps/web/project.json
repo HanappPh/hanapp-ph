@@ -8,7 +8,8 @@
       "defaultConfiguration": "development",
       "options": {
         "buildTarget": "@hanapp-ph/web:build:development",
-        "dev": true
+        "dev": true,
+        "port": 4200
       },
       "configurations": {
         "development": {
