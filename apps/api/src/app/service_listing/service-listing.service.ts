@@ -42,14 +42,18 @@ export class ServiceListingService {
     return data;
   }
   // find all listings
-  async findAll(providerId?: string) {
+  async findAll(providerId?: string, excludeProviderId?: string) {
     const supabase = this.supabaseService.getClient();
     let query = supabase
       .from('service_listings')
       .select(`*`)
+      .eq('is_active', true)
       .order('created_at', { ascending: false });
     if (providerId) {
       query = query.eq('provider_id', providerId);
+    }
+    if (excludeProviderId) {
+      query = query.neq('provider_id', excludeProviderId);
     }
     const { data, error } = await query;
     if (error) {
@@ -58,6 +62,38 @@ export class ServiceListingService {
         HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
+
+    // Fetch provider and category information for each listing
+    if (data && data.length > 0) {
+      const providerIds = [
+        ...new Set(data.map(listing => listing.provider_id)),
+      ];
+      const categoryIds = [
+        ...new Set(data.map(listing => listing.category_id)),
+      ];
+
+      const { data: providers } = await supabase
+        .from('users')
+        .select('id, full_name, avatar_url')
+        .in('id', providerIds);
+
+      const { data: categories } = await supabase
+        .from('categories')
+        .select('id, name')
+        .in('id', categoryIds);
+
+      // Create maps for quick lookup
+      const providerMap = new Map(providers?.map(p => [p.id, p]) || []);
+      const categoryMap = new Map(categories?.map(c => [c.id, c]) || []);
+
+      // Attach provider and category data to each listing
+      return data.map(listing => ({
+        ...listing,
+        provider: providerMap.get(listing.provider_id) || null,
+        category: categoryMap.get(listing.category_id) || null,
+      }));
+    }
+
     return data;
   }
   // find by id
@@ -75,6 +111,54 @@ export class ServiceListingService {
       );
     }
     return data;
+  }
+
+  // find by id with full details (listing + services + provider + category)
+  async findOneWithDetails(listingId: string) {
+    const supabase = this.supabaseService.getClient();
+
+    // Fetch the listing with provider and category data
+    const { data: listing, error: listingError } = await supabase
+      .from('service_listings')
+      .select('*')
+      .eq('id', listingId)
+      .single();
+
+    if (listingError || !listing) {
+      throw new HttpException(
+        `Failed to fetch service listing: ${listingError?.message}`,
+        HttpStatus.NOT_FOUND
+      );
+    }
+
+    // Fetch provider info
+    const { data: provider } = await supabase
+      .from('users')
+      .select('id, full_name, avatar_url, email, phone, created_at')
+      .eq('id', listing.provider_id)
+      .single();
+
+    // Fetch category info
+    const { data: category } = await supabase
+      .from('categories')
+      .select('id, name')
+      .eq('id', listing.category_id)
+      .single();
+
+    // Fetch all services for this listing
+    const { data: services } = await supabase
+      .from('service_listing_details')
+      .select('*')
+      .eq('listing_id', listingId)
+      .order('created_at', { ascending: true });
+
+    // Return combined data
+    return {
+      ...listing,
+      provider: provider || null,
+      category: category || null,
+      services: services || [],
+    };
   }
 
   // update listing
