@@ -5,6 +5,8 @@ import { MapPin, Star } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
+import { useAuth } from '../lib/hooks/useAuth';
+
 type Job = {
   id: string;
   title: string;
@@ -22,9 +24,16 @@ interface JobCardProps {
 
 export default function CategoriesJobCard({ job }: JobCardProps) {
   const router = useRouter();
+  const { activeRole } = useAuth();
 
   const handleClick = () => {
-    router.push(`/jobs/${job.id}`);
+    // When in provider mode, redirect to provider job details page
+    // When in client mode, redirect to client job details page
+    if (activeRole === 'provider') {
+      router.push(`/provider/jobs/${job.id}`);
+    } else {
+      router.push(`/jobs/${job.id}`);
+    }
   };
 
   return (
