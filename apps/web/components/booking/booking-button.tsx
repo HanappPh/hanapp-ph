@@ -84,33 +84,42 @@ export default function BookingActionButton({
 
   const handleDelete = async () => {
     if (!session?.access_token) {
-      console.error('No access token available');
       return;
     }
 
     setIsDeleting(true);
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/service-requests/${bookingId}`,
-        {
-          method: 'DELETE',
-          headers: {
-            Authorization: `Bearer ${session.access_token}`,
-          },
-        }
-      );
+      // Check if it's a service request (numeric ID) or job application (string ID starting with 'app-')
+      const isServiceRequest =
+        typeof bookingId === 'number' || !String(bookingId).startsWith('app-');
 
-      if (!response.ok) {
-        throw new Error('Failed to delete booking');
+      if (isServiceRequest) {
+        // Update service request status to cancelled
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/service-requests/${bookingId}`,
+          {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${session.access_token}`,
+            },
+            body: JSON.stringify({ status: 'cancelled' }),
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error('Failed to cancel booking');
+        }
       }
+      // For job applications, we'll just update the UI via callback
 
       setShowDeleteDialog(false);
-      // Call the onDelete callback to refresh the bookings list
+      // Call the onDelete callback to update UI
       if (onDelete) {
         onDelete();
       }
     } catch (error) {
-      console.error('Error deleting booking:', error);
+      console.error('Error cancelling booking:', error);
     } finally {
       setIsDeleting(false);
     }

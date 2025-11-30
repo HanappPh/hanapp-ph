@@ -222,7 +222,7 @@ const hardcodedBookings = {
 };
 
 export default function BookingsPage() {
-  const [activeTab, setActiveTab] = useState('sent'); // Start with 'sent' tab for new posts
+  const [activeTab, setActiveTab] = useState('requested'); // Default to requested tab
   const { user } = useAuth();
   const searchParams = useSearchParams();
   const [bookingsData, setBookingsData] = useState<{
@@ -249,9 +249,27 @@ export default function BookingsPage() {
     }
   }, [searchParams]);
 
-  // Function to trigger data refresh
-  const handleDelete = () => {
-    setRefreshTrigger(prev => prev + 1);
+  // Function to handle cancelling from requested tab (moves to cancelled)
+  const handleCancelFromRequested = (bookingId: number | string) => {
+    setBookingsData(prev => {
+      // Find the booking in requested
+      const bookingToCancel = prev.requested.find(b => b.id === bookingId);
+      if (!bookingToCancel) {
+        return prev;
+      }
+
+      // Update status to Cancelled
+      const cancelledBooking = {
+        ...bookingToCancel,
+        status: 'Cancelled' as const,
+      };
+
+      return {
+        ...prev,
+        requested: prev.requested.filter(b => b.id !== bookingId),
+        cancelled: [cancelledBooking, ...prev.cancelled],
+      };
+    });
   };
 
   // Function to handle confirming a booking (moves from received to ongoing)
@@ -452,6 +470,9 @@ export default function BookingsPage() {
 
         // Categorize service requests by status
         const categorizedServiceRequests = {
+          pending: transformedServiceRequests.filter(
+            b => b.status === 'Pending'
+          ),
           ongoing: transformedServiceRequests.filter(
             b => b.status === 'Accepted' || b.status === 'Paid'
           ),
@@ -466,6 +487,7 @@ export default function BookingsPage() {
         setBookingsData({
           requested: [
             ...transformedSentApplications,
+            ...categorizedServiceRequests.pending,
             ...hardcodedBookings.requested,
           ],
           received: [
@@ -620,7 +642,7 @@ export default function BookingsPage() {
                     key={booking.id}
                     {...booking}
                     tabContext="requested"
-                    onDelete={handleDelete}
+                    onDelete={() => handleCancelFromRequested(booking.id)}
                   ></BookingCard>
                 ))
               ) : (
