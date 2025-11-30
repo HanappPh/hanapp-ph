@@ -1,10 +1,13 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import React, { use, useEffect, useState } from 'react';
 
 import JobDetailsCard from '../../../../../../components/job-application/job-application-details';
 import JobApplicationForm from '../../../../../../components/job-application/job-application-form';
+import { createJobApplication } from '../../../../../../lib/api/jobApplications';
 import { fetchServiceRequestById } from '../../../../../../lib/api/serviceRequests';
+import { useAuth } from '../../../../../../lib/hooks/useAuth';
 
 // Category ID to name mapping
 const CATEGORY_NAMES: Record<number, string> = {
@@ -48,23 +51,28 @@ const FALLBACK_JOB_DETAILS = {
 };
 
 interface JobApplicationPageProps {
-  params: {
+  params: Promise<{
     jobId: string;
-  };
+  }>;
 }
 
 export default function JobApplicationPage({
   params,
 }: JobApplicationPageProps) {
+  const { jobId } = use(params);
+  const router = useRouter();
+  const { user } = useAuth();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [jobDetails, setJobDetails] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     const fetchJobDetails = async () => {
       try {
         setLoading(true);
-        const data = await fetchServiceRequestById(params.jobId);
+        const data = await fetchServiceRequestById(jobId);
 
         if (!data) {
           throw new Error('Failed to fetch job details');
@@ -133,15 +141,42 @@ export default function JobApplicationPage({
     };
 
     fetchJobDetails();
-  }, [params.jobId]);
+  }, [jobId]);
 
-  const handleApplicationSubmit = (
+  const handleApplicationSubmit = async (
     qualifications: string,
     experience: string
   ) => {
-    console.log('Submitted qualifications:', qualifications);
-    console.log('Submitted experience:', experience);
-    // TODO: send to API
+    if (!user?.id) {
+      alert('You must be logged in to submit an application');
+      return;
+    }
+
+    if (submitting) {
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+
+      await createJobApplication(
+        {
+          serviceRequestId: jobId,
+          qualifications,
+          experience,
+        },
+        user.id
+      );
+
+      alert('Application submitted successfully!');
+      // Redirect to bookings page with sent tab active
+      router.push('/bookings?tab=sent&refresh=true');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      alert(err.message || 'Failed to submit application. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (loading) {
@@ -171,7 +206,10 @@ export default function JobApplicationPage({
 
           {/* Right Column - Application Form */}
           <div>
-            <JobApplicationForm onSubmit={handleApplicationSubmit} />
+            <JobApplicationForm
+              onSubmit={handleApplicationSubmit}
+              isSubmitting={submitting}
+            />
           </div>
         </div>
       </div>
