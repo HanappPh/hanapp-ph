@@ -67,10 +67,23 @@ export function JobDetailsSection({
               <SelectValue placeholder="Select category" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="1">Cleaning</SelectItem>
-              <SelectItem value="2">Tutoring</SelectItem>
-              <SelectItem value="3">Repair</SelectItem>
-              <SelectItem value="4">Delivery</SelectItem>
+              <SelectItem value="1">Laundry</SelectItem>
+              <SelectItem value="2">Transportation</SelectItem>
+              <SelectItem value="3">Babysitting</SelectItem>
+              <SelectItem value="4">Errands</SelectItem>
+              <SelectItem value="5">Pet Care</SelectItem>
+              <SelectItem value="6">Catering</SelectItem>
+              <SelectItem value="7">Construction</SelectItem>
+              <SelectItem value="8">Plumbing</SelectItem>
+              <SelectItem value="9">Auto Repair</SelectItem>
+              <SelectItem value="10">Tech Support</SelectItem>
+              <SelectItem value="11">Gardening</SelectItem>
+              <SelectItem value="12">Legal</SelectItem>
+              <SelectItem value="13">Painting</SelectItem>
+              <SelectItem value="14">Home Services</SelectItem>
+              <SelectItem value="15">Electrical</SelectItem>
+              <SelectItem value="16">Moving</SelectItem>
+              <SelectItem value="17">Professional Services</SelectItem>
             </SelectContent>
           </Select>
         </div>

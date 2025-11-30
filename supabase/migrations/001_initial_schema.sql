@@ -262,7 +262,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 CREATE TABLE public.service_requests (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   client_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-  category_id INTEGER NOT NULL CHECK (category_id IN (1, 2, 3, 4)), -- 1=Cleaning, 2=Tutoring, 3=Repair, 4=Delivery
+  category_id INTEGER NOT NULL CHECK (category_id IN (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17)), -- Initial: 1=Cleaning, 2=Tutoring, 3=Repair, 4=Delivery (expanded to 17 categories in migration 002)
   title TEXT NOT NULL,
   description TEXT NOT NULL,
   additional_requirements TEXT,

@@ -13,6 +13,11 @@ import React, {
 // import { CategoriesHeader } from '../../../../components/categories/categories-header';
 import { CategoriesSidebar } from '../../../../components/categories/categories-sidebar';
 import CategoriesJobCard from '../../../../components/categories-job-card';
+import {
+  fetchServiceRequestsForJobListings,
+  type JobListing,
+} from '../../../../lib/api/serviceRequests';
+import { useAuth } from '../../../../lib/hooks/useAuth';
 
 // Type definition
 type Job = {
@@ -215,9 +220,49 @@ type SortOption = 'location' | 'rating' | 'price-high-low' | 'price-low-high';
 function CategoriesPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { activeRole } = useAuth();
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<SortOption>('location');
   const [searchQuery, setSearchQuery] = useState('');
+  const [clientJobRequests, setClientJobRequests] = useState<JobListing[]>([]);
+  const [loadingJobRequests, setLoadingJobRequests] = useState(false);
+
+  // Fetch client job requests when in provider mode
+  useEffect(() => {
+    if (activeRole === 'provider') {
+      const fetchJobRequests = async () => {
+        setLoadingJobRequests(true);
+        try {
+          const requests = await fetchServiceRequestsForJobListings();
+          setClientJobRequests(requests);
+        } catch (error) {
+          console.error('Error fetching job requests:', error);
+        } finally {
+          setLoadingJobRequests(false);
+        }
+      };
+      fetchJobRequests();
+    }
+  }, [activeRole]);
+
+  // Determine which data source to use based on activeRole
+  const jobsDataSource = useMemo(() => {
+    if (activeRole === 'provider') {
+      // Convert JobListing[] to Job[] format for provider mode
+      return clientJobRequests.map(listing => ({
+        id: listing.id,
+        title: listing.title,
+        category: listing.category,
+        location: listing.location,
+        price: listing.price,
+        rating: listing.rating,
+        image: listing.image,
+        categories: [listing.category], // Convert single category to array
+      }));
+    }
+    // Client mode: use the hardcoded provider listings
+    return jobs;
+  }, [activeRole, clientJobRequests]);
 
   // Initialize search query and category from URL parameters
   useEffect(() => {
@@ -326,7 +371,7 @@ function CategoriesPageContent() {
   };
 
   const filteredJobs = useMemo(() => {
-    const filtered = jobs.filter(job => {
+    const filtered = jobsDataSource.filter(job => {
       // Filter by categories
       const matchesCategories =
         selectedCategories.length === 0 ||
@@ -346,17 +391,17 @@ function CategoriesPageContent() {
     });
 
     return sortJobs(filtered, sortBy);
-  }, [selectedCategories, searchQuery, sortBy, sortJobs]);
+  }, [selectedCategories, searchQuery, sortBy, sortJobs, jobsDataSource]);
 
   const categoryCounts = useMemo(() => {
     const counts: Record<string, number> = {};
     categories.forEach(category => {
-      counts[category] = jobs.filter(job =>
+      counts[category] = jobsDataSource.filter(job =>
         job.categories.includes(category)
       ).length;
     });
     return counts;
-  }, []);
+  }, [jobsDataSource]);
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -370,7 +415,11 @@ function CategoriesPageContent() {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
                 type="text"
-                placeholder="Search services, categories, or locations..."
+                placeholder={
+                  activeRole === 'provider'
+                    ? 'Search job requests, categories, or locations...'
+                    : 'Search services, categories, or locations...'
+                }
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 onKeyDown={handleSearchKeyDown}
@@ -455,7 +504,9 @@ function CategoriesPageContent() {
               <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <p className="text-gray-900">
                   <span className="font-semibold">{filteredJobs.length}</span>{' '}
-                  results found
+                  {activeRole === 'provider'
+                    ? 'job requests found'
+                    : 'services found'}
                   {(selectedCategories.length > 0 || searchQuery.trim()) && (
                     <span className="text-gray-600 block sm:inline mt-1 sm:mt-0">
                       {' '}
@@ -483,11 +534,19 @@ function CategoriesPageContent() {
                 </div>
               </div>
 
-              {filteredJobs.length === 0 ? (
+              {loadingJobRequests && activeRole === 'provider' ? (
+                <div className="bg-gray-50 rounded-lg p-6 sm:p-12 text-center border border-gray-200">
+                  <div className="flex justify-center items-center gap-2">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-hanapp-primary"></div>
+                    <p className="text-gray-600">Loading job requests...</p>
+                  </div>
+                </div>
+              ) : filteredJobs.length === 0 ? (
                 <div className="bg-gray-50 rounded-lg p-6 sm:p-12 text-center border border-gray-200">
                   <p className="text-gray-600">
-                    No services found matching your criteria. Try adjusting your
-                    filters.
+                    {activeRole === 'provider'
+                      ? 'No client job requests found matching your criteria. Try adjusting your filters.'
+                      : 'No services found matching your criteria. Try adjusting your filters.'}
                   </p>
                 </div>
               ) : (

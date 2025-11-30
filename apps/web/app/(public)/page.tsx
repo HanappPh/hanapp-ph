@@ -294,7 +294,7 @@ export default function HomePage() {
 
   return (
     <>
-      <ClientHomeHero userName="Andrew" />
+      <ClientHomeHero />
 
       <ClientHomeCategories
         onCategoryClick={handleCategoryClick}

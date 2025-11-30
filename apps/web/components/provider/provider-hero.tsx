@@ -7,19 +7,9 @@ import { useState, KeyboardEvent } from 'react';
 
 import { useAuth } from '../../lib/hooks/useAuth';
 
-export function ClientHomeHero() {
+export function ProviderHero() {
   const router = useRouter();
-
-  // Safely get auth context, handle case where AuthProvider might not be available (e.g., in tests)
-  let profile = null;
-  try {
-    const auth = useAuth();
-    profile = auth?.profile;
-  } catch {
-    // AuthProvider not available, use default
-    console.warn('useAuth called outside AuthProvider context');
-  }
-
+  const { profile } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
 
   // Get the first name from full_name, or use 'Guest' as fallback
@@ -30,7 +20,7 @@ export function ClientHomeHero() {
   const handleSearch = () => {
     if (searchQuery.trim()) {
       router.push(
-        `/jobs/categories?search=${encodeURIComponent(searchQuery.trim())}`
+        `/provider/jobs?search=${encodeURIComponent(searchQuery.trim())}`
       );
     }
   };
@@ -43,14 +33,14 @@ export function ClientHomeHero() {
 
   return (
     <section className="relative bg-gray-50">
-      {/* Blue gradient background - only top half */}
-      <div className="absolute inset-x-0 top-0 h-1/2 bg-hanapp-gradient" />
+      {/* Provider gradient background - only top half */}
+      <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-[#FFDD8E] to-[#F5C45E]" />
 
       <div className="relative container mx-auto px-4 py-6">
         {/* Greeting */}
         <div className="mb-4">
-          <h1 className="text-2xl font-semibold text-white">
-            Ano <span className="text-yellow-400">Hanapp</span> mo, {userName}?
+          <h1 className="text-2xl font-semibold text-[#102E50]">
+            Welcome back, <span className="font-bold">{userName}!</span>
           </h1>
         </div>
 
@@ -71,11 +61,11 @@ export function ClientHomeHero() {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
           <input
             type="text"
-            placeholder="Search here"
+            placeholder="Search for jobs or services..."
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="w-full pl-10 pr-4 py-3 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+            className="w-full pl-10 pr-4 py-3 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#F5C45E]"
           />
         </div>
       </div>
