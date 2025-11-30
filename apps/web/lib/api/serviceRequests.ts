@@ -15,7 +15,7 @@ const API_BASE_URL = getApiBaseUrl();
 export interface ServiceRequest {
   id: string;
   client_id: string;
-  category_id: number; // 1=Cleaning, 2=Tutoring, 3=Repair, 4=Delivery
+  category_id: number; // 1-17: See getCategoryName() for mapping
   title: string;
   description: string;
   additional_requirements?: string;
@@ -53,10 +53,23 @@ export interface JobListing {
 // Category mapping
 const getCategoryName = (categoryId: number): string => {
   const categoryNames = {
-    1: 'Cleaning',
-    2: 'Tutoring',
-    3: 'Repair',
-    4: 'Delivery',
+    1: 'Laundry',
+    2: 'Transportation',
+    3: 'Babysitting',
+    4: 'Errands',
+    5: 'Pet Care',
+    6: 'Catering',
+    7: 'Construction',
+    8: 'Plumbing',
+    9: 'Auto Repair',
+    10: 'Tech Support',
+    11: 'Gardening',
+    12: 'Legal',
+    13: 'Painting',
+    14: 'Home Services',
+    15: 'Electrical',
+    16: 'Moving',
+    17: 'Professional Services',
   };
   return categoryNames[categoryId as keyof typeof categoryNames] || 'Other';
 };
