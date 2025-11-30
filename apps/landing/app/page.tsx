@@ -9,6 +9,7 @@ import { testimoniesData } from '../components/data/testimoniesData';
 import DemoAboutSections from '../components/DemoAboutSections';
 import FinalCTASection from '../components/FinalCTASection';
 import FindHelpSection from '../components/FindHelpSection';
+import Footer from '../components/Footer';
 import HeroSection from '../components/HeroSection';
 import MobileShowcaseSection from '../components/MobileShowcaseSection';
 import Navigation from '../components/Navigation';
@@ -56,6 +57,9 @@ const LandingPage = () => {
 
       {/* Final CTA Section */}
       <FinalCTASection />
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };
