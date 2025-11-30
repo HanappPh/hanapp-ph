@@ -26,9 +26,31 @@ export default function ClientJobPage() {
       rating: number;
       comment: string;
       created_at: string;
-      client?: { full_name: string };
+      client?: { full_name: string; avatar_url?: string };
     }>
   >([]);
+
+  // Fetch reviews for the service listing
+  const fetchReviews = async (listingId: string) => {
+    try {
+      const response = await fetch(
+        `http://localhost:3001/api/reviews/listing/${listingId}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (response.ok) {
+        const result = await response.json();
+        setDbReviews(result.reviews || []);
+      }
+    } catch (error) {
+      console.error('Failed to fetch reviews:', error);
+    }
+  };
 
   // Fetch service listing details on mount
   useEffect(() => {
@@ -38,26 +60,9 @@ export default function ClientJobPage() {
         const data = await fetchServiceListingDetails(jobId);
         setListing(data);
 
-        // Fetch reviews for this provider
-        if (data?.provider_id) {
-          try {
-            const response = await fetch(
-              `http://localhost:3001/api/reviews/provider/${data.provider_id}`,
-              {
-                method: 'GET',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-              }
-            );
-
-            if (response.ok) {
-              const reviewsData = await response.json();
-              setDbReviews(reviewsData);
-            }
-          } catch (error) {
-            console.error('Failed to fetch reviews:', error);
-          }
+        // Fetch reviews for this service listing
+        if (data?.id) {
+          await fetchReviews(data.id);
         }
       } catch (error) {
         console.error('Failed to load listing details:', error);
@@ -125,7 +130,7 @@ export default function ClientJobPage() {
   // Format availability schedule from JSONB
   const formatAvailabilitySchedule = (): string => {
     if (!listing?.availability_schedule) {
-      return 'Mon–Sun, 9:00 AM – 7:00 PM';
+      return 'Mon-Sun, 9:00 AM - 7:00 PM';
     }
 
     try {
@@ -150,10 +155,10 @@ export default function ClientJobPage() {
         return processScheduleObject(rawSchedule as Record<string, unknown>);
       }
 
-      return 'Mon–Sun, 9:00 AM – 7:00 PM';
+      return 'Mon-Sun, 9:00 AM - 7:00 PM';
     } catch (error) {
       console.error('Error parsing availability schedule:', error);
-      return 'Mon–Sun, 9:00 AM – 7:00 PM';
+      return 'Mon-Sun, 9:00 AM - 7:00 PM';
     }
   };
 
@@ -302,13 +307,13 @@ export default function ClientJobPage() {
               );
 
             if (isConsecutive && dayNames.length > 2) {
-              dayDisplay = `${dayNames[0]}–${dayNames[dayNames.length - 1]}`;
+              dayDisplay = `${dayNames[0]}-${dayNames[dayNames.length - 1]}`;
             } else {
               dayDisplay = dayNames.join(', ');
             }
           }
 
-          const timeDisplay = `${formatTime(group.start)} – ${formatTime(group.end)}`;
+          const timeDisplay = `${formatTime(group.start)} - ${formatTime(group.end)}`;
           return `${dayDisplay}, ${timeDisplay}`;
         });
 
@@ -319,18 +324,18 @@ export default function ClientJobPage() {
       if ('days' in scheduleObj && 'hours' in scheduleObj) {
         const days = Array.isArray(scheduleObj.days)
           ? scheduleObj.days.join(', ')
-          : 'Mon–Sun';
+          : 'Mon-Sun';
         const hours =
           typeof scheduleObj.hours === 'string'
             ? scheduleObj.hours
-            : '9:00 AM – 7:00 PM';
+            : '9:00 AM - 7:00 PM';
         return `${days}, ${hours}`;
       }
 
-      return 'Mon–Sun, 9:00 AM – 7:00 PM';
+      return 'Mon-Sun, 9:00 AM - 7:00 PM';
     } catch (error) {
       console.error('Error parsing availability schedule:', error);
-      return 'Mon–Sun, 9:00 AM – 7:00 PM';
+      return 'Mon-Sun, 9:00 AM - 7:00 PM';
     }
   };
 
@@ -518,6 +523,13 @@ export default function ClientJobPage() {
         }))
       : fallbackReviews;
 
+  const handleReviewSubmitted = () => {
+    // Refresh reviews after submission
+    if (listing?.id) {
+      fetchReviews(listing.id);
+    }
+  };
+
   const sellerProfile = {
     name: listing?.provider?.full_name || 'Provider',
     phone: listing?.provider?.phone || 'Not available',
@@ -569,8 +581,8 @@ export default function ClientJobPage() {
 
   const serviceHeaderData = {
     title: listing?.title || 'Service Listing',
-    rating: 4.8, // TODO: Add ratings to DB
-    totalReviews: 120, // TODO: Add reviews count to DB
+    rating: listing?.rating || 0,
+    totalReviews: listing?.review_count || 0,
     responseTime: '24 hours',
     location: listing?.service_areas?.[0] || 'Location not specified',
   };
@@ -629,7 +641,13 @@ export default function ClientJobPage() {
           <div>
             <ServicesSection services={services} expectations={expectations} />
             <div className="w-full mt-2 sm:mt-4 lg:mt-6">
-              <ReviewsSection reviews={reviews} sellerProfile={sellerProfile} />
+              <ReviewsSection
+                reviews={reviews}
+                sellerProfile={sellerProfile}
+                serviceListingId={listing.id}
+                onReviewSubmitted={handleReviewSubmitted}
+                providerId={listing.provider_id}
+              />
             </div>
             <div className="w-full mt-2 sm:mt-4 lg:mt-6">
               <h2 className="text-base sm:text-lg lg:text-2xl font-bold text-[#102E50] text-center mb-4">

@@ -54,26 +54,66 @@ export class ReviewsService {
   // CREATE REVIEW
   // ======================================
   async createReview(dto: CreateReviewDto, userId: string) {
-    // Validate booking ownership
-    await this.validateBookingOwner(dto.booking_id, userId);
+    // Validate that either booking_id or service_listing_id is provided
+    if (!dto.booking_id && !dto.service_listing_id) {
+      throw new HttpException(
+        'Either booking_id or service_listing_id must be provided',
+        HttpStatus.BAD_REQUEST
+      );
+    }
 
-    // Get service_id and provider_id from booking
-    const { data: booking, error: bookingError } = await this.supabaseService
-      .from('bookings')
-      .select('service_id, provider_id')
-      .eq('id', dto.booking_id)
-      .single();
+    let providerId: string;
+    let serviceId: string | null = null;
+    let serviceListingId: string | null = null;
 
-    if (bookingError || !booking) {
-      throw new HttpException('Booking not found', HttpStatus.NOT_FOUND);
+    // Handle booking-based review
+    if (dto.booking_id) {
+      // Validate booking ownership
+      await this.validateBookingOwner(dto.booking_id, userId);
+
+      // Get service_id and provider_id from booking
+      const { data: booking, error: bookingError } = await this.supabaseService
+        .from('bookings')
+        .select('service_id, provider_id')
+        .eq('id', dto.booking_id)
+        .single();
+
+      if (bookingError || !booking) {
+        throw new HttpException('Booking not found', HttpStatus.NOT_FOUND);
+      }
+
+      providerId = booking.provider_id;
+      serviceId = booking.service_id;
+    }
+    // Handle service listing-based review
+    else if (dto.service_listing_id) {
+      // Get provider_id from service_listing
+      const { data: listing, error: listingError } = await this.supabaseService
+        .from('service_listings')
+        .select('provider_id')
+        .eq('id', dto.service_listing_id)
+        .single();
+
+      if (listingError || !listing) {
+        throw new HttpException(
+          'Service listing not found',
+          HttpStatus.NOT_FOUND
+        );
+      }
+
+      providerId = listing.provider_id;
+      serviceListingId = dto.service_listing_id;
+    } else {
+      throw new HttpException('Invalid review data', HttpStatus.BAD_REQUEST);
     }
 
     const { data, error } = await this.supabaseService
       .from('reviews')
       .insert({
-        booking_id: dto.booking_id,
-        service_id: booking.service_id,
-        provider_id: booking.provider_id,
+        booking_id: dto.booking_id ?? null,
+        service_listing_id: serviceListingId,
+        service_id: serviceId,
+        provider_id: providerId,
         client_id: userId,
         rating: dto.rating,
         comment: dto.comment ?? null,
@@ -180,6 +220,36 @@ export class ReviewsService {
       .from('reviews')
       .select('*')
       .eq('provider_id', providerId)
+      .order('created_at', { ascending: false }); // newest first
+
+    if (error) {
+      throw new HttpException(
+        `Failed to fetch reviews: ${error.message}`,
+        HttpStatus.BAD_REQUEST
+      );
+    }
+    return {
+      success: true,
+      reviews: data,
+    };
+  }
+
+  // ======================================
+  // GET REVIEWS BY SERVICE LISTING ID
+  // ======================================
+  async getReviewsByServiceListingId(serviceListingId: string) {
+    const { data, error } = await this.supabaseService
+      .from('reviews')
+      .select(
+        `
+        *,
+        client:client_id (
+          full_name,
+          avatar_url
+        )
+      `
+      )
+      .eq('service_listing_id', serviceListingId)
       .order('created_at', { ascending: false }); // newest first
 
     if (error) {

@@ -71,6 +71,7 @@ export class ServiceListingService {
       const categoryIds = [
         ...new Set(data.map(listing => listing.category_id)),
       ];
+      const listingIds = data.map(listing => listing.id);
 
       const { data: providers } = await supabase
         .from('users')
@@ -82,15 +83,26 @@ export class ServiceListingService {
         .select('id, name')
         .in('id', categoryIds);
 
+      // Fetch ratings for all listings
+      const { data: ratings } = await supabase
+        .from('service_listing_ratings')
+        .select('*')
+        .in('service_listing_id', listingIds);
+
       // Create maps for quick lookup
       const providerMap = new Map(providers?.map(p => [p.id, p]) || []);
       const categoryMap = new Map(categories?.map(c => [c.id, c]) || []);
+      const ratingsMap = new Map(
+        ratings?.map(r => [r.service_listing_id, r]) || []
+      );
 
-      // Attach provider and category data to each listing
+      // Attach provider, category, and rating data to each listing
       return data.map(listing => ({
         ...listing,
         provider: providerMap.get(listing.provider_id) || null,
         category: categoryMap.get(listing.category_id) || null,
+        rating: ratingsMap.get(listing.id)?.average_rating || 0,
+        review_count: ratingsMap.get(listing.id)?.review_count || 0,
       }));
     }
 
@@ -152,12 +164,21 @@ export class ServiceListingService {
       .eq('listing_id', listingId)
       .order('created_at', { ascending: true });
 
+    // Fetch rating information for this listing
+    const { data: ratingData } = await supabase
+      .from('service_listing_ratings')
+      .select('*')
+      .eq('service_listing_id', listingId)
+      .single();
+
     // Return combined data
     return {
       ...listing,
       provider: provider || null,
       category: category || null,
       services: services || [],
+      rating: ratingData?.average_rating || 0,
+      review_count: ratingData?.review_count || 0,
     };
   }
 
