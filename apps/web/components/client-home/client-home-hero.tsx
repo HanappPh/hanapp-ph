@@ -9,7 +9,17 @@ import { useAuth } from '../../lib/hooks/useAuth';
 
 export function ClientHomeHero() {
   const router = useRouter();
-  const { profile } = useAuth();
+
+  // Safely get auth context, handle case where AuthProvider might not be available (e.g., in tests)
+  let profile = null;
+  try {
+    const auth = useAuth();
+    profile = auth?.profile;
+  } catch {
+    // AuthProvider not available, use default
+    console.warn('useAuth called outside AuthProvider context');
+  }
+
   const [searchQuery, setSearchQuery] = useState('');
 
   // Get the first name from full_name, or use 'Guest' as fallback
