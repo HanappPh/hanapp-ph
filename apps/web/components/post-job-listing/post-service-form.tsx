@@ -8,22 +8,9 @@ interface ServiceType {
   description: string;
   rate: number;
   rate_type: string;
-  category: string;
   is_addon: boolean;
   images?: string[];
 }
-
-const CATEGORIES = [
-  'Cleaning',
-  'Installation',
-  'Repair',
-  'Maintenance',
-  'Construction',
-  'Landscaping',
-  'Plumbing',
-  'Electrical',
-  'Other',
-];
 
 const RATE_TYPES = [
   'per unit',
@@ -53,9 +40,7 @@ export function ServiceForm({
   const [rateType, setRateType] = useState(
     editingService?.rate_type || 'per unit'
   );
-  const [category, setCategory] = useState(
-    editingService?.category || 'Cleaning'
-  );
+
   const [isAddon, setIsAddon] = useState(editingService?.is_addon || false);
   const [images] = useState<string[]>(() => editingService?.images || []);
 
@@ -72,7 +57,6 @@ export function ServiceForm({
       description,
       rate: parseFloat(rate),
       rate_type: rateType,
-      category,
       is_addon: isAddon,
       images: images || [],
     });
@@ -94,7 +78,7 @@ export function ServiceForm({
       </h3>
 
       <div className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Service Name
@@ -106,23 +90,6 @@ export function ServiceForm({
               placeholder="Enter service name"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
             />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Category
-            </label>
-            <select
-              value={category}
-              onChange={e => setCategory(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-            >
-              {CATEGORIES.map(cat => (
-                <option key={cat} value={cat}>
-                  {cat}
-                </option>
-              ))}
-            </select>
           </div>
         </div>
 

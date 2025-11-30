@@ -14,21 +14,29 @@ import { useState } from 'react';
 
 import { useAuth } from '../../lib/hooks/useAuth';
 
+import BookingActionModal from './booking-action-modal';
 import ReviewModal from './review-modal';
+
 interface BookingActionButtonProps {
   status: string;
-  bookingId: number;
-  tabContext?: 'sent' | 'received' | 'ongoing' | 'past' | 'cancelled';
+  bookingId: number | string; // Allow both for job applications
+  serviceName: string;
+  tabContext?: 'requested' | 'received' | 'ongoing' | 'past' | 'cancelled';
   onDelete?: () => void;
+  onConfirm?: () => void;
 }
 
 export default function BookingActionButton({
   status,
   bookingId,
+  serviceName,
   tabContext,
   onDelete,
+  onConfirm,
 }: BookingActionButtonProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isReviewOpen, setIsReviewOpen] = useState(false);
   const { session } = useAuth();
@@ -67,7 +75,6 @@ export default function BookingActionButton({
         return;
       }
 
-      console.log('Review submitted successfully:', result);
       alert('Thank you for your review!');
     } catch (error) {
       console.error('Error submitting review:', error);
@@ -77,40 +84,48 @@ export default function BookingActionButton({
 
   const handleDelete = async () => {
     if (!session?.access_token) {
-      console.error('No access token available');
       return;
     }
 
     setIsDeleting(true);
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/service-requests/${bookingId}`,
-        {
-          method: 'DELETE',
-          headers: {
-            Authorization: `Bearer ${session.access_token}`,
-          },
-        }
-      );
+      // Check if it's a service request (numeric ID) or job application (string ID starting with 'app-')
+      const isServiceRequest =
+        typeof bookingId === 'number' || !String(bookingId).startsWith('app-');
 
-      if (!response.ok) {
-        throw new Error('Failed to delete booking');
+      if (isServiceRequest) {
+        // Update service request status to cancelled
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/service-requests/${bookingId}`,
+          {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${session.access_token}`,
+            },
+            body: JSON.stringify({ status: 'cancelled' }),
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error('Failed to cancel booking');
+        }
       }
+      // For job applications, we'll just update the UI via callback
 
       setShowDeleteDialog(false);
-      // Call the onDelete callback to refresh the bookings list
+      // Call the onDelete callback to update UI
       if (onDelete) {
         onDelete();
       }
     } catch (error) {
-      console.error('Error deleting booking:', error);
-      alert('Failed to delete booking. Please try again.');
+      console.error('Error cancelling booking:', error);
     } finally {
       setIsDeleting(false);
     }
   };
   // Handle different tab contexts
-  if (tabContext === 'sent') {
+  if (tabContext === 'requested') {
     return (
       <>
         <div className="flex gap-2 mt-3">
@@ -158,23 +173,45 @@ export default function BookingActionButton({
 
   if (tabContext === 'received') {
     return (
-      <div className="flex gap-2 mt-3">
-        <Button
-          size="sm"
-          className="bg-green-600 hover:bg-green-700 text-white"
-        >
-          <Check className="w-4 h-4 mr-1" />
-          Confirm
-        </Button>
-        <Button
-          size="sm"
-          variant="outline"
-          className="border-red-500 text-red-500 hover:bg-red-50"
-        >
-          <Trash2 className="w-4 h-4 mr-1" />
-          Delete
-        </Button>
-      </div>
+      <>
+        <div className="flex gap-2 mt-3">
+          <Button
+            size="sm"
+            className="bg-green-600 hover:bg-green-700 text-white"
+            onClick={() => setShowConfirmModal(true)}
+          >
+            <Check className="w-4 h-4 mr-1" />
+            Confirm
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            className="border-red-500 text-red-500 hover:bg-red-50"
+            onClick={() => setShowDeleteModal(true)}
+          >
+            <Trash2 className="w-4 h-4 mr-1" />
+            Delete
+          </Button>
+        </div>
+
+        <BookingActionModal
+          isOpen={showConfirmModal}
+          onClose={() => setShowConfirmModal(false)}
+          action="confirm"
+          bookingId={bookingId}
+          serviceName={serviceName}
+          onSuccess={onConfirm}
+        />
+
+        <BookingActionModal
+          isOpen={showDeleteModal}
+          onClose={() => setShowDeleteModal(false)}
+          action="delete"
+          bookingId={bookingId}
+          serviceName={serviceName}
+          onSuccess={onDelete}
+        />
+      </>
     );
   }
 

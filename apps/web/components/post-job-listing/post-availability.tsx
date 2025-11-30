@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 
 const DAYS = [
   'monday',
@@ -24,8 +24,10 @@ const DAY_LABELS: Record<(typeof DAYS)[number], string> = {
 
 export function AvailabilityForm({
   onAvailabilityChange,
+  resetTrigger,
 }: {
   onAvailabilityChange: Function;
+  resetTrigger?: number;
 }) {
   const [availability, setAvailability] = useState({
     monday: { available: false, start: '08:00', end: '17:00' },
@@ -36,6 +38,19 @@ export function AvailabilityForm({
     saturday: { available: false, start: '08:00', end: '17:00' },
     sunday: { available: false, start: '08:00', end: '17:00' },
   });
+
+  React.useEffect(() => {
+    const resetAvailability = {
+      monday: { available: false, start: '08:00', end: '17:00' },
+      tuesday: { available: false, start: '08:00', end: '17:00' },
+      wednesday: { available: false, start: '08:00', end: '17:00' },
+      thursday: { available: false, start: '08:00', end: '17:00' },
+      friday: { available: false, start: '08:00', end: '17:00' },
+      saturday: { available: false, start: '08:00', end: '17:00' },
+      sunday: { available: false, start: '08:00', end: '17:00' },
+    };
+    setAvailability(resetAvailability);
+  }, [resetTrigger]);
 
   const toggleDay = (day: string) => {
     const dayKey = day as keyof typeof availability;
