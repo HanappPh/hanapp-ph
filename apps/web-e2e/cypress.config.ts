@@ -1,11 +1,10 @@
 import { nxE2EPreset } from '@nx/cypress/plugins/cypress-preset';
 import { defineConfig } from 'cypress';
 import * as http from 'http';
-import { join } from 'path';
 
 // Register custom tsconfig for CI environments
 // This addresses the TS5098 error with customConditions
-process.env.TS_NODE_PROJECT = join(__dirname, 'tsconfig.cypress.json');
+process.env.TS_NODE_PROJECT = './tsconfig.cypress.json';
 
 export default defineConfig({
   e2e: {
