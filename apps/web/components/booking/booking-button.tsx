@@ -20,6 +20,7 @@ import ReviewModal from './review-modal';
 interface BookingActionButtonProps {
   status: string;
   bookingId: number | string; // Allow both for job applications
+  serviceId: number | string;
   serviceName: string;
   tabContext?: 'requested' | 'received' | 'ongoing' | 'past' | 'cancelled';
   onDelete?: () => void;
@@ -29,6 +30,7 @@ interface BookingActionButtonProps {
 export default function BookingActionButton({
   status,
   bookingId,
+  serviceId,
   serviceName,
   tabContext,
   onDelete,
@@ -39,6 +41,7 @@ export default function BookingActionButton({
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isReviewOpen, setIsReviewOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { session } = useAuth();
 
   const handleSubmitReview = async (review: {
@@ -51,6 +54,7 @@ export default function BookingActionButton({
     }
 
     try {
+      setIsSubmitting(true);
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/reviews`,
         {
@@ -61,8 +65,9 @@ export default function BookingActionButton({
           },
           body: JSON.stringify({
             booking_id: bookingId,
+            service_listing_id: serviceId,
             rating: review.rating,
-            comment: review.comment,
+            comment: review.comment || undefined,
           }),
         }
       );
@@ -79,6 +84,8 @@ export default function BookingActionButton({
     } catch (error) {
       console.error('Error submitting review:', error);
       alert('Something went wrong. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -245,7 +252,7 @@ export default function BookingActionButton({
         <div className="flex gap-2 mt-3">
           <Button
             size="sm"
-            className="bg-hanapp-accent hover:bg-yellow-500 text-hanapp-secondary"
+            className="bg-hanapp-primary hover:bg-hanapp-secondary text-white"
             onClick={() => setIsReviewOpen(true)}
           >
             Rate Service
@@ -253,6 +260,7 @@ export default function BookingActionButton({
           <ReviewModal
             isOpen={isReviewOpen}
             onClose={() => setIsReviewOpen(false)}
+            isSubmitting={isSubmitting}
             onSubmit={handleSubmitReview}
           />
           <Button

@@ -4,7 +4,6 @@ import { useEffect, useState, useCallback } from 'react';
 
 import { JobIdBg } from '../../../../components/jobid/jobid-bg';
 import { Sidebar } from '../../../../components/jobid/jobid-cards';
-import { JobIdFaq } from '../../../../components/jobid/jobid-faq';
 import { PhotosMedia } from '../../../../components/jobid/jobid-media';
 import { ReviewsSection } from '../../../../components/jobid/jobid-reviews';
 import { ServicesSection } from '../../../../components/jobid/jobid-service';
@@ -88,33 +87,33 @@ export default function ClientJobPage() {
   }, [jobId, fetchReviews]);
 
   // Random FAQ details for demo
-  const faqs = [
-    {
-      id: '1',
-      question: 'How long does a typical AC cleaning take?',
-      answer: 'Usually 1-2 hours depending on unit type and condition.',
-    },
-    {
-      id: '2',
-      question: 'Do I need to provide cleaning materials?',
-      answer: 'No, our technicians bring all necessary tools and solutions.',
-    },
-    {
-      id: '3',
-      question: 'Is there a warranty for the service?',
-      answer: 'Yes, we offer a 7-day workmanship warranty.',
-    },
-    {
-      id: '4',
-      question: 'Can I book same-day service?',
-      answer: 'Same-day slots are subject to availability and confirmation.',
-    },
-    {
-      id: '5',
-      question: 'Are chemical solutions safe for my AC?',
-      answer: 'We use AC-safe chemicals and rinse thoroughly.',
-    },
-  ];
+  // const faqs = [
+  //   {
+  //     id: '1',
+  //     question: 'How long does a typical AC cleaning take?',
+  //     answer: 'Usually 1-2 hours depending on unit type and condition.',
+  //   },
+  //   {
+  //     id: '2',
+  //     question: 'Do I need to provide cleaning materials?',
+  //     answer: 'No, our technicians bring all necessary tools and solutions.',
+  //   },
+  //   {
+  //     id: '3',
+  //     question: 'Is there a warranty for the service?',
+  //     answer: 'Yes, we offer a 7-day workmanship warranty.',
+  //   },
+  //   {
+  //     id: '4',
+  //     question: 'Can I book same-day service?',
+  //     answer: 'Same-day slots are subject to availability and confirmation.',
+  //   },
+  //   {
+  //     id: '5',
+  //     question: 'Are chemical solutions safe for my AC?',
+  //     answer: 'We use AC-safe chemicals and rinse thoroughly.',
+  //   },
+  // ];
 
   // Transform services from database to match the expected format
   const services =
@@ -660,12 +659,12 @@ export default function ClientJobPage() {
                 providerId={listing.provider_id}
               />
             </div>
-            <div className="w-full mt-2 sm:mt-4 lg:mt-6">
+            {/* <div className="w-full mt-2 sm:mt-4 lg:mt-6">
               <h2 className="text-base sm:text-lg lg:text-2xl font-bold text-[#102E50] text-center mb-4">
                 Frequently Asked Questions About Provider
               </h2>
               <JobIdFaq faqs={faqs} />
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

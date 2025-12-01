@@ -13,6 +13,7 @@ import BookingStatusBadge from './booking-status';
 
 interface BookingCardProps {
   id: number | string; // Allow both for job applications
+  serviceId: number | string;
   serviceName: string;
   providerName: string;
   rating: number;
@@ -103,6 +104,7 @@ export default function BookingCard(booking: BookingCardProps) {
               <BookingActionButton
                 status={booking.status}
                 bookingId={booking.id}
+                serviceId={booking.serviceId}
                 serviceName={booking.serviceName}
                 tabContext={booking.tabContext}
                 onDelete={booking.onDelete}
