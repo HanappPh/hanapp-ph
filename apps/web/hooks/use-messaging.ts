@@ -5,7 +5,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 
 import { supabase } from '../lib/supabase/client';
 
-const API_BASE_URL = 'http://localhost:3001/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 interface Message {
   id: string;
@@ -65,7 +65,7 @@ export function useMessaging(userId: string) {
         throw new Error('No access token available');
       }
 
-      const response = await fetch(`${API_BASE_URL}/messages/threads`, {
+      const response = await fetch(`${API_BASE_URL}/api/messages/threads`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
           'x-user-id': userId,
@@ -102,7 +102,7 @@ export function useMessaging(userId: string) {
         }
 
         const response = await fetch(
-          `${API_BASE_URL}/messages/threads/${otherUserId}?limit=${limit}`,
+          `${API_BASE_URL}/api/messages/threads/${otherUserId}?limit=${limit}`,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -141,7 +141,7 @@ export function useMessaging(userId: string) {
           throw new Error('No access token available');
         }
 
-        const response = await fetch(`${API_BASE_URL}/messages`, {
+        const response = await fetch(`${API_BASE_URL}/api/messages`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

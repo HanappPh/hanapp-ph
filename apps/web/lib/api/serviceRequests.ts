@@ -1,4 +1,5 @@
 // API client for service requests
+const port = process.env.NEXT_PUBLIC_API_URL;
 const getApiBaseUrl = () => {
   if (typeof window !== 'undefined') {
     // Client side - use the current host but point to port 3001
@@ -7,7 +8,7 @@ const getApiBaseUrl = () => {
     return `${protocol}//${hostname}:3001/api`;
   }
   // Server side or fallback
-  return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+  return port;
 };
 
 const API_BASE_URL = getApiBaseUrl();
@@ -100,7 +101,7 @@ export const fetchServiceRequestsForJobListings = async (): Promise<
   JobListing[]
 > => {
   try {
-    const fullUrl = `${API_BASE_URL}/service-requests/public/job-listings`;
+    const fullUrl = `${API_BASE_URL}/api/service-requests/public/job-listings`;
 
     // Get auth token from Supabase if user is logged in
     const headers: Record<string, string> = {
@@ -142,7 +143,7 @@ export const fetchServiceRequestById = async (
   id: string
 ): Promise<ServiceRequest | null> => {
   try {
-    const fullUrl = `${API_BASE_URL}/service-requests/${id}`;
+    const fullUrl = `${API_BASE_URL}/api/service-requests/${id}`;
 
     // Get auth token from Supabase if user is logged in
     const headers: Record<string, string> = {
