@@ -770,6 +770,7 @@ export default function BookingsPage() {
       <div>
         <div className="max-w-6xl mx-auto p-6 pb-10">
           <Tabs
+            defaultValue="requested"
             value={activeTab}
             onValueChange={setActiveTab}
             className="w-full"
