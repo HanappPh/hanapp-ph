@@ -75,30 +75,28 @@ export default function RequestServicePage() {
         throw new Error('No valid session found');
       }
 
-      const response = await fetch(
-        'http://localhost:3001/api/service-requests',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${session.access_token}`, // Send user's auth token
-          },
-          body: JSON.stringify({
-            clientId: user.id, // Use logged-in user's ID
-            categoryId: Number(formData.categoryId), // Convert string to number
-            title: formData.title,
-            description: formData.description,
-            additional_requirements: formData.additionalRequirements, // Additional requirements
-            rate: Number(formData.rate),
-            contact: formData.contact,
-            jobLocation: formData.jobLocation,
-            jobDate: formData.jobDate,
-            jobTime: formData.jobTimeStart, // Start time
-            jobTime2: formData.jobTimeEnd, // End time
-            images: formData.images,
-          }),
-        }
-      );
+      const port = process.env.NEXT_PUBLIC_API_URL;
+      const response = await fetch(`${port}/api/service-requests`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`, // Send user's auth token
+        },
+        body: JSON.stringify({
+          clientId: user.id, // Use logged-in user's ID
+          categoryId: Number(formData.categoryId), // Convert string to number
+          title: formData.title,
+          description: formData.description,
+          additional_requirements: formData.additionalRequirements, // Additional requirements
+          rate: Number(formData.rate),
+          contact: formData.contact,
+          jobLocation: formData.jobLocation,
+          jobDate: formData.jobDate,
+          jobTime: formData.jobTimeStart, // Start time
+          jobTime2: formData.jobTimeEnd, // End time
+          images: formData.images,
+        }),
+      });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));

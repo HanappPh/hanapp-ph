@@ -499,8 +499,9 @@ export default function BookingsPage() {
         }
 
         // Fetch service requests created by the user (where client_id matches user.id)
+        const port = process.env.NEXT_PUBLIC_API_URL;
         const response = await fetch(
-          `http://localhost:3001/api/service-requests?clientId=${user.id}`,
+          `${port}/api/service-requests?clientId=${user.id}`,
           {
             headers: {
               Authorization: `Bearer ${session.access_token}`,

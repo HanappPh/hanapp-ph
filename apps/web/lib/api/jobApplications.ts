@@ -1,11 +1,12 @@
 // API client for job applications
+const port = process.env.NEXT_PUBLIC_API_URL;
 const getApiBaseUrl = () => {
   if (typeof window !== 'undefined') {
     const protocol = window.location.protocol;
     const hostname = window.location.hostname;
     return `${protocol}//${hostname}:3001/api`;
   }
-  return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+  return port;
 };
 
 const API_BASE_URL = getApiBaseUrl();
@@ -54,7 +55,7 @@ export const createJobApplication = async (
       }
     }
 
-    const response = await fetch(`${API_BASE_URL}/job-applications`, {
+    const response = await fetch(`${API_BASE_URL}/api/job-applications`, {
       method: 'POST',
       headers,
       body: JSON.stringify({
@@ -102,7 +103,7 @@ export const fetchSentApplications = async (
     }
 
     const response = await fetch(
-      `${API_BASE_URL}/job-applications/sent?providerId=${providerId}`,
+      `${API_BASE_URL}/api/job-applications/sent?providerId=${providerId}`,
       { headers }
     );
 
@@ -143,7 +144,7 @@ export const fetchReceivedApplications = async (
     }
 
     const response = await fetch(
-      `${API_BASE_URL}/job-applications/received?clientId=${clientId}`,
+      `${API_BASE_URL}/api/job-applications/received?clientId=${clientId}`,
       { headers }
     );
 
