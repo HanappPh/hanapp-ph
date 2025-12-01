@@ -372,7 +372,7 @@ export default function BookingsPage() {
 
       // Update service request in database to mark as provider finished
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/service-requests/${booking.serviceRequestId}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/service-requests/${booking.serviceRequestId}/finish`,
         {
           method: 'PATCH',
           headers: {
@@ -380,7 +380,7 @@ export default function BookingsPage() {
             Authorization: `Bearer ${session.access_token}`,
           },
           body: JSON.stringify({
-            is_provider_finished: true,
+            providerId: user?.id,
           }),
         }
       );
@@ -426,7 +426,7 @@ export default function BookingsPage() {
 
       // Update service request status to completed in database
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/service-requests/${booking.serviceRequestId}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/service-requests/${booking.serviceRequestId}/complete`,
         {
           method: 'PATCH',
           headers: {
@@ -434,7 +434,7 @@ export default function BookingsPage() {
             Authorization: `Bearer ${session.access_token}`,
           },
           body: JSON.stringify({
-            status: 'completed',
+            clientId: user?.id,
           }),
         }
       );

@@ -72,4 +72,34 @@ export class ServiceRequestController {
   remove(@Param('id') id: string) {
     return this.serviceRequestService.remove(id);
   }
+
+  @Patch(':id/confirm')
+  confirmBooking(
+    @Param('id') id: string,
+    @Body('userId') userId: string,
+    @Headers('authorization') authHeader?: string
+  ) {
+    const token = authHeader?.replace('Bearer ', '');
+    return this.serviceRequestService.confirmBooking(id, userId, token);
+  }
+
+  @Patch(':id/finish')
+  finishBooking(
+    @Param('id') id: string,
+    @Body('providerId') providerId: string,
+    @Headers('authorization') authHeader?: string
+  ) {
+    const token = authHeader?.replace('Bearer ', '');
+    return this.serviceRequestService.finishBooking(id, providerId, token);
+  }
+
+  @Patch(':id/complete')
+  completeBooking(
+    @Param('id') id: string,
+    @Body('clientId') clientId: string,
+    @Headers('authorization') authHeader?: string
+  ) {
+    const token = authHeader?.replace('Bearer ', '');
+    return this.serviceRequestService.completeBooking(id, clientId, token);
+  }
 }
