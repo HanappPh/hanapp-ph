@@ -371,19 +371,22 @@ export default function BookingsPage() {
       return;
     }
 
-    // Update local state
+    // Update local state - match by serviceRequestId since that's what was updated in DB
     setFinishedBookings(prev => new Set(prev).add(selectedBooking.id));
 
     // Update the booking data to reflect the change
     setBookingsData(prev => ({
       ...prev,
       ongoing: prev.ongoing.map(b =>
-        b.id === selectedBooking.id ? { ...b, isProviderFinished: true } : b
+        b.serviceRequestId === selectedBooking.serviceRequestId
+          ? { ...b, isProviderFinished: true }
+          : b
       ),
     }));
 
     setShowFinishModal(false);
     setSelectedBooking(null);
+    // Trigger a refresh to sync with server state
     setRefreshTrigger(prev => prev + 1);
   };
 
