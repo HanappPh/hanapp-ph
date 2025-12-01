@@ -45,6 +45,8 @@ export interface ServiceListingResponse {
   images?: string[];
   created_at: string;
   updated_at: string;
+  rating?: number;
+  review_count?: number;
   provider?: {
     id: string;
     full_name: string;
@@ -82,6 +84,8 @@ export interface ServiceListingWithDetails extends ServiceListingResponse {
     name: string;
   };
   services: ServiceDetail[];
+  rating: number;
+  review_count: number;
 }
 
 export async function fetchServiceListings(

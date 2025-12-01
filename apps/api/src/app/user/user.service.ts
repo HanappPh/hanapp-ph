@@ -357,6 +357,24 @@ export class UserService {
   // PROFILE MANAGEMENT
   // ============================================
 
+  async getPublicProfile(userId: string) {
+    // Public profile endpoint - returns non-sensitive user information
+    const { data, error } = await this.supabaseService
+      .from('users')
+      .select('id, full_name, avatar_url, email, phone, user_type, created_at')
+      .eq('id', userId)
+      .single();
+
+    if (error) {
+      throw new HttpException(
+        'Failed to fetch user profile',
+        HttpStatus.NOT_FOUND
+      );
+    }
+
+    return data;
+  }
+
   async getProfile(userId: string, authenticatedUser: User) {
     // Users can only access their own profile or admins can access any profile
     if (authenticatedUser.id !== userId) {

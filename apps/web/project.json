@@ -65,19 +65,16 @@
       }
     },
     "build": {
-      "executor": "@nx/next:build",
-      "outputs": ["{options.outputPath}"],
+      "executor": "nx:run-commands",
+      "outputs": ["{projectRoot}/.next"],
       "defaultConfiguration": "production",
       "options": {
-        "outputPath": "dist/apps/web"
+        "command": "next build",
+        "cwd": "apps/web"
       },
       "configurations": {
-        "development": {
-          "outputPath": "apps/web"
-        },
-        "production": {
-          "outputPath": "dist/apps/web"
-        }
+        "development": {},
+        "production": {}
       }
     }
   },
