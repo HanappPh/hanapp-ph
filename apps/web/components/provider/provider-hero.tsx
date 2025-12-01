@@ -20,7 +20,7 @@ export function ProviderHero() {
   const handleSearch = () => {
     if (searchQuery.trim()) {
       router.push(
-        `/provider/jobs?search=${encodeURIComponent(searchQuery.trim())}`
+        `/jobs/categories?search=${encodeURIComponent(searchQuery.trim())}`
       );
     }
   };
