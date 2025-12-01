@@ -1,14 +1,14 @@
-import { nxE2EPreset } from '@nx/cypress/plugins/cypress-preset';
+import { nxE2EPreset } from '@nx/cypress/plugins/cypress-preset.js';
 import { defineConfig } from 'cypress';
 import * as http from 'http';
 
 // Register custom tsconfig for CI environments
 // This addresses the TS5098 error with customConditions
-process.env.TS_NODE_PROJECT = './tsconfig.cypress.json';
+process.env.TS_NODE_PROJECT = './apps/web-e2e/tsconfig.cypress.json';
 
 export default defineConfig({
   e2e: {
-    ...nxE2EPreset(__filename, {
+    ...nxE2EPreset(__dirname, {
       cypressDir: 'src',
       webServerCommands: {
         default: 'npx nx run @hanapp-ph/web:serve',
@@ -47,7 +47,7 @@ export default defineConfig({
             req.end();
           });
         },
-        log(message: string) {
+        log(message) {
           console.log(`[Web E2E]: ${message}`);
           return null;
         },
