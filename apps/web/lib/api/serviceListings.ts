@@ -1,4 +1,5 @@
 // API client for service listings
+const port = process.env.NEXT_PUBLIC_API_URL;
 const getApiBaseUrl = () => {
   if (typeof window !== 'undefined') {
     // Client side - use the current host but point to port 3001
@@ -7,7 +8,7 @@ const getApiBaseUrl = () => {
     return `${protocol}//${hostname}:3001/api`;
   }
   // Server side or fallback
-  return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+  return port;
 };
 
 const API_BASE_URL = getApiBaseUrl();
@@ -92,7 +93,7 @@ export async function fetchServiceListings(
   excludeProviderId?: string
 ): Promise<ServiceListingResponse[]> {
   try {
-    const url = new URL(`${API_BASE_URL}/service-listings`);
+    const url = new URL(`${API_BASE_URL}/api/service-listings`);
     if (excludeProviderId) {
       url.searchParams.append('excludeProviderId', excludeProviderId);
     }
@@ -122,7 +123,7 @@ export async function fetchServiceListingDetails(
 ): Promise<ServiceListingWithDetails | null> {
   try {
     const response = await fetch(
-      `${API_BASE_URL}/service-listings/${listingId}/details`,
+      `${API_BASE_URL}/api/service-listings/${listingId}/details`,
       {
         method: 'GET',
         headers: {
