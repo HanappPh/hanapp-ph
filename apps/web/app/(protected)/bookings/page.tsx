@@ -621,19 +621,34 @@ export default function BookingsPage() {
             }
           );
 
-        // Categorize service requests by status
+        // Get service request IDs that are already in received applications to avoid duplicates
+        const receivedApplicationServiceRequestIds = new Set(
+          transformedReceivedApplications
+            .map(app => app.serviceRequestId)
+            .filter(Boolean)
+        );
+
+        // Categorize service requests by status, excluding ones that have applications
         const categorizedServiceRequests = {
           pending: transformedServiceRequests.filter(
-            b => b.status === 'Pending'
+            b =>
+              b.status === 'Pending' &&
+              !receivedApplicationServiceRequestIds.has(b.serviceRequestId)
           ),
           ongoing: transformedServiceRequests.filter(
-            b => b.status === 'Accepted' || b.status === 'Paid'
+            b =>
+              (b.status === 'Accepted' || b.status === 'Paid') &&
+              !receivedApplicationServiceRequestIds.has(b.serviceRequestId)
           ),
           past: transformedServiceRequests.filter(
-            b => b.status === 'Completed'
+            b =>
+              b.status === 'Completed' &&
+              !receivedApplicationServiceRequestIds.has(b.serviceRequestId)
           ),
           cancelled: transformedServiceRequests.filter(
-            b => b.status === 'Cancelled' || b.status === 'Rejected'
+            b =>
+              (b.status === 'Cancelled' || b.status === 'Rejected') &&
+              !receivedApplicationServiceRequestIds.has(b.serviceRequestId)
           ),
         };
 
