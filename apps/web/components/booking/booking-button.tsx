@@ -20,25 +20,38 @@ import ReviewModal from './review-modal';
 interface BookingActionButtonProps {
   status: string;
   bookingId: number | string; // Allow both for job applications
+  serviceId: number | string;
   serviceName: string;
   tabContext?: 'requested' | 'received' | 'ongoing' | 'past' | 'cancelled';
   onDelete?: () => void;
   onConfirm?: () => void;
+  onFinishBooking?: () => void;
+  onReleasePayment?: () => void;
+  isFinished?: boolean;
+  userRole?: 'provider' | 'client';
+  isProviderFinished?: boolean;
 }
 
 export default function BookingActionButton({
   status,
   bookingId,
+  serviceId,
   serviceName,
   tabContext,
   onDelete,
   onConfirm,
+  onFinishBooking,
+  onReleasePayment,
+  isFinished = false,
+  userRole,
+  isProviderFinished = false,
 }: BookingActionButtonProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isReviewOpen, setIsReviewOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { session } = useAuth();
 
   const handleSubmitReview = async (review: {
@@ -51,6 +64,7 @@ export default function BookingActionButton({
     }
 
     try {
+      setIsSubmitting(true);
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/reviews`,
         {
@@ -61,8 +75,9 @@ export default function BookingActionButton({
           },
           body: JSON.stringify({
             booking_id: bookingId,
+            service_listing_id: serviceId,
             rating: review.rating,
-            comment: review.comment,
+            comment: review.comment || undefined,
           }),
         }
       );
@@ -79,6 +94,8 @@ export default function BookingActionButton({
     } catch (error) {
       console.error('Error submitting review:', error);
       alert('Something went wrong. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -225,15 +242,36 @@ export default function BookingActionButton({
           <MessageCircle className="w-4 h-4 mr-1" />
           Message
         </Button>
-        <Button
-          size="sm"
-          variant="outline"
-          className="border-gray-400 text-gray-400 cursor-not-allowed opacity-60"
-          disabled
-        >
-          <CreditCard className="w-4 h-4 mr-1" />
-          Payment
-        </Button>
+        {userRole === 'provider' && (
+          <Button
+            size="sm"
+            className={
+              isFinished
+                ? 'bg-green-600 hover:bg-green-700 text-white'
+                : 'bg-hanapp-accent hover:bg-yellow-500 text-hanapp-secondary'
+            }
+            onClick={onFinishBooking}
+          >
+            <Check className="w-4 h-4 mr-1" />
+            Finish Booking
+          </Button>
+        )}
+        {userRole === 'client' && (
+          <Button
+            size="sm"
+            variant="outline"
+            className={
+              isProviderFinished
+                ? 'border-hanapp-primary text-hanapp-primary hover:bg-hanapp-primary hover:text-white'
+                : 'border-gray-400 text-gray-400 cursor-not-allowed opacity-60'
+            }
+            disabled={!isProviderFinished}
+            onClick={onReleasePayment}
+          >
+            <CreditCard className="w-4 h-4 mr-1" />
+            Release Payment
+          </Button>
+        )}
       </div>
     );
   }
@@ -245,7 +283,7 @@ export default function BookingActionButton({
         <div className="flex gap-2 mt-3">
           <Button
             size="sm"
-            className="bg-hanapp-accent hover:bg-yellow-500 text-hanapp-secondary"
+            className="bg-hanapp-primary hover:bg-hanapp-secondary text-white"
             onClick={() => setIsReviewOpen(true)}
           >
             Rate Service
@@ -253,6 +291,7 @@ export default function BookingActionButton({
           <ReviewModal
             isOpen={isReviewOpen}
             onClose={() => setIsReviewOpen(false)}
+            isSubmitting={isSubmitting}
             onSubmit={handleSubmitReview}
           />
           <Button
