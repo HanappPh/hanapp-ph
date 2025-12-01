@@ -1,4 +1,4 @@
-import { nxE2EPreset } from '@nx/cypress/plugins/cypress-preset';
+import { nxE2EPreset } from '@nx/cypress/plugins/cypress-preset.js';
 import { defineConfig } from 'cypress';
 import * as http from 'http';
 
