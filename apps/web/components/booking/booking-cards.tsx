@@ -33,6 +33,9 @@ interface BookingCardProps {
   tabContext?: 'requested' | 'received' | 'ongoing' | 'past' | 'cancelled';
   onDelete?: () => void;
   onConfirm?: () => void;
+  onFinishBooking?: () => void;
+  onReleasePayment?: () => void;
+  isFinished?: boolean;
 }
 
 export default function BookingCard(booking: BookingCardProps) {
@@ -107,6 +110,9 @@ export default function BookingCard(booking: BookingCardProps) {
                 tabContext={booking.tabContext}
                 onDelete={booking.onDelete}
                 onConfirm={booking.onConfirm}
+                onFinishBooking={booking.onFinishBooking}
+                onReleasePayment={booking.onReleasePayment}
+                isFinished={booking.isFinished}
               ></BookingActionButton>
             </div>
           </div>
