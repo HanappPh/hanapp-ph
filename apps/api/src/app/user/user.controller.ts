@@ -222,6 +222,19 @@ export class UserController {
   // USER PROFILE ENDPOINTS (Protected - Auth Required)
   // ============================================
 
+  @Public()
+  @Get(':userId')
+  @ApiOperation({ summary: 'Get public user profile by ID (no auth required)' })
+  @ApiParam({ name: 'userId', description: 'User ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'User profile retrieved',
+  })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  async getPublicProfile(@Param('userId') userId: string) {
+    return this.userService.getPublicProfile(userId);
+  }
+
   @ApiBearerAuth('JWT-auth')
   @Get('profile/:userId')
   @ApiOperation({ summary: 'Get user profile by ID (requires authentication)' })
