@@ -293,9 +293,19 @@ export default function BookingsPage() {
         status: 'Accepted' as const,
       };
 
+      // Extract service request ID from the application ID if it exists
+      // Application IDs are in format "app-{id}", we need to find the matching service request
+      const serviceRequestId = bookingToConfirm.serviceId;
+
       return {
         ...prev,
+        // Remove from received tab
         received: prev.received.filter(b => b.id !== bookingId),
+        // Remove from requested tab if there's a matching service request
+        requested: prev.requested.filter(
+          b => b.serviceId !== serviceRequestId && b.id !== serviceRequestId
+        ),
+        // Add to ongoing
         ongoing: [confirmedBooking, ...prev.ongoing],
       };
     });
@@ -313,10 +323,12 @@ export default function BookingsPage() {
         return prev;
       }
 
-      // Update status to Cancelled
+      // Update status to Rejected (for applications) or Cancelled
       const cancelledBooking = {
         ...bookingToDelete,
-        status: 'Cancelled' as const,
+        status: (String(bookingId).startsWith('app-')
+          ? 'Rejected'
+          : 'Cancelled') as const,
       };
 
       return {
@@ -531,22 +543,52 @@ export default function BookingsPage() {
           ),
         };
 
+        // Categorize sent applications by status
+        const categorizedSentApplications = {
+          pending: transformedSentApplications.filter(
+            b => b.status === 'Pending'
+          ),
+          ongoing: transformedSentApplications.filter(
+            b => b.status === 'Accepted'
+          ),
+          cancelled: transformedSentApplications.filter(
+            b => b.status === 'Rejected' || b.status === 'Cancelled'
+          ),
+        };
+
+        // Categorize received applications by status
+        const categorizedReceivedApplications = {
+          pending: transformedReceivedApplications.filter(
+            b => b.status === 'Pending'
+          ),
+          ongoing: transformedReceivedApplications.filter(
+            b => b.status === 'Accepted'
+          ),
+          cancelled: transformedReceivedApplications.filter(
+            b => b.status === 'Rejected' || b.status === 'Cancelled'
+          ),
+        };
+
         setBookingsData({
           requested: [
-            ...transformedSentApplications,
+            ...categorizedSentApplications.pending,
             ...categorizedServiceRequests.pending,
             ...hardcodedBookings.requested,
           ],
           received: [
-            ...transformedReceivedApplications,
+            ...categorizedReceivedApplications.pending,
             ...hardcodedBookings.received,
           ],
           ongoing: [
+            ...categorizedSentApplications.ongoing,
+            ...categorizedReceivedApplications.ongoing,
             ...categorizedServiceRequests.ongoing,
             ...hardcodedBookings.ongoing,
           ],
           past: [...categorizedServiceRequests.past, ...hardcodedBookings.past],
           cancelled: [
+            ...categorizedSentApplications.cancelled,
+            ...categorizedReceivedApplications.cancelled,
             ...categorizedServiceRequests.cancelled,
             ...hardcodedBookings.cancelled,
           ],
