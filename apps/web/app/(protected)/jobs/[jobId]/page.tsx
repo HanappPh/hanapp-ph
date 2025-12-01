@@ -1,6 +1,6 @@
 'use client';
 import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 
 import { JobIdBg } from '../../../../components/jobid/jobid-bg';
 import { Sidebar } from '../../../../components/jobid/jobid-cards';
@@ -12,7 +12,7 @@ import {
   fetchServiceListingDetails,
   ServiceListingWithDetails,
 } from '../../../../lib/api/serviceListings';
-
+import { useAuth } from '../../../../lib/hooks/useAuth';
 export default function ClientJobPage() {
   const params = useParams();
   const jobId = params.jobId as string;
@@ -30,27 +30,38 @@ export default function ClientJobPage() {
     }>
   >([]);
 
-  // Fetch reviews for the service listing
-  const fetchReviews = async (listingId: string) => {
-    try {
-      const response = await fetch(
-        `http://localhost:3001/api/reviews/listing/${listingId}`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+  const env = process.env;
+  const { session } = useAuth();
 
-      if (response.ok) {
-        const result = await response.json();
-        setDbReviews(result.reviews || []);
+  // Fetch reviews for the service listing
+  const fetchReviews = useCallback(
+    async (listingId: string) => {
+      try {
+        const response = await fetch(
+          `${env.NEXT_PUBLIC_API_URL}/api/reviews/listing/${listingId}`,
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${session?.access_token || env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+            },
+          }
+        );
+
+        if (response.ok) {
+          const result = await response.json();
+          setDbReviews(result.reviews || []);
+        }
+      } catch (error) {
+        console.error('Failed to fetch reviews:', error);
       }
-    } catch (error) {
-      console.error('Failed to fetch reviews:', error);
-    }
-  };
+    },
+    [
+      session?.access_token,
+      env.NEXT_PUBLIC_API_URL,
+      env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    ]
+  );
 
   // Fetch service listing details on mount
   useEffect(() => {
@@ -74,7 +85,7 @@ export default function ClientJobPage() {
     if (jobId) {
       loadListingDetails();
     }
-  }, [jobId]);
+  }, [jobId, fetchReviews]);
 
   // Random FAQ details for demo
   const faqs = [
