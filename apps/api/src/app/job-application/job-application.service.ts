@@ -95,7 +95,8 @@ export class JobApplicationService {
           time_2,
           images,
           category_id,
-          client_id
+          client_id,
+          is_provider_finished
         )
       `
       )
@@ -132,7 +133,8 @@ export class JobApplicationService {
           time,
           time_2,
           images,
-          category_id
+          category_id,
+          is_provider_finished
         )
       `
       )
