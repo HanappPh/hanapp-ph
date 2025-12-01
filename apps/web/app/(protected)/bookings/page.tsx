@@ -234,6 +234,9 @@ export default function BookingsPage() {
   }>(hardcodedBookings);
   const [isLoading, setIsLoading] = useState(true);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [finishedBookings, setFinishedBookings] = useState<
+    Set<number | string>
+  >(new Set());
 
   // Check if we need to refresh data and set active tab
   useEffect(() => {
@@ -315,6 +318,41 @@ export default function BookingsPage() {
         received: prev.received.filter(b => b.id !== bookingId),
         cancelled: [cancelledBooking, ...prev.cancelled],
       };
+    });
+  };
+
+  // Function to handle finishing a booking (provider marks as finished)
+  const handleFinishBooking = (bookingId: number | string) => {
+    setFinishedBookings(prev => new Set(prev).add(bookingId));
+  };
+
+  // Function to handle releasing payment (moves from ongoing to completed)
+  const handleReleasePayment = (bookingId: number | string) => {
+    setBookingsData(prev => {
+      // Find the booking in ongoing
+      const bookingToComplete = prev.ongoing.find(b => b.id === bookingId);
+      if (!bookingToComplete) {
+        return prev;
+      }
+
+      // Update status to Completed
+      const completedBooking = {
+        ...bookingToComplete,
+        status: 'Completed' as const,
+      };
+
+      return {
+        ...prev,
+        ongoing: prev.ongoing.filter(b => b.id !== bookingId),
+        past: [completedBooking, ...prev.past],
+      };
+    });
+
+    // Remove from finished bookings set
+    setFinishedBookings(prev => {
+      const newSet = new Set(prev);
+      newSet.delete(bookingId);
+      return newSet;
     });
   };
 
@@ -614,7 +652,7 @@ export default function BookingsPage() {
                       : 'transparent',
                 }}
               >
-                Past
+                Completed
               </TabsTrigger>
               <TabsTrigger
                 value="cancelled"
@@ -699,6 +737,9 @@ export default function BookingsPage() {
                     key={booking.id}
                     {...booking}
                     tabContext="ongoing"
+                    onFinishBooking={() => handleFinishBooking(booking.id)}
+                    onReleasePayment={() => handleReleasePayment(booking.id)}
+                    isFinished={finishedBookings.has(booking.id)}
                   ></BookingCard>
                 ))
               ) : (
@@ -734,7 +775,7 @@ export default function BookingsPage() {
                     <Clock className="w-14 h-14 text-gray-400" />
                   </div>
                   <h3 className="text-xl font-semibold text-gray-600 mb-3">
-                    No past bookings
+                    No completed bookings
                   </h3>
                   <p className="text-lg text-gray-500">
                     Your completed bookings will appear here
