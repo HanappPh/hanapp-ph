@@ -12,6 +12,7 @@ import { Clock, Calendar } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 
+import BookingActionModal from '../../../components/booking/booking-action-modal';
 import BookingCard from '../../../components/booking/booking-cards';
 import {
   fetchSentApplications,
@@ -242,6 +243,11 @@ export default function BookingsPage() {
   const [finishedBookings, setFinishedBookings] = useState<
     Set<number | string>
   >(new Set());
+  const [showFinishModal, setShowFinishModal] = useState(false);
+  const [showCompleteModal, setShowCompleteModal] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState<BookingDetails | null>(
+    null
+  );
 
   // Check if we need to refresh data and set active tab
   useEffect(() => {
@@ -352,131 +358,82 @@ export default function BookingsPage() {
   };
 
   // Function to handle finishing a booking (provider marks as finished)
-  const handleFinishBooking = async (bookingId: number | string) => {
-    try {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      if (!session?.access_token) {
-        alert('Authentication required');
-        return;
-      }
-
-      // Find the booking to get the service request ID
-      const booking = bookingsData.ongoing.find(b => b.id === bookingId);
-      if (!booking || !booking.serviceRequestId) {
-        console.error('Booking or service request ID not found');
-        return;
-      }
-
-      // Update service request in database to mark as provider finished
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/service-requests/${booking.serviceRequestId}/finish`,
-        {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${session.access_token}`,
-          },
-          body: JSON.stringify({
-            providerId: user?.id,
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error('Failed to update booking status');
-      }
-
-      // Update local state
-      setFinishedBookings(prev => new Set(prev).add(bookingId));
-
-      // Update the booking data to reflect the change
-      setBookingsData(prev => ({
-        ...prev,
-        ongoing: prev.ongoing.map(b =>
-          b.id === bookingId ? { ...b, isProviderFinished: true } : b
-        ),
-      }));
-    } catch (error) {
-      console.error('Error finishing booking:', error);
-      alert('Failed to finish booking. Please try again.');
+  const handleFinishBooking = (bookingId: number | string) => {
+    const booking = bookingsData.ongoing.find(b => b.id === bookingId);
+    if (booking) {
+      setSelectedBooking(booking);
+      setShowFinishModal(true);
     }
   };
 
-  // Function to handle releasing payment (moves from ongoing to completed)
-  const handleReleasePayment = async (bookingId: number | string) => {
-    try {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      if (!session?.access_token) {
-        alert('Authentication required');
-        return;
-      }
-
-      // Find the booking to get the service request ID
-      const booking = bookingsData.ongoing.find(b => b.id === bookingId);
-      if (!booking || !booking.serviceRequestId) {
-        console.error('Booking or service request ID not found');
-        return;
-      }
-
-      // Update service request status to completed in database
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/service-requests/${booking.serviceRequestId}/complete`,
-        {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${session.access_token}`,
-          },
-          body: JSON.stringify({
-            clientId: user?.id,
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error('Failed to update booking status');
-      }
-
-      // Update local state
-      setBookingsData(prev => {
-        // Find the booking in ongoing
-        const bookingToComplete = prev.ongoing.find(b => b.id === bookingId);
-        if (!bookingToComplete) {
-          return prev;
-        }
-
-        // Update status to Completed
-        const completedBooking = {
-          ...bookingToComplete,
-          status: 'Completed' as const,
-        };
-
-        return {
-          ...prev,
-          ongoing: prev.ongoing.filter(b => b.id !== bookingId),
-          past: [completedBooking, ...prev.past],
-        };
-      });
-
-      // Remove from finished bookings set
-      setFinishedBookings(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(bookingId);
-        return newSet;
-      });
-
-      // Trigger a refresh to sync with server state
-      setRefreshTrigger(prev => prev + 1);
-    } catch (error) {
-      console.error('Error releasing payment:', error);
-      alert('Failed to release payment. Please try again.');
+  const handleFinishBookingSuccess = () => {
+    if (!selectedBooking) {
+      return;
     }
+
+    // Update local state
+    setFinishedBookings(prev => new Set(prev).add(selectedBooking.id));
+
+    // Update the booking data to reflect the change
+    setBookingsData(prev => ({
+      ...prev,
+      ongoing: prev.ongoing.map(b =>
+        b.id === selectedBooking.id ? { ...b, isProviderFinished: true } : b
+      ),
+    }));
+
+    setShowFinishModal(false);
+    setSelectedBooking(null);
+    setRefreshTrigger(prev => prev + 1);
+  };
+
+  // Function to handle releasing payment (moves from ongoing to completed)
+  const handleReleasePayment = (bookingId: number | string) => {
+    const booking = bookingsData.ongoing.find(b => b.id === bookingId);
+    if (booking) {
+      setSelectedBooking(booking);
+      setShowCompleteModal(true);
+    }
+  };
+
+  const handleReleasePaymentSuccess = () => {
+    if (!selectedBooking) {
+      return;
+    }
+
+    // Update local state
+    setBookingsData(prev => {
+      // Find the booking in ongoing
+      const bookingToComplete = prev.ongoing.find(
+        b => b.id === selectedBooking.id
+      );
+      if (!bookingToComplete) {
+        return prev;
+      }
+
+      // Update status to Completed
+      const completedBooking = {
+        ...bookingToComplete,
+        status: 'Completed' as const,
+      };
+
+      return {
+        ...prev,
+        ongoing: prev.ongoing.filter(b => b.id !== selectedBooking.id),
+        past: [completedBooking, ...prev.past],
+      };
+    });
+
+    // Remove from finished bookings set
+    setFinishedBookings(prev => {
+      const newSet = new Set(prev);
+      newSet.delete(selectedBooking.id);
+      return newSet;
+    });
+
+    setShowCompleteModal(false);
+    setSelectedBooking(null);
+    setRefreshTrigger(prev => prev + 1);
   };
 
   // Fetch service requests from the API and merge with hardcoded data
@@ -994,6 +951,36 @@ export default function BookingsPage() {
           </Tabs>
         </div>
       </div>
+
+      {/* Finish Booking Modal */}
+      {selectedBooking && (
+        <BookingActionModal
+          isOpen={showFinishModal}
+          onClose={() => {
+            setShowFinishModal(false);
+            setSelectedBooking(null);
+          }}
+          action="finish"
+          bookingId={selectedBooking.serviceRequestId || selectedBooking.id}
+          serviceName={selectedBooking.serviceName}
+          onSuccess={handleFinishBookingSuccess}
+        />
+      )}
+
+      {/* Release Payment Modal */}
+      {selectedBooking && (
+        <BookingActionModal
+          isOpen={showCompleteModal}
+          onClose={() => {
+            setShowCompleteModal(false);
+            setSelectedBooking(null);
+          }}
+          action="complete"
+          bookingId={selectedBooking.serviceRequestId || selectedBooking.id}
+          serviceName={selectedBooking.serviceName}
+          onSuccess={handleReleasePaymentSuccess}
+        />
+      )}
     </div>
   );
 }
