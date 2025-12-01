@@ -40,6 +40,11 @@ interface BookingDetails {
     | 'Cancelled';
   serviceImage?: string;
   providerImage?: string;
+  userRole?: 'provider' | 'client';
+  providerId?: string;
+  clientId?: string;
+  serviceRequestId?: number | string;
+  isProviderFinished?: boolean;
 }
 
 // Hardcoded data as fallback
@@ -347,38 +352,131 @@ export default function BookingsPage() {
   };
 
   // Function to handle finishing a booking (provider marks as finished)
-  const handleFinishBooking = (bookingId: number | string) => {
-    setFinishedBookings(prev => new Set(prev).add(bookingId));
+  const handleFinishBooking = async (bookingId: number | string) => {
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session?.access_token) {
+        alert('Authentication required');
+        return;
+      }
+
+      // Find the booking to get the service request ID
+      const booking = bookingsData.ongoing.find(b => b.id === bookingId);
+      if (!booking || !booking.serviceRequestId) {
+        console.error('Booking or service request ID not found');
+        return;
+      }
+
+      // Update service request in database to mark as provider finished
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/service-requests/${booking.serviceRequestId}`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({
+            is_provider_finished: true,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to update booking status');
+      }
+
+      // Update local state
+      setFinishedBookings(prev => new Set(prev).add(bookingId));
+
+      // Update the booking data to reflect the change
+      setBookingsData(prev => ({
+        ...prev,
+        ongoing: prev.ongoing.map(b =>
+          b.id === bookingId ? { ...b, isProviderFinished: true } : b
+        ),
+      }));
+    } catch (error) {
+      console.error('Error finishing booking:', error);
+      alert('Failed to finish booking. Please try again.');
+    }
   };
 
   // Function to handle releasing payment (moves from ongoing to completed)
-  const handleReleasePayment = (bookingId: number | string) => {
-    setBookingsData(prev => {
-      // Find the booking in ongoing
-      const bookingToComplete = prev.ongoing.find(b => b.id === bookingId);
-      if (!bookingToComplete) {
-        return prev;
+  const handleReleasePayment = async (bookingId: number | string) => {
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session?.access_token) {
+        alert('Authentication required');
+        return;
       }
 
-      // Update status to Completed
-      const completedBooking = {
-        ...bookingToComplete,
-        status: 'Completed' as const,
-      };
+      // Find the booking to get the service request ID
+      const booking = bookingsData.ongoing.find(b => b.id === bookingId);
+      if (!booking || !booking.serviceRequestId) {
+        console.error('Booking or service request ID not found');
+        return;
+      }
 
-      return {
-        ...prev,
-        ongoing: prev.ongoing.filter(b => b.id !== bookingId),
-        past: [completedBooking, ...prev.past],
-      };
-    });
+      // Update service request status to completed in database
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/service-requests/${booking.serviceRequestId}`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({
+            status: 'completed',
+          }),
+        }
+      );
 
-    // Remove from finished bookings set
-    setFinishedBookings(prev => {
-      const newSet = new Set(prev);
-      newSet.delete(bookingId);
-      return newSet;
-    });
+      if (!response.ok) {
+        throw new Error('Failed to update booking status');
+      }
+
+      // Update local state
+      setBookingsData(prev => {
+        // Find the booking in ongoing
+        const bookingToComplete = prev.ongoing.find(b => b.id === bookingId);
+        if (!bookingToComplete) {
+          return prev;
+        }
+
+        // Update status to Completed
+        const completedBooking = {
+          ...bookingToComplete,
+          status: 'Completed' as const,
+        };
+
+        return {
+          ...prev,
+          ongoing: prev.ongoing.filter(b => b.id !== bookingId),
+          past: [completedBooking, ...prev.past],
+        };
+      });
+
+      // Remove from finished bookings set
+      setFinishedBookings(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(bookingId);
+        return newSet;
+      });
+
+      // Trigger a refresh to sync with server state
+      setRefreshTrigger(prev => prev + 1);
+    } catch (error) {
+      console.error('Error releasing payment:', error);
+      alert('Failed to release payment. Please try again.');
+    }
   };
 
   // Fetch service requests from the API and merge with hardcoded data
@@ -440,6 +538,7 @@ export default function BookingsPage() {
 
               return {
                 id: request.id,
+                serviceId: request.id,
                 serviceName: request.title,
                 providerName: request.users?.full_name || 'Unknown',
                 rating: 0, // Default for now
@@ -453,6 +552,11 @@ export default function BookingsPage() {
                   request.images?.[0] || '/cleaning-service-provider.jpg',
                 providerImage:
                   request.users?.avatar_url || '/cleaning-service-provider.jpg',
+                userRole: 'client' as const,
+                serviceRequestId: request.id,
+                clientId: request.client_id,
+                providerId: request.provider_id,
+                isProviderFinished: request.is_provider_finished || false,
               };
             }
           );
@@ -490,6 +594,12 @@ export default function BookingsPage() {
                   serviceRequest?.images?.[0] ||
                   '/cleaning-service-provider.jpg',
                 providerImage: '/cleaning-service-provider.jpg',
+                userRole: 'provider' as const,
+                serviceRequestId: serviceRequest?.id,
+                clientId: serviceRequest?.client_id,
+                providerId: application.provider_id,
+                isProviderFinished:
+                  serviceRequest?.is_provider_finished || false,
               };
             }
           );
@@ -527,6 +637,12 @@ export default function BookingsPage() {
                   serviceRequest?.images?.[0] ||
                   '/cleaning-service-provider.jpg',
                 providerImage: '/cleaning-service-provider.jpg',
+                userRole: 'client' as const,
+                serviceRequestId: serviceRequest?.id,
+                clientId: serviceRequest?.client_id,
+                providerId: application.provider_id,
+                isProviderFinished:
+                  serviceRequest?.is_provider_finished || false,
               };
             }
           );
@@ -597,6 +713,19 @@ export default function BookingsPage() {
             ...hardcodedBookings.cancelled,
           ],
         });
+
+        // Initialize finished bookings set from database
+        const finishedIds = new Set<number | string>();
+        [
+          ...categorizedSentApplications.ongoing,
+          ...categorizedReceivedApplications.ongoing,
+          ...categorizedServiceRequests.ongoing,
+        ].forEach(booking => {
+          if (booking.isProviderFinished) {
+            finishedIds.add(booking.id);
+          }
+        });
+        setFinishedBookings(finishedIds);
       } catch (error) {
         // Keep hardcoded data on error
         console.error('Error fetching bookings:', error);
