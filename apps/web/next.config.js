@@ -24,9 +24,15 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: process.env.NEXT_PUBLIC_SUPABASE_URL
-          ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname
-          : 'localhost',
+        hostname: (() => {
+          try {
+            return process.env.NEXT_PUBLIC_SUPABASE_URL
+              ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname
+              : 'placeholder.supabase.co';
+          } catch {
+            return 'placeholder.supabase.co';
+          }
+        })(),
         pathname: '/storage/v1/object/public/**',
       },
     ],

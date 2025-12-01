@@ -111,4 +111,17 @@ export class ReviewsController {
   async getReviewsByProviderId(@Param('providerId') providerId: string) {
     return this.reviewsService.getReviewsByServiceId(providerId);
   }
+
+  // ===============================
+  // GET REVIEWS BY SERVICE LISTING ID
+  // ===============================
+  @Get('listing/:listingId')
+  @ApiOperation({ summary: 'Get reviews by service listing ID (public)' })
+  @ApiResponse({
+    status: 200,
+    description: 'Reviews retrieved successfully',
+  })
+  async getReviewsByServiceListingId(@Param('listingId') listingId: string) {
+    return this.reviewsService.getReviewsByServiceListingId(listingId);
+  }
 }
