@@ -47,7 +47,7 @@ export default defineConfig({
             req.end();
           });
         },
-        log(message: string) {
+        log(message) {
           console.log(`[Web E2E]: ${message}`);
           return null;
         },
