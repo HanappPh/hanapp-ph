@@ -4,7 +4,7 @@ import * as http from 'http';
 
 // Register custom tsconfig for CI environments
 // This addresses the TS5098 error with customConditions
-process.env.TS_NODE_PROJECT = './tsconfig.cypress.json';
+process.env.TS_NODE_PROJECT = './apps/web-e2e/tsconfig.cypress.json';
 
 export default defineConfig({
   e2e: {
