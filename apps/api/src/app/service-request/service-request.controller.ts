@@ -57,22 +57,6 @@ export class ServiceRequestController {
     return this.serviceRequestService.findForJobListings();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.serviceRequestService.findOne(id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateDto: UpdateServiceRequestDto) {
-    return this.serviceRequestService.update(id, updateDto);
-  }
-
-  @Delete(':id')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id') id: string) {
-    return this.serviceRequestService.remove(id);
-  }
-
   @Patch(':id/confirm')
   confirmBooking(
     @Param('id') id: string,
@@ -101,5 +85,21 @@ export class ServiceRequestController {
   ) {
     const token = authHeader?.replace('Bearer ', '');
     return this.serviceRequestService.completeBooking(id, clientId, token);
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.serviceRequestService.findOne(id);
+  }
+
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() updateDto: UpdateServiceRequestDto) {
+    return this.serviceRequestService.update(id, updateDto);
+  }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  remove(@Param('id') id: string) {
+    return this.serviceRequestService.remove(id);
   }
 }

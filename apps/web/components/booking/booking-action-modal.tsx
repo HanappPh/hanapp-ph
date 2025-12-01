@@ -17,7 +17,7 @@ import { useAuth } from '../../lib/hooks/useAuth';
 interface BookingActionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  action: 'confirm' | 'delete';
+  action: 'confirm' | 'delete' | 'finish' | 'complete';
   bookingId: number | string;
   serviceName: string;
   onSuccess?: () => void;
@@ -113,6 +113,46 @@ export default function BookingActionModal({
           const error = await response.json();
           throw new Error(error.message || 'Failed to delete booking');
         }
+      } else if (action === 'finish') {
+        // Provider marks booking as finished
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/service-requests/${bookingId}/finish`,
+          {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${session.access_token}`,
+            },
+            body: JSON.stringify({
+              providerId: user.id,
+            }),
+          }
+        );
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || 'Failed to finish booking');
+        }
+      } else if (action === 'complete') {
+        // Client releases payment and completes booking
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/service-requests/${bookingId}/complete`,
+          {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${session.access_token}`,
+            },
+            body: JSON.stringify({
+              clientId: user.id,
+            }),
+          }
+        );
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || 'Failed to complete booking');
+        }
       }
 
       onClose();
@@ -145,6 +185,22 @@ export default function BookingActionModal({
       cancelText: 'Keep Booking',
       confirmVariant: 'destructive' as const,
       icon: <Trash2 className="w-5 h-5" />,
+    },
+    finish: {
+      title: 'Finish Booking',
+      description: `Mark "${serviceName}" as finished? The client will be able to release payment after you confirm.`,
+      confirmText: 'Yes, Mark as Finished',
+      cancelText: 'Cancel',
+      confirmVariant: 'default' as const,
+      icon: <Check className="w-5 h-5" />,
+    },
+    complete: {
+      title: 'Release Payment',
+      description: `Release payment for "${serviceName}"? This will complete the booking and move it to your past jobs.`,
+      confirmText: 'Yes, Release Payment',
+      cancelText: 'Cancel',
+      confirmVariant: 'default' as const,
+      icon: <Check className="w-5 h-5" />,
     },
   };
 
