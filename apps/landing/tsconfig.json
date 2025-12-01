@@ -38,13 +38,17 @@
     "app/**/*.jsx",
     "app/**/*.ts",
     "app/**/*.tsx",
+    "components/**/*.js",
+    "components/**/*.jsx",
+    "components/**/*.ts",
+    "components/**/*.tsx",
     ".next/types/**/*.ts"
   ],
   "exclude": [
     "out-tsc",
     "dist",
     "node_modules",
-    "jest.config.ts",
+    "jest.config.cjs",
     "app/**/*.spec.ts",
     "app/**/*.test.ts",
     ".next",

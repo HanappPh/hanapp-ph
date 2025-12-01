@@ -1,25 +1,23 @@
-import { nxE2EPreset } from '@nx/cypress/plugins/cypress-preset';
+import { nxE2EPreset } from '@nx/cypress/plugins/cypress-preset.js';
 import { defineConfig } from 'cypress';
 import * as http from 'http';
 
 // Register custom tsconfig for CI environments
 // This addresses the TS5098 error with customConditions
-process.env.TS_NODE_PROJECT = process.env.CI
-  ? './apps/web-e2e/tsconfig.cypress.json'
-  : './apps/web-e2e/tsconfig.json';
+process.env.TS_NODE_PROJECT = './apps/web-e2e/tsconfig.cypress.json';
 
 export default defineConfig({
   e2e: {
-    ...nxE2EPreset(__filename, {
+    ...nxE2EPreset(__dirname, {
       cypressDir: 'src',
       webServerCommands: {
-        default: 'npx nx run web:serve',
+        default: 'npx nx run @hanapp-ph/web:serve',
       },
       // CI configuration - don't auto-start server, we handle it externally
       ciWebServerCommand: undefined,
-      ciBaseUrl: 'http://localhost:3000',
+      ciBaseUrl: 'http://localhost:4200',
     }),
-    baseUrl: 'http://localhost:3000',
+    baseUrl: 'http://localhost:4200',
     defaultCommandTimeout: 10000,
     requestTimeout: 10000,
     responseTimeout: 10000,
@@ -31,7 +29,7 @@ export default defineConfig({
             const req = http.request(
               {
                 hostname: 'localhost',
-                port: 3000,
+                port: 4200,
                 path: '/',
                 method: 'GET',
                 timeout: 5000,
@@ -49,7 +47,7 @@ export default defineConfig({
             req.end();
           });
         },
-        log(message: string) {
+        log(message) {
           console.log(`[Web E2E]: ${message}`);
           return null;
         },

@@ -7,12 +7,12 @@
       "executor": "@nx/cypress:cypress",
       "options": {
         "cypressConfig": "apps/landing-e2e/cypress.config.ts",
-        "devServerTarget": "landing:serve:development",
+        "devServerTarget": "@hanapp-ph/landing:serve:development",
         "testingType": "e2e"
       },
       "configurations": {
         "production": {
-          "devServerTarget": "landing:serve:production"
+          "devServerTarget": "@hanapp-ph/landing:serve:production"
         },
         "ci": {
           "baseUrl": "http://localhost:3001"

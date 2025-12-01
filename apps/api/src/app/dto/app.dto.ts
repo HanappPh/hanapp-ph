@@ -1,29 +1,35 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+/**
+ * Response DTO for application data endpoint
+ */
 export class AppDataResponseDto {
   @ApiProperty({
+    description: 'Message from the API',
     example: 'Hello API',
-    description: 'Welcome message from the API',
   })
   message!: string;
 }
 
+/**
+ * Response DTO for health check endpoint
+ */
 export class HealthResponseDto {
   @ApiProperty({
-    example: 'ok',
     description: 'Health status of the API',
+    example: 'OK',
   })
   status!: string;
 
   @ApiProperty({
-    example: '2025-09-10T14:30:45.123Z',
-    description: 'Current server timestamp',
+    description: 'Timestamp of the health check',
+    example: '2025-10-28T12:00:00.000Z',
   })
   timestamp!: string;
 
   @ApiProperty({
-    example: 3600.5,
-    description: 'Server uptime in seconds',
+    description: 'Uptime of the API in seconds',
+    example: 12345,
   })
   uptime!: number;
 }

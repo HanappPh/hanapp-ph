@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "nx": {
-    "name": "api",
+    "name": "@hanapp-ph/api",
     "targets": {
       "build": {
         "executor": "nx:run-commands",
@@ -64,15 +64,15 @@
           "build"
         ],
         "options": {
-          "buildTarget": "api:build",
+          "buildTarget": "@hanapp-ph/api:build",
           "runBuildTargetDependencies": false
         },
         "configurations": {
           "development": {
-            "buildTarget": "api:build:development"
+            "buildTarget": "@hanapp-ph/api:build:development"
           },
           "production": {
-            "buildTarget": "api:build:production"
+            "buildTarget": "@hanapp-ph/api:build:production"
           }
         }
       },
@@ -83,5 +83,9 @@
       }
     }
   },
-  "dependencies": {}
+  "dependencies": {
+    "@supabase/supabase-js": "^2.76.1",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.2"
+  }
 }

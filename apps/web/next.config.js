@@ -12,19 +12,31 @@ const nextConfig = {
   nx: {
     svgr: false,
   },
-
+  // Experimental features for better performance
   experimental: {
-    // Enable Turbopack for faster development builds
-    turbo: {
-      // Configure Turbopack-specific settings if needed
-      resolveAlias: {
-        '@': './app',
-      },
-    },
+    // Use source files directly in development for better DX
+    externalDir: true,
   },
-
-  // Ensure correct path resolution
-  distDir: '.next',
+  // Ensure transpilation of monorepo packages
+  transpilePackages: ['@hanapp-ph/commons'],
+  // Image configuration for external domains
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: (() => {
+          try {
+            return process.env.NEXT_PUBLIC_SUPABASE_URL
+              ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname
+              : 'placeholder.supabase.co';
+          } catch {
+            return 'placeholder.supabase.co';
+          }
+        })(),
+        pathname: '/storage/v1/object/public/**',
+      },
+    ],
+  },
 };
 
 const plugins = [
