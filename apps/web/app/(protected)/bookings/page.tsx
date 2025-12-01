@@ -324,11 +324,15 @@ export default function BookingsPage() {
       }
 
       // Update status to Rejected (for applications) or Cancelled
+      const newStatus: BookingDetails['status'] = String(bookingId).startsWith(
+        'app-'
+      )
+        ? 'Rejected'
+        : 'Cancelled';
+
       const cancelledBooking = {
         ...bookingToDelete,
-        status: (String(bookingId).startsWith('app-')
-          ? 'Rejected'
-          : 'Cancelled') as const,
+        status: newStatus,
       };
 
       return {
