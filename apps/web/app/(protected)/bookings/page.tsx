@@ -526,14 +526,21 @@ export default function BookingsPage() {
           sentApplications.map(
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (application: any) => {
+              const serviceRequest = application.service_requests;
+
+              // Use service request status if available, otherwise use application status
+              const effectiveStatus =
+                serviceRequest?.status || application.status;
+
               const statusMap: Record<string, BookingDetails['status']> = {
                 pending: 'Pending',
+                approved: 'Accepted',
                 accepted: 'Accepted',
                 rejected: 'Rejected',
                 withdrawn: 'Cancelled',
+                cancelled: 'Cancelled',
+                completed: 'Completed',
               };
-
-              const serviceRequest = application.service_requests;
 
               return {
                 id: `app-${application.id}`,
@@ -549,7 +556,7 @@ export default function BookingsPage() {
                     ? `${serviceRequest.time} - ${serviceRequest.time_2}`
                     : serviceRequest?.time || 'N/A',
                 location: serviceRequest?.job_location || 'Unknown',
-                status: statusMap[application.status] || 'Pending',
+                status: statusMap[effectiveStatus?.toLowerCase()] || 'Pending',
                 serviceImage:
                   serviceRequest?.images?.[0] ||
                   '/cleaning-service-provider.jpg',
@@ -569,14 +576,21 @@ export default function BookingsPage() {
           receivedApplications.map(
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (application: any) => {
+              const serviceRequest = application.service_requests;
+
+              // Use service request status if available, otherwise use application status
+              const effectiveStatus =
+                serviceRequest?.status || application.status;
+
               const statusMap: Record<string, BookingDetails['status']> = {
                 pending: 'Pending',
+                approved: 'Accepted',
                 accepted: 'Accepted',
                 rejected: 'Rejected',
                 withdrawn: 'Cancelled',
+                cancelled: 'Cancelled',
+                completed: 'Completed',
               };
-
-              const serviceRequest = application.service_requests;
 
               return {
                 id: `app-${application.id}`,
@@ -592,7 +606,7 @@ export default function BookingsPage() {
                     ? `${serviceRequest.time} - ${serviceRequest.time_2}`
                     : serviceRequest?.time || 'N/A',
                 location: serviceRequest?.job_location || 'Unknown',
-                status: statusMap[application.status] || 'Pending',
+                status: statusMap[effectiveStatus?.toLowerCase()] || 'Pending',
                 serviceImage:
                   serviceRequest?.images?.[0] ||
                   '/cleaning-service-provider.jpg',
@@ -631,6 +645,9 @@ export default function BookingsPage() {
           ongoing: transformedSentApplications.filter(
             b => b.status === 'Accepted'
           ),
+          past: transformedSentApplications.filter(
+            b => b.status === 'Completed'
+          ),
           cancelled: transformedSentApplications.filter(
             b => b.status === 'Rejected' || b.status === 'Cancelled'
           ),
@@ -643,6 +660,9 @@ export default function BookingsPage() {
           ),
           ongoing: transformedReceivedApplications.filter(
             b => b.status === 'Accepted'
+          ),
+          past: transformedReceivedApplications.filter(
+            b => b.status === 'Completed'
           ),
           cancelled: transformedReceivedApplications.filter(
             b => b.status === 'Rejected' || b.status === 'Cancelled'
@@ -665,7 +685,12 @@ export default function BookingsPage() {
             ...categorizedServiceRequests.ongoing,
             ...hardcodedBookings.ongoing,
           ],
-          past: [...categorizedServiceRequests.past, ...hardcodedBookings.past],
+          past: [
+            ...categorizedSentApplications.past,
+            ...categorizedReceivedApplications.past,
+            ...categorizedServiceRequests.past,
+            ...hardcodedBookings.past,
+          ],
           cancelled: [
             ...categorizedSentApplications.cancelled,
             ...categorizedReceivedApplications.cancelled,
