@@ -13,6 +13,7 @@ import BookingStatusBadge from './booking-status';
 
 interface BookingCardProps {
   id: number | string; // Allow both for job applications
+  serviceId: number | string;
   serviceName: string;
   providerName: string;
   rating: number;
@@ -33,6 +34,11 @@ interface BookingCardProps {
   tabContext?: 'requested' | 'received' | 'ongoing' | 'past' | 'cancelled';
   onDelete?: () => void;
   onConfirm?: () => void;
+  onFinishBooking?: () => void;
+  onReleasePayment?: () => void;
+  isFinished?: boolean;
+  userRole?: 'provider' | 'client';
+  isProviderFinished?: boolean;
 }
 
 export default function BookingCard(booking: BookingCardProps) {
@@ -103,10 +109,16 @@ export default function BookingCard(booking: BookingCardProps) {
               <BookingActionButton
                 status={booking.status}
                 bookingId={booking.id}
+                serviceId={booking.serviceId}
                 serviceName={booking.serviceName}
                 tabContext={booking.tabContext}
                 onDelete={booking.onDelete}
                 onConfirm={booking.onConfirm}
+                onFinishBooking={booking.onFinishBooking}
+                onReleasePayment={booking.onReleasePayment}
+                isFinished={booking.isFinished}
+                userRole={booking.userRole}
+                isProviderFinished={booking.isProviderFinished}
               ></BookingActionButton>
             </div>
           </div>

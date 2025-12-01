@@ -215,8 +215,6 @@ export default function CreateServicePage() {
           listingId,
         };
 
-        console.log('Service payload to submit:', payload);
-
         const response = await fetch(
           `${env.NEXT_PUBLIC_API_URL}/api/services`,
           {
@@ -273,8 +271,6 @@ export default function CreateServicePage() {
       setViewMode('services');
       return;
     }
-
-    console.log('auth uid:', session.user.id);
 
     try {
       // Step 1: Create the listing (if not already created)

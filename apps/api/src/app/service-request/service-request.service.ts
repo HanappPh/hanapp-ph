@@ -286,4 +286,139 @@ export class ServiceRequestService {
 
     return result;
   }
+
+  // Confirm a booking (client accepts an application, moves to ongoing)
+  async confirmBooking(id: string, userId: string, token?: string) {
+    const supabase = token
+      ? this.supabaseService.createUserClient(token)
+      : this.supabaseService.getClient();
+
+    // Verify the user is the client who owns this service request
+    const { data: serviceRequest, error: fetchError } = await supabase
+      .from('service_requests')
+      .select('client_id')
+      .eq('id', id)
+      .single();
+
+    if (fetchError || !serviceRequest) {
+      throw new HttpException(
+        'Service request not found',
+        HttpStatus.NOT_FOUND
+      );
+    }
+
+    if (serviceRequest.client_id !== userId) {
+      throw new HttpException(
+        'You do not have permission to confirm this booking',
+        HttpStatus.FORBIDDEN
+      );
+    }
+
+    // Update status to 'approved' (ongoing)
+    const { data, error } = await supabase
+      .from('service_requests')
+      .update({
+        status: 'approved',
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      throw new HttpException(
+        `Failed to confirm booking: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+
+    return data;
+  }
+
+  // Finish a booking (provider marks service as complete, awaiting payment)
+  async finishBooking(id: string, _providerId: string, _token?: string) {
+    // Use regular client to bypass RLS since we're checking permissions explicitly
+    const supabase = this.supabaseService.getClient();
+
+    // Get the service request
+    const { data: serviceRequest, error: fetchError } = await supabase
+      .from('service_requests')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (fetchError || !serviceRequest) {
+      throw new HttpException(
+        'Service request not found',
+        HttpStatus.NOT_FOUND
+      );
+    }
+
+    // Mark as finished by provider (doesn't change status, just sets flag)
+    const { data, error } = await supabase
+      .from('service_requests')
+      .update({
+        is_provider_finished: true,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      throw new HttpException(
+        `Failed to finish booking: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+
+    return data;
+  }
+
+  // Complete a booking (client releases payment, moves to completed)
+  async completeBooking(id: string, clientId: string, _token?: string) {
+    // Use regular client to bypass RLS since we're checking permissions explicitly
+    const supabase = this.supabaseService.getClient();
+
+    // Verify the user is the client who owns this service request
+    const { data: serviceRequest, error: fetchError } = await supabase
+      .from('service_requests')
+      .select('client_id')
+      .eq('id', id)
+      .single();
+
+    if (fetchError || !serviceRequest) {
+      throw new HttpException(
+        'Service request not found',
+        HttpStatus.NOT_FOUND
+      );
+    }
+
+    if (serviceRequest.client_id !== clientId) {
+      throw new HttpException(
+        'You do not have permission to complete this booking',
+        HttpStatus.FORBIDDEN
+      );
+    }
+
+    // Update status to 'completed'
+    const { data, error } = await supabase
+      .from('service_requests')
+      .update({
+        status: 'completed',
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      throw new HttpException(
+        `Failed to complete booking: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+
+    return data;
+  }
 }

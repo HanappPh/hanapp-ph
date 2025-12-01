@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
-import { supabase } from '../../lib/supabase/client';
+// import { supabase } from '../../lib/supabase/client';
 
 const PLACEHOLDER_IMAGE_URL = '/img-carousel-placeholder_2.png'; // You might want to replace this with a real placeholder image path
 
@@ -208,17 +208,17 @@ function SellerProfileCard({
 export function ReviewsSection({
   reviews,
   sellerProfile,
-  serviceListingId,
-  onReviewSubmitted,
+  // serviceListingId,
+  // onReviewSubmitted,
   providerId,
 }: ReviewsSectionProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedRating, setSelectedRating] = useState(0);
-  const [showRatingModal, setShowRatingModal] = useState(false);
-  const [userRating, setUserRating] = useState(0);
-  const [hoverRating, setHoverRating] = useState(0);
-  const [reviewComment, setReviewComment] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  // const [showRatingModal, setShowRatingModal] = useState(false);
+  // const [userRating, setUserRating] = useState(0);
+  // const [hoverRating, setHoverRating] = useState(0);
+  // const [reviewComment, setReviewComment] = useState('');
+  // const [isSubmitting, setIsSubmitting] = useState(false);
   const reviewsPerPage = 5;
   const columns = 1;
 
@@ -270,81 +270,81 @@ export function ReviewsSection({
 
   const ratingCounts = getRatingCounts();
 
-  const handleSubmitRating = async () => {
-    if (userRating === 0) {
-      return;
-    }
+  // const handleSubmitRating = async () => {
+  //   if (userRating === 0) {
+  //     return;
+  //   }
 
-    if (!serviceListingId) {
-      alert('Service listing ID is required to submit a review');
-      return;
-    }
+  //   if (!serviceListingId) {
+  //     alert('Service listing ID is required to submit a review');
+  //     return;
+  //   }
 
-    setIsSubmitting(true);
+  //   setIsSubmitting(true);
 
-    try {
-      // Get authentication token from Supabase session
-      const {
-        data: { session },
-        error: sessionError,
-      } = await supabase.auth.getSession();
+  //   try {
+  //     // Get authentication token from Supabase session
+  //     const {
+  //       data: { session },
+  //       error: sessionError,
+  //     } = await supabase.auth.getSession();
 
-      if (sessionError || !session?.access_token) {
-        alert('Please login to submit a review');
-        setIsSubmitting(false);
-        return;
-      }
+  //     if (sessionError || !session?.access_token) {
+  //       alert('Please login to submit a review');
+  //       setIsSubmitting(false);
+  //       return;
+  //     }
 
-      const token = session.access_token;
+  //     const token = session.access_token;
 
-      const response = await fetch('http://localhost:3001/api/reviews', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          service_listing_id: serviceListingId,
-          rating: userRating,
-          comment: reviewComment || undefined,
-        }),
-      });
+  //     const response = await fetch('http://localhost:3001/api/reviews', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //       body: JSON.stringify({
+  //         service_listing_id: serviceListingId,
+  //         rating: userRating,
+  //         comment: reviewComment || undefined,
+  //       }),
+  //     });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to submit review');
-      }
+  //     if (!response.ok) {
+  //       const errorData = await response.json();
+  //       throw new Error(errorData.message || 'Failed to submit review');
+  //     }
 
-      // Reset and close
-      setUserRating(0);
-      setHoverRating(0);
-      setReviewComment('');
-      setShowRatingModal(false);
+  //     // Reset and close
+  //     setUserRating(0);
+  //     setHoverRating(0);
+  //     setReviewComment('');
+  //     setShowRatingModal(false);
 
-      // Notify parent to refresh reviews
-      if (onReviewSubmitted) {
-        onReviewSubmitted();
-      }
+  //     // Notify parent to refresh reviews
+  //     if (onReviewSubmitted) {
+  //       onReviewSubmitted();
+  //     }
 
-      alert('Review submitted successfully!');
-    } catch (error) {
-      console.error('Error submitting review:', error);
-      alert(
-        error instanceof Error
-          ? error.message
-          : 'Failed to submit review. Please try again.'
-      );
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+  //     alert('Review submitted successfully!');
+  //   } catch (error) {
+  //     console.error('Error submitting review:', error);
+  //     alert(
+  //       error instanceof Error
+  //         ? error.message
+  //         : 'Failed to submit review. Please try again.'
+  //     );
+  //   } finally {
+  //     setIsSubmitting(false);
+  //   }
+  // };
 
-  const handleCancelRating = () => {
-    setUserRating(0);
-    setHoverRating(0);
-    setReviewComment('');
-    setShowRatingModal(false);
-  };
+  // const handleCancelRating = () => {
+  //   setUserRating(0);
+  //   setHoverRating(0);
+  //   setReviewComment('');
+  //   setShowRatingModal(false);
+  // };
 
   return (
     <div className="w-full xl:max-w-screen-xl 2xl:max-w-screen-2xl mx-auto pr-4 sm:pr-6 lg:pr-8 pb-5 sm:pb-6 lg:pb-8 overflow-hidden">
@@ -367,12 +367,12 @@ export function ReviewsSection({
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#102E50] break-words">
                 Reviews
               </h2>
-              <Button
+              {/* <Button
                 className="bg-[#102E50] hover:bg-[#0a1f35] text-white font-semibold px-4 sm:px-6 py-2 sm:py-2.5 rounded-md transition-colors duration-200 whitespace-nowrap"
                 onClick={() => setShowRatingModal(true)}
               >
                 Rate Service
-              </Button>
+              </Button> */}
             </div>
             <p className="text-gray-600 text-lg sm:text-xl">
               {totalReviewsCount} reviews for this service
@@ -494,97 +494,6 @@ export function ReviewsSection({
           </Card>
         )}
       </div>
-
-      {/* Rating Modal */}
-      {showRatingModal && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4"
-          onClick={handleCancelRating}
-        >
-          <Card
-            className="p-6 sm:p-8 w-full max-w-md mx-auto"
-            onClick={e => e.stopPropagation()}
-          >
-            <CardContent className="p-0 space-y-6">
-              <h3 className="text-2xl font-bold text-[#102E50] text-center">
-                Rate This Service
-              </h3>
-
-              {/* Star Rating */}
-              <div className="flex justify-center gap-2">
-                {[1, 2, 3, 4, 5].map(star => (
-                  <button
-                    key={star}
-                    type="button"
-                    onClick={() => setUserRating(star)}
-                    onMouseEnter={() => setHoverRating(star)}
-                    onMouseLeave={() => setHoverRating(0)}
-                    className="transition-transform hover:scale-110"
-                  >
-                    <Star
-                      className={`w-10 h-10 sm:w-12 sm:h-12 transition-colors ${
-                        star <= (hoverRating || userRating)
-                          ? 'fill-[#102E50] text-[#102E50]'
-                          : 'text-gray-300'
-                      }`}
-                    />
-                  </button>
-                ))}
-              </div>
-
-              {/* Rating Text */}
-              {userRating > 0 && (
-                <p className="text-center text-lg font-semibold text-[#102E50]">
-                  {userRating === 5 && 'Excellent!'}
-                  {userRating === 4 && 'Very Good!'}
-                  {userRating === 3 && 'Good'}
-                  {userRating === 2 && 'Fair'}
-                  {userRating === 1 && 'Poor'}
-                </p>
-              )}
-
-              {/* Comment Textarea */}
-              <div>
-                <label
-                  htmlFor="review-comment"
-                  className="block text-sm font-semibold text-[#102E50] mb-2"
-                >
-                  Your Review (Optional)
-                </label>
-                <textarea
-                  id="review-comment"
-                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#102E50] focus:border-transparent resize-none"
-                  rows={4}
-                  placeholder="Share your experience with this service..."
-                  value={reviewComment}
-                  onChange={e => setReviewComment(e.target.value)}
-                  maxLength={500}
-                />
-                <p className="text-xs text-gray-500 mt-1 text-right">
-                  {reviewComment.length}/500
-                </p>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex gap-3 pt-2">
-                <Button
-                  className="flex-1 px-4 py-2.5 bg-white text-[#102E50] border-2 border-[#102E50] rounded-md hover:bg-gray-50 font-semibold transition-colors"
-                  onClick={handleCancelRating}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  className="flex-1 px-4 py-2.5 bg-[#102E50] text-white rounded-md hover:bg-[#0a1f35] font-semibold transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
-                  onClick={handleSubmitRating}
-                  disabled={userRating === 0 || isSubmitting}
-                >
-                  {isSubmitting ? 'Submitting...' : 'Submit Rating'}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
     </div>
   );
 }

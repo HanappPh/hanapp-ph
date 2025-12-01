@@ -169,8 +169,8 @@ export default function JobApplicationPage({
       );
 
       alert('Application submitted successfully!');
-      // Redirect to bookings page with sent tab active
-      router.push('/bookings?tab=sent&refresh=true');
+      // Redirect to bookings page with requested tab active
+      router.push('/bookings?tab=requested&refresh=true');
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       alert(err.message || 'Failed to submit application. Please try again.');

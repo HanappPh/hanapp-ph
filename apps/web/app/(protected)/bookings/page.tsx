@@ -12,6 +12,7 @@ import { Clock, Calendar } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 
+import BookingActionModal from '../../../components/booking/booking-action-modal';
 import BookingCard from '../../../components/booking/booking-cards';
 import {
   fetchSentApplications,
@@ -40,6 +41,11 @@ interface BookingDetails {
     | 'Cancelled';
   serviceImage?: string;
   providerImage?: string;
+  userRole?: 'provider' | 'client';
+  providerId?: string;
+  clientId?: string;
+  serviceRequestId?: number | string;
+  isProviderFinished?: boolean;
 }
 
 // Hardcoded data as fallback
@@ -234,6 +240,14 @@ export default function BookingsPage() {
   }>(hardcodedBookings);
   const [isLoading, setIsLoading] = useState(true);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [finishedBookings, setFinishedBookings] = useState<
+    Set<number | string>
+  >(new Set());
+  const [showFinishModal, setShowFinishModal] = useState(false);
+  const [showCompleteModal, setShowCompleteModal] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState<BookingDetails | null>(
+    null
+  );
 
   // Check if we need to refresh data and set active tab
   useEffect(() => {
@@ -270,6 +284,9 @@ export default function BookingsPage() {
         cancelled: [cancelledBooking, ...prev.cancelled],
       };
     });
+
+    // Trigger a refresh to sync with server state
+    setRefreshTrigger(prev => prev + 1);
   };
 
   // Function to handle confirming a booking (moves from received to ongoing)
@@ -287,12 +304,25 @@ export default function BookingsPage() {
         status: 'Accepted' as const,
       };
 
+      // Extract service request ID from the application ID if it exists
+      // Application IDs are in format "app-{id}", we need to find the matching service request
+      const serviceRequestId = bookingToConfirm.serviceId;
+
       return {
         ...prev,
+        // Remove from received tab
         received: prev.received.filter(b => b.id !== bookingId),
+        // Remove from requested tab if there's a matching service request
+        requested: prev.requested.filter(
+          b => b.serviceId !== serviceRequestId && b.id !== serviceRequestId
+        ),
+        // Add to ongoing
         ongoing: [confirmedBooking, ...prev.ongoing],
       };
     });
+
+    // Trigger a refresh to sync with server state
+    setRefreshTrigger(prev => prev + 1);
   };
 
   // Function to handle deleting a booking (moves from received to cancelled)
@@ -304,10 +334,16 @@ export default function BookingsPage() {
         return prev;
       }
 
-      // Update status to Cancelled
+      // Update status to Rejected (for applications) or Cancelled
+      const newStatus: BookingDetails['status'] = String(bookingId).startsWith(
+        'app-'
+      )
+        ? 'Rejected'
+        : 'Cancelled';
+
       const cancelledBooking = {
         ...bookingToDelete,
-        status: 'Cancelled' as const,
+        status: newStatus,
       };
 
       return {
@@ -316,6 +352,91 @@ export default function BookingsPage() {
         cancelled: [cancelledBooking, ...prev.cancelled],
       };
     });
+
+    // Trigger a refresh to sync with server state
+    setRefreshTrigger(prev => prev + 1);
+  };
+
+  // Function to handle finishing a booking (provider marks as finished)
+  const handleFinishBooking = (bookingId: number | string) => {
+    const booking = bookingsData.ongoing.find(b => b.id === bookingId);
+    if (booking) {
+      setSelectedBooking(booking);
+      setShowFinishModal(true);
+    }
+  };
+
+  const handleFinishBookingSuccess = () => {
+    if (!selectedBooking) {
+      return;
+    }
+
+    // Update local state - match by serviceRequestId since that's what was updated in DB
+    setFinishedBookings(prev => new Set(prev).add(selectedBooking.id));
+
+    // Update the booking data to reflect the change
+    setBookingsData(prev => ({
+      ...prev,
+      ongoing: prev.ongoing.map(b =>
+        b.serviceRequestId === selectedBooking.serviceRequestId
+          ? { ...b, isProviderFinished: true }
+          : b
+      ),
+    }));
+
+    setShowFinishModal(false);
+    setSelectedBooking(null);
+    // Trigger a refresh to sync with server state
+    setRefreshTrigger(prev => prev + 1);
+  };
+
+  // Function to handle releasing payment (moves from ongoing to completed)
+  const handleReleasePayment = (bookingId: number | string) => {
+    const booking = bookingsData.ongoing.find(b => b.id === bookingId);
+    if (booking) {
+      setSelectedBooking(booking);
+      setShowCompleteModal(true);
+    }
+  };
+
+  const handleReleasePaymentSuccess = () => {
+    if (!selectedBooking) {
+      return;
+    }
+
+    // Update local state
+    setBookingsData(prev => {
+      // Find the booking in ongoing
+      const bookingToComplete = prev.ongoing.find(
+        b => b.id === selectedBooking.id
+      );
+      if (!bookingToComplete) {
+        return prev;
+      }
+
+      // Update status to Completed
+      const completedBooking = {
+        ...bookingToComplete,
+        status: 'Completed' as const,
+      };
+
+      return {
+        ...prev,
+        ongoing: prev.ongoing.filter(b => b.id !== selectedBooking.id),
+        past: [completedBooking, ...prev.past],
+      };
+    });
+
+    // Remove from finished bookings set
+    setFinishedBookings(prev => {
+      const newSet = new Set(prev);
+      newSet.delete(selectedBooking.id);
+      return newSet;
+    });
+
+    setShowCompleteModal(false);
+    setSelectedBooking(null);
+    setRefreshTrigger(prev => prev + 1);
   };
 
   // Fetch service requests from the API and merge with hardcoded data
@@ -377,6 +498,7 @@ export default function BookingsPage() {
 
               return {
                 id: request.id,
+                serviceId: request.id,
                 serviceName: request.title,
                 providerName: request.users?.full_name || 'Unknown',
                 rating: 0, // Default for now
@@ -390,6 +512,11 @@ export default function BookingsPage() {
                   request.images?.[0] || '/cleaning-service-provider.jpg',
                 providerImage:
                   request.users?.avatar_url || '/cleaning-service-provider.jpg',
+                userRole: 'client' as const,
+                serviceRequestId: request.id,
+                clientId: request.client_id,
+                providerId: request.provider_id,
+                isProviderFinished: request.is_provider_finished || false,
               };
             }
           );
@@ -399,14 +526,21 @@ export default function BookingsPage() {
           sentApplications.map(
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (application: any) => {
+              const serviceRequest = application.service_requests;
+
+              // Use service request status if available, otherwise use application status
+              const effectiveStatus =
+                serviceRequest?.status || application.status;
+
               const statusMap: Record<string, BookingDetails['status']> = {
                 pending: 'Pending',
+                approved: 'Accepted',
                 accepted: 'Accepted',
                 rejected: 'Rejected',
                 withdrawn: 'Cancelled',
+                cancelled: 'Cancelled',
+                completed: 'Completed',
               };
-
-              const serviceRequest = application.service_requests;
 
               return {
                 id: `app-${application.id}`,
@@ -422,11 +556,17 @@ export default function BookingsPage() {
                     ? `${serviceRequest.time} - ${serviceRequest.time_2}`
                     : serviceRequest?.time || 'N/A',
                 location: serviceRequest?.job_location || 'Unknown',
-                status: statusMap[application.status] || 'Pending',
+                status: statusMap[effectiveStatus?.toLowerCase()] || 'Pending',
                 serviceImage:
                   serviceRequest?.images?.[0] ||
                   '/cleaning-service-provider.jpg',
                 providerImage: '/cleaning-service-provider.jpg',
+                userRole: 'provider' as const,
+                serviceRequestId: serviceRequest?.id,
+                clientId: serviceRequest?.client_id,
+                providerId: application.provider_id,
+                isProviderFinished:
+                  serviceRequest?.is_provider_finished || false,
               };
             }
           );
@@ -436,14 +576,21 @@ export default function BookingsPage() {
           receivedApplications.map(
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (application: any) => {
+              const serviceRequest = application.service_requests;
+
+              // Use service request status if available, otherwise use application status
+              const effectiveStatus =
+                serviceRequest?.status || application.status;
+
               const statusMap: Record<string, BookingDetails['status']> = {
                 pending: 'Pending',
+                approved: 'Accepted',
                 accepted: 'Accepted',
                 rejected: 'Rejected',
                 withdrawn: 'Cancelled',
+                cancelled: 'Cancelled',
+                completed: 'Completed',
               };
-
-              const serviceRequest = application.service_requests;
 
               return {
                 id: `app-${application.id}`,
@@ -459,51 +606,126 @@ export default function BookingsPage() {
                     ? `${serviceRequest.time} - ${serviceRequest.time_2}`
                     : serviceRequest?.time || 'N/A',
                 location: serviceRequest?.job_location || 'Unknown',
-                status: statusMap[application.status] || 'Pending',
+                status: statusMap[effectiveStatus?.toLowerCase()] || 'Pending',
                 serviceImage:
                   serviceRequest?.images?.[0] ||
                   '/cleaning-service-provider.jpg',
                 providerImage: '/cleaning-service-provider.jpg',
+                userRole: 'client' as const,
+                serviceRequestId: serviceRequest?.id,
+                clientId: serviceRequest?.client_id,
+                providerId: application.provider_id,
+                isProviderFinished:
+                  serviceRequest?.is_provider_finished || false,
               };
             }
           );
 
-        // Categorize service requests by status
+        // Get service request IDs that are already in received applications to avoid duplicates
+        const receivedApplicationServiceRequestIds = new Set(
+          transformedReceivedApplications
+            .map(app => app.serviceRequestId)
+            .filter(Boolean)
+        );
+
+        // Categorize service requests by status, excluding ones that have applications
         const categorizedServiceRequests = {
           pending: transformedServiceRequests.filter(
-            b => b.status === 'Pending'
+            b =>
+              b.status === 'Pending' &&
+              !receivedApplicationServiceRequestIds.has(b.serviceRequestId)
           ),
           ongoing: transformedServiceRequests.filter(
-            b => b.status === 'Accepted' || b.status === 'Paid'
+            b =>
+              (b.status === 'Accepted' || b.status === 'Paid') &&
+              !receivedApplicationServiceRequestIds.has(b.serviceRequestId)
           ),
           past: transformedServiceRequests.filter(
-            b => b.status === 'Completed'
+            b =>
+              b.status === 'Completed' &&
+              !receivedApplicationServiceRequestIds.has(b.serviceRequestId)
           ),
           cancelled: transformedServiceRequests.filter(
-            b => b.status === 'Cancelled' || b.status === 'Rejected'
+            b =>
+              (b.status === 'Cancelled' || b.status === 'Rejected') &&
+              !receivedApplicationServiceRequestIds.has(b.serviceRequestId)
+          ),
+        };
+
+        // Categorize sent applications by status
+        const categorizedSentApplications = {
+          pending: transformedSentApplications.filter(
+            b => b.status === 'Pending'
+          ),
+          ongoing: transformedSentApplications.filter(
+            b => b.status === 'Accepted'
+          ),
+          past: transformedSentApplications.filter(
+            b => b.status === 'Completed'
+          ),
+          cancelled: transformedSentApplications.filter(
+            b => b.status === 'Rejected' || b.status === 'Cancelled'
+          ),
+        };
+
+        // Categorize received applications by status
+        const categorizedReceivedApplications = {
+          pending: transformedReceivedApplications.filter(
+            b => b.status === 'Pending'
+          ),
+          ongoing: transformedReceivedApplications.filter(
+            b => b.status === 'Accepted'
+          ),
+          past: transformedReceivedApplications.filter(
+            b => b.status === 'Completed'
+          ),
+          cancelled: transformedReceivedApplications.filter(
+            b => b.status === 'Rejected' || b.status === 'Cancelled'
           ),
         };
 
         setBookingsData({
           requested: [
-            ...transformedSentApplications,
+            ...categorizedSentApplications.pending,
             ...categorizedServiceRequests.pending,
             ...hardcodedBookings.requested,
           ],
           received: [
-            ...transformedReceivedApplications,
+            ...categorizedReceivedApplications.pending,
             ...hardcodedBookings.received,
           ],
           ongoing: [
+            ...categorizedSentApplications.ongoing,
+            ...categorizedReceivedApplications.ongoing,
             ...categorizedServiceRequests.ongoing,
             ...hardcodedBookings.ongoing,
           ],
-          past: [...categorizedServiceRequests.past, ...hardcodedBookings.past],
+          past: [
+            ...categorizedSentApplications.past,
+            ...categorizedReceivedApplications.past,
+            ...categorizedServiceRequests.past,
+            ...hardcodedBookings.past,
+          ],
           cancelled: [
+            ...categorizedSentApplications.cancelled,
+            ...categorizedReceivedApplications.cancelled,
             ...categorizedServiceRequests.cancelled,
             ...hardcodedBookings.cancelled,
           ],
         });
+
+        // Initialize finished bookings set from database
+        const finishedIds = new Set<number | string>();
+        [
+          ...categorizedSentApplications.ongoing,
+          ...categorizedReceivedApplications.ongoing,
+          ...categorizedServiceRequests.ongoing,
+        ].forEach(booking => {
+          if (booking.isProviderFinished) {
+            finishedIds.add(booking.id);
+          }
+        });
+        setFinishedBookings(finishedIds);
       } catch (error) {
         // Keep hardcoded data on error
         console.error('Error fetching bookings:', error);
@@ -548,6 +770,7 @@ export default function BookingsPage() {
       <div>
         <div className="max-w-6xl mx-auto p-6 pb-10">
           <Tabs
+            defaultValue="requested"
             value={activeTab}
             onValueChange={setActiveTab}
             className="w-full"
@@ -614,7 +837,7 @@ export default function BookingsPage() {
                       : 'transparent',
                 }}
               >
-                Past
+                Completed
               </TabsTrigger>
               <TabsTrigger
                 value="cancelled"
@@ -699,6 +922,9 @@ export default function BookingsPage() {
                     key={booking.id}
                     {...booking}
                     tabContext="ongoing"
+                    onFinishBooking={() => handleFinishBooking(booking.id)}
+                    onReleasePayment={() => handleReleasePayment(booking.id)}
+                    isFinished={finishedBookings.has(booking.id)}
                   ></BookingCard>
                 ))
               ) : (
@@ -734,7 +960,7 @@ export default function BookingsPage() {
                     <Clock className="w-14 h-14 text-gray-400" />
                   </div>
                   <h3 className="text-xl font-semibold text-gray-600 mb-3">
-                    No past bookings
+                    No completed bookings
                   </h3>
                   <p className="text-lg text-gray-500">
                     Your completed bookings will appear here
@@ -769,6 +995,36 @@ export default function BookingsPage() {
           </Tabs>
         </div>
       </div>
+
+      {/* Finish Booking Modal */}
+      {selectedBooking && (
+        <BookingActionModal
+          isOpen={showFinishModal}
+          onClose={() => {
+            setShowFinishModal(false);
+            setSelectedBooking(null);
+          }}
+          action="finish"
+          bookingId={selectedBooking.serviceRequestId || selectedBooking.id}
+          serviceName={selectedBooking.serviceName}
+          onSuccess={handleFinishBookingSuccess}
+        />
+      )}
+
+      {/* Release Payment Modal */}
+      {selectedBooking && (
+        <BookingActionModal
+          isOpen={showCompleteModal}
+          onClose={() => {
+            setShowCompleteModal(false);
+            setSelectedBooking(null);
+          }}
+          action="complete"
+          bookingId={selectedBooking.serviceRequestId || selectedBooking.id}
+          serviceName={selectedBooking.serviceName}
+          onSuccess={handleReleasePaymentSuccess}
+        />
+      )}
     </div>
   );
 }
