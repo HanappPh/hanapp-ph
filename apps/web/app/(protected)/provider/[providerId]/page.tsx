@@ -55,15 +55,13 @@ export default function ProviderProfilePage() {
         setLoading(true);
 
         // Fetch provider profile
-        const providerResponse = await fetch(
-          `http://localhost:3001/api/user/${providerId}`,
-          {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          }
-        );
+        const port = process.env.NEXT_PUBLIC_API_URL;
+        const providerResponse = await fetch(`${port}/api/user/${providerId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
 
         if (providerResponse.ok) {
           const providerData = await providerResponse.json();
@@ -72,7 +70,7 @@ export default function ProviderProfilePage() {
 
         // Fetch provider's service listings
         const listingsResponse = await fetch(
-          `http://localhost:3001/api/service-listings?providerId=${providerId}`,
+          `${port}/api/service-listings?providerId=${providerId}`,
           {
             method: 'GET',
             headers: {
@@ -88,7 +86,7 @@ export default function ProviderProfilePage() {
 
         // Fetch provider's reviews
         const reviewsResponse = await fetch(
-          `http://localhost:3001/api/reviews/provider/${providerId}`,
+          `${port}/api/reviews/provider/${providerId}`,
           {
             method: 'GET',
             headers: {

@@ -35,8 +35,10 @@ async function bootstrap() {
   );
 
   // Enable CORS for Next.js frontend
+  const port = process.env.FRONTEND_URL_WEB;
+  const port2 = process.env.FRONTEND_URL_WEB_2;
   app.enableCors({
-    origin: ['http://localhost:3000', 'http://localhost:4200'], // Add your frontend URLs
+    origin: [port, port2], // Add your frontend URLs
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'x-user-id'],
@@ -80,12 +82,12 @@ async function bootstrap() {
     },
   });
 
-  const port = process.env.PORT || 3000;
-  await app.listen(port);
+  const port3 = process.env.PORT || 3000;
+  await app.listen(port3);
   Logger.log(
-    `Application is running on: http://localhost:${port}/${globalPrefix}`
+    `Application is running on: http://localhost:${port3}/${globalPrefix}`
   );
-  Logger.log(`Swagger API Documentation: http://localhost:${port}/api-docs`);
+  Logger.log(`Swagger API Documentation: http://localhost:${port3}/api-docs`);
 }
 
 bootstrap();
