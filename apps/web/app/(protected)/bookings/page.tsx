@@ -273,6 +273,9 @@ export default function BookingsPage() {
         cancelled: [cancelledBooking, ...prev.cancelled],
       };
     });
+
+    // Trigger a refresh to sync with server state
+    setRefreshTrigger(prev => prev + 1);
   };
 
   // Function to handle confirming a booking (moves from received to ongoing)
@@ -296,6 +299,9 @@ export default function BookingsPage() {
         ongoing: [confirmedBooking, ...prev.ongoing],
       };
     });
+
+    // Trigger a refresh to sync with server state
+    setRefreshTrigger(prev => prev + 1);
   };
 
   // Function to handle deleting a booking (moves from received to cancelled)
@@ -319,6 +325,9 @@ export default function BookingsPage() {
         cancelled: [cancelledBooking, ...prev.cancelled],
       };
     });
+
+    // Trigger a refresh to sync with server state
+    setRefreshTrigger(prev => prev + 1);
   };
 
   // Function to handle finishing a booking (provider marks as finished)
