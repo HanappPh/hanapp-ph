@@ -37,6 +37,8 @@ interface BookingCardProps {
   onFinishBooking?: () => void;
   onReleasePayment?: () => void;
   isFinished?: boolean;
+  userRole?: 'provider' | 'client';
+  isProviderFinished?: boolean;
 }
 
 export default function BookingCard(booking: BookingCardProps) {
@@ -115,6 +117,8 @@ export default function BookingCard(booking: BookingCardProps) {
                 onFinishBooking={booking.onFinishBooking}
                 onReleasePayment={booking.onReleasePayment}
                 isFinished={booking.isFinished}
+                userRole={booking.userRole}
+                isProviderFinished={booking.isProviderFinished}
               ></BookingActionButton>
             </div>
           </div>

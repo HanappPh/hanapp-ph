@@ -28,6 +28,8 @@ interface BookingActionButtonProps {
   onFinishBooking?: () => void;
   onReleasePayment?: () => void;
   isFinished?: boolean;
+  userRole?: 'provider' | 'client';
+  isProviderFinished?: boolean;
 }
 
 export default function BookingActionButton({
@@ -41,6 +43,8 @@ export default function BookingActionButton({
   onFinishBooking,
   onReleasePayment,
   isFinished = false,
+  userRole,
+  isProviderFinished = false,
 }: BookingActionButtonProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -238,32 +242,36 @@ export default function BookingActionButton({
           <MessageCircle className="w-4 h-4 mr-1" />
           Message
         </Button>
-        <Button
-          size="sm"
-          className={
-            isFinished
-              ? 'bg-green-600 hover:bg-green-700 text-white'
-              : 'bg-hanapp-accent hover:bg-yellow-500 text-hanapp-secondary'
-          }
-          onClick={onFinishBooking}
-        >
-          <Check className="w-4 h-4 mr-1" />
-          Finish Booking
-        </Button>
-        <Button
-          size="sm"
-          variant="outline"
-          className={
-            isFinished
-              ? 'border-hanapp-primary text-hanapp-primary hover:bg-hanapp-primary hover:text-white'
-              : 'border-gray-400 text-gray-400 cursor-not-allowed opacity-60'
-          }
-          disabled={!isFinished}
-          onClick={onReleasePayment}
-        >
-          <CreditCard className="w-4 h-4 mr-1" />
-          Release Payment
-        </Button>
+        {userRole === 'provider' && (
+          <Button
+            size="sm"
+            className={
+              isFinished
+                ? 'bg-green-600 hover:bg-green-700 text-white'
+                : 'bg-hanapp-accent hover:bg-yellow-500 text-hanapp-secondary'
+            }
+            onClick={onFinishBooking}
+          >
+            <Check className="w-4 h-4 mr-1" />
+            Finish Booking
+          </Button>
+        )}
+        {userRole === 'client' && (
+          <Button
+            size="sm"
+            variant="outline"
+            className={
+              isProviderFinished
+                ? 'border-hanapp-primary text-hanapp-primary hover:bg-hanapp-primary hover:text-white'
+                : 'border-gray-400 text-gray-400 cursor-not-allowed opacity-60'
+            }
+            disabled={!isProviderFinished}
+            onClick={onReleasePayment}
+          >
+            <CreditCard className="w-4 h-4 mr-1" />
+            Release Payment
+          </Button>
+        )}
       </div>
     );
   }
