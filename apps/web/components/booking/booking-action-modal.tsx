@@ -12,6 +12,8 @@ import {
 import { Check, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
+import { useAuth } from '../../lib/hooks/useAuth';
+
 interface BookingActionModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -26,21 +28,91 @@ export default function BookingActionModal({
   onClose,
   action,
   serviceName,
+  bookingId,
   onSuccess,
 }: BookingActionModalProps) {
   const [isProcessing, setIsProcessing] = useState(false);
+  const { user, session } = useAuth();
 
   const handleAction = async () => {
+    if (!session?.access_token || !user?.id) {
+      alert('Authentication required');
+      return;
+    }
+
     setIsProcessing(true);
     try {
+      // Extract the actual application ID (remove 'app-' prefix if it exists)
+      const actualBookingId = String(bookingId).replace('app-', '');
+
       if (action === 'confirm') {
-        // For now, we'll simulate the API call
-        // In the future, this should call an API to update the booking status
-        await new Promise(resolve => setTimeout(resolve, 1000));
-      } else {
-        // For now, we'll simulate the API call
-        // In the future, this should call an API to delete/cancel the booking
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        // Update job application status to accepted
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/job-applications/${actualBookingId}/status`,
+          {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${session.access_token}`,
+            },
+            body: JSON.stringify({
+              status: 'accepted',
+              userId: user.id,
+            }),
+          }
+        );
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || 'Failed to confirm booking');
+        }
+
+        // Get the updated application to find the service_request_id
+        const updatedApplication = await response.json();
+        const serviceRequestId = updatedApplication.service_request_id;
+
+        // Update the service request status to accepted
+        if (serviceRequestId) {
+          const srResponse = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/service-requests/${serviceRequestId}`,
+            {
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${session.access_token}`,
+              },
+              body: JSON.stringify({
+                status: 'accepted',
+              }),
+            }
+          );
+
+          if (!srResponse.ok) {
+            console.warn('Failed to update service request status');
+            // Don't throw here, the application was already accepted
+          }
+        }
+      } else if (action === 'delete') {
+        // Update job application status to rejected
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/job-applications/${actualBookingId}/status`,
+          {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${session.access_token}`,
+            },
+            body: JSON.stringify({
+              status: 'rejected',
+              userId: user.id,
+            }),
+          }
+        );
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || 'Failed to delete booking');
+        }
       }
 
       onClose();
@@ -49,7 +121,9 @@ export default function BookingActionModal({
       }
     } catch (error) {
       console.error(`Error ${action}ing booking:`, error);
-      alert(`Failed to ${action} booking. Please try again.`);
+      alert(
+        `Failed to ${action} booking. ${error instanceof Error ? error.message : 'Please try again.'}`
+      );
     } finally {
       setIsProcessing(false);
     }
