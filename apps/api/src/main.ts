@@ -35,19 +35,52 @@ async function bootstrap() {
   );
 
   // Enable CORS for Next.js frontend
-  const port = process.env.FRONTEND_URL_WEB;
-  const port2 = process.env.FRONTEND_URL_WEB_2;
   app.enableCors({
-    origin: [port, port2], // Add your frontend URLs
+    origin: (
+      origin: string | undefined,
+      callback: (err: Error | null, allow?: boolean) => void
+    ) => {
+      // Allow requests with no origin (mobile apps, Postman, server-to-server)
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      // List of allowed origins
+      const allowedOrigins = [
+        'http://localhost:3000',
+        'http://localhost:4200',
+        process.env.FRONTEND_URL_WEB,
+        process.env.FRONTEND_URL_WEB_2,
+      ].filter(Boolean); // Remove undefined values
+
+      // Check if origin is explicitly allowed
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      // Allow all Vercel preview deployments (*.vercel.app)
+      if (origin.endsWith('.vercel.app')) {
+        return callback(null, true);
+      }
+
+      // Allow your future custom domain (hanapp.ph and subdomains)
+      if (origin.endsWith('.hanapp.ph') || origin === 'https://hanapp.ph') {
+        return callback(null, true);
+      }
+
+      // Reject all other origins
+      Logger.warn(`CORS blocked request from origin: ${origin}`);
+      callback(new Error('Not allowed by CORS'));
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'x-user-id'],
   });
 
   const config = new DocumentBuilder()
-    .setTitle('HanApp-PH API')
+    .setTitle('Hanapp-PH API')
     .setDescription(
-      'The HanApp-PH API documentation - Your startup API endpoints'
+      'The Hanapp-PH API documentation - Your startup API endpoints'
     )
     .setVersion('1.0')
     .addTag('hanapp', 'Main application endpoints')
@@ -82,12 +115,12 @@ async function bootstrap() {
     },
   });
 
-  const port3 = process.env.PORT || 3000;
-  await app.listen(port3);
+  const port = process.env.PORT || 3000;
+  await app.listen(port);
   Logger.log(
-    `Application is running on: http://localhost:${port3}/${globalPrefix}`
+    `Application is running on: http://localhost:${port}/${globalPrefix}`
   );
-  Logger.log(`Swagger API Documentation: http://localhost:${port3}/api-docs`);
+  Logger.log(`Swagger API Documentation: http://localhost:${port}/api-docs`);
 }
 
 bootstrap();
