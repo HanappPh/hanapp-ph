@@ -1,6 +1,6 @@
 ﻿import { Injectable, HttpException, HttpStatus, Logger } from '@nestjs/common';
 
-import { SupabaseService } from '../app/services/supabase.service';
+import { SupabaseService } from '../services/supabase.service';
 
 import {
   CreateMessageDto,
