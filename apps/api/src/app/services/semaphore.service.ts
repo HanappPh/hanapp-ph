@@ -40,7 +40,7 @@ export class SemaphoreService {
           apikey: this.apiKey,
           number: formattedPhone,
           message,
-          sendername: 'HanApp',
+          sendername: 'Hanapp',
         }),
       });
 
