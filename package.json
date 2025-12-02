@@ -41,7 +41,8 @@
     "prepare": "husky",
     "precommit": "lint-staged",
     "prepush": "npm run test:affected && npm run lint:affected",
-    "release": "standard-version"
+    "release": "standard-version",
+    "build": "nx build @hanapp-ph/api"
   },
   "private": true,
   "devDependencies": {
