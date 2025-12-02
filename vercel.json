@@ -1,5 +1,5 @@
 {
   "buildCommand": "npx nx build @hanapp-ph/web",
-  "outputDirectory": "dist/apps/web/.next",
+  "outputDirectory": "apps/web/.next",
   "installCommand": "npm install --legacy-peer-deps"
 }
