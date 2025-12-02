@@ -12,6 +12,7 @@
     "dev:landing:webpack": "nx dev @hanapp-ph/landing",
     "dev:api": "nodemon --watch apps/api/src --ext ts --exec \"ts-node -P apps/api/tsconfig.app.json apps/api/src/main.ts\"",
     "build:web": "nx build @hanapp-ph/web",
+    "vercel-build": "nx build @hanapp-ph/web",
     "build:landing": "nx build @hanapp-ph/landing",
     "build:api": "nx build @hanapp-ph/api",
     "build:all": "nx run-many -t build",
