@@ -38,7 +38,7 @@
     "clean:cache": "nx reset",
     "dep-graph": "nx dep-graph",
     "affected:graph": "nx affected:graph",
-    "prepare": "husky",
+    "prepare": "",
     "precommit": "lint-staged",
     "prepush": "npm run test:affected && npm run lint:affected",
     "release": "standard-version",
