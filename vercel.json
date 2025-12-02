@@ -1,17 +1,5 @@
 {
-  "builds": [
-    {
-      "src": "apps/web/package.json",
-      "use": "@vercel/next",
-      "config": {
-        "outputDirectory": "dist/apps/web/.next"
-      }
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/apps/web/$1"
-    }
-  ]
+  "buildCommand": "npx nx build @hanapp-ph/web",
+  "outputDirectory": "dist/apps/web/.next",
+  "installCommand": "npm install --legacy-peer-deps"
 }
