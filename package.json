@@ -3,8 +3,9 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "start": "node dist/apps/api/main",
+    "start": "node apps/api/dist/main",
     "start:dev": "concurrently \"npm run dev:api\" \"npm run dev:web\"",
+    "start:prod": "node apps/api/dist/main",
     "dev:web": "nx serve @hanapp-ph/web --turbo",
     "dev:web:webpack": "nx serve @hanapp-ph/web",
     "dev:landing": "nx dev @hanapp-ph/landing",
