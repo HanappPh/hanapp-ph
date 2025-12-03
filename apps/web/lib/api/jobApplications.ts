@@ -1,15 +1,5 @@
 // API client for job applications
-const port = process.env.NEXT_PUBLIC_API_URL;
-const getApiBaseUrl = () => {
-  if (typeof window !== 'undefined') {
-    const protocol = window.location.protocol;
-    const hostname = window.location.hostname;
-    return `${protocol}//${hostname}:3001/api`;
-  }
-  return port;
-};
-
-const API_BASE_URL = getApiBaseUrl();
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 export interface JobApplication {
   id: string;
