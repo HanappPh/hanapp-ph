@@ -79,7 +79,6 @@ export default function CreateServicePage() {
   });
   // const router = useRouter();
   const { user } = useAuth();
-  const env = process.env;
 
   const handleAddService = (service: ServiceType) => {
     if (editingIndex !== null) {
@@ -156,7 +155,7 @@ export default function CreateServicePage() {
     };
 
     try {
-      const apiUrl = env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
       const response = await fetch(`${apiUrl}/api/service-listings`, {
         method: 'POST',
         headers: {
@@ -217,7 +216,8 @@ export default function CreateServicePage() {
           listingId,
         };
 
-        const apiUrl = env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+        const apiUrl =
+          process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
         const response = await fetch(`${apiUrl}/api/services`, {
           method: 'POST',
           headers: {
