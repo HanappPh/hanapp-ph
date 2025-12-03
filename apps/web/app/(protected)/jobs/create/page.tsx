@@ -113,9 +113,6 @@ export default function RequestServicePage() {
         throw new Error(errorMessage);
       }
 
-      const result = await response.json();
-      console.log('Service request created:', result);
-
       // Redirect to bookings page with a refresh indicator
       router.push('/bookings?refresh=true');
     } catch (err) {

@@ -463,25 +463,18 @@ export default function BookingsPage() {
           process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
         const url = `${apiUrl}/api/service-requests?clientId=${user.id}`;
 
-        console.log('Fetching bookings from:', url);
-
         const response = await fetch(url, {
           headers: {
             Authorization: `Bearer ${session.access_token}`,
           },
+          cache: 'no-store',
         });
 
         if (!response.ok) {
-          console.error(
-            'Failed to fetch bookings:',
-            response.status,
-            response.statusText
-          );
           throw new Error('Failed to fetch bookings');
         }
 
         const serviceRequests = await response.json();
-        console.log('Service requests fetched:', serviceRequests.length);
 
         // Fetch job applications sent by the user (as provider)
         const sentApplications = await fetchSentApplications(user.id);
