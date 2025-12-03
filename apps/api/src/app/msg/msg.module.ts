@@ -1,6 +1,6 @@
 ﻿import { Module } from '@nestjs/common';
 
-import { SupabaseService } from '../app/services/supabase.service';
+import { SupabaseService } from '../services/supabase.service';
 
 import { MsgController } from './msg.controller';
 import { MsgService } from './msg.service';

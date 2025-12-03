@@ -29,20 +29,21 @@ export default function ClientJobPage() {
     }>
   >([]);
 
-  const env = process.env;
   const { session } = useAuth();
 
   // Fetch reviews for the service listing
   const fetchReviews = useCallback(
     async (listingId: string) => {
       try {
+        const apiUrl =
+          process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
         const response = await fetch(
-          `${env.NEXT_PUBLIC_API_URL}/api/reviews/listing/${listingId}`,
+          `${apiUrl}/api/reviews/listing/${listingId}`,
           {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
-              Authorization: `Bearer ${session?.access_token || env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+              Authorization: `Bearer ${session?.access_token || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
             },
           }
         );
@@ -55,11 +56,7 @@ export default function ClientJobPage() {
         console.error('Failed to fetch reviews:', error);
       }
     },
-    [
-      session?.access_token,
-      env.NEXT_PUBLIC_API_URL,
-      env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    ]
+    [session?.access_token]
   );
 
   // Fetch service listing details on mount

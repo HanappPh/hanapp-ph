@@ -459,15 +459,16 @@ export default function BookingsPage() {
         }
 
         // Fetch service requests created by the user (where client_id matches user.id)
-        const port = process.env.NEXT_PUBLIC_API_URL;
-        const response = await fetch(
-          `${port}/api/service-requests?clientId=${user.id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${session.access_token}`,
-            },
-          }
-        );
+        const apiUrl =
+          process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+        const url = `${apiUrl}/api/service-requests?clientId=${user.id}`;
+
+        const response = await fetch(url, {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          cache: 'no-store',
+        });
 
         if (!response.ok) {
           throw new Error('Failed to fetch bookings');
