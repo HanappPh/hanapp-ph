@@ -94,9 +94,11 @@ export const fetchSentApplications = async (
 
     const response = await fetch(
       `${API_BASE_URL}/api/job-applications/sent?providerId=${providerId}`,
-      { headers }
+      {
+        headers,
+        cache: 'no-store',
+      }
     );
-
     if (!response.ok) {
       throw new Error('Failed to fetch sent applications');
     }
@@ -135,9 +137,11 @@ export const fetchReceivedApplications = async (
 
     const response = await fetch(
       `${API_BASE_URL}/api/job-applications/received?clientId=${clientId}`,
-      { headers }
+      {
+        headers,
+        cache: 'no-store',
+      }
     );
-
     if (!response.ok) {
       throw new Error('Failed to fetch received applications');
     }
