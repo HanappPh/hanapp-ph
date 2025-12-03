@@ -156,20 +156,22 @@ export default function CreateServicePage() {
     };
 
     try {
-      const response = await fetch(
-        `${env.NEXT_PUBLIC_API_URL}/api/service-listings`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify(payload),
-        }
-      );
+      const apiUrl = env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const response = await fetch(`${apiUrl}/api/service-listings`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(payload),
+        cache: 'no-store',
+      });
 
       if (!response.ok) {
-        throw new Error('Failed to create service listing');
+        const errorData = await response.text();
+        throw new Error(
+          `Failed to create service listing: ${response.status} ${errorData}`
+        );
       }
 
       const createdListing = await response.json();
@@ -215,17 +217,16 @@ export default function CreateServicePage() {
           listingId,
         };
 
-        const response = await fetch(
-          `${env.NEXT_PUBLIC_API_URL}/api/services`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${accessToken}`,
-            },
-            body: JSON.stringify(payload),
-          }
-        );
+        const apiUrl = env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+        const response = await fetch(`${apiUrl}/api/services`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify(payload),
+          cache: 'no-store',
+        });
 
         if (!response.ok) {
           const errorText = await response.text();
