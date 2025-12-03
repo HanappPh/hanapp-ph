@@ -1,17 +1,5 @@
 // API client for service requests
-const port = process.env.NEXT_PUBLIC_API_URL;
-const getApiBaseUrl = () => {
-  if (typeof window !== 'undefined') {
-    // Client side - use the current host but point to port 3001
-    const protocol = window.location.protocol;
-    const hostname = window.location.hostname;
-    return `${protocol}//${hostname}:3001/api`;
-  }
-  // Server side or fallback
-  return port;
-};
-
-const API_BASE_URL = getApiBaseUrl();
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 export interface ServiceRequest {
   id: string;
