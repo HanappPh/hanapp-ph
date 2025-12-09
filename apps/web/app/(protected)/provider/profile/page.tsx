@@ -1,5 +1,7 @@
 'use client';
+import { useSearchParams } from 'next/navigation';
 import * as React from 'react';
+import { useEffect, useState } from 'react';
 
 import { MainContent } from '../../../../components/profile/profile-content';
 import { Sidebar } from '../../../../components/profile/profile-sidebar';
@@ -12,11 +14,57 @@ import { MobileServicePreferences } from '../../../../components/profile-mobile/
 import { MobileProfileStats } from '../../../../components/profile-mobile/mobile-stats';
 import { MobileProfileTabs } from '../../../../components/profile-mobile/mobile-tabs';
 import { useAuth } from '../../../../lib/hooks/useAuth';
+import type { Profile } from '../../../../types/profiletype';
 
 export default function ProfilePage() {
-  const [showDropdown, setShowDropdown] = React.useState(false);
-  const [selectedTab, setSelectedTab] = React.useState('Profile');
-  const { profile } = useAuth();
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [selectedTab, setSelectedTab] = useState('Profile');
+  const { profile: authProfile } = useAuth();
+  const searchParams = useSearchParams();
+  const providerId = searchParams.get('id');
+
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const loadProviderProfile = async () => {
+      // If providerId exists in query params, fetch that provider's profile
+      if (providerId) {
+        try {
+          setLoading(true);
+          const port = process.env.NEXT_PUBLIC_API_URL;
+          const response = await fetch(`${port}/api/user/${providerId}`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+
+          if (response.ok) {
+            const providerData = await response.json();
+            setProfile(providerData);
+          }
+        } catch (error) {
+          console.error('Failed to load provider profile:', error);
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        // Use the logged-in user's profile
+        setProfile(authProfile || null);
+      }
+    };
+
+    loadProviderProfile();
+  }, [providerId, authProfile]);
+
+  if (loading) {
+    return (
+      <div className="bg-[#F3F5F9] flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#102E50]"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-[#F3F5F9] flex flex-col">
