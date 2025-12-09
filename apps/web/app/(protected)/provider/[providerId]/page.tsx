@@ -6,15 +6,7 @@ import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-interface ProviderProfile {
-  id: string;
-  full_name: string;
-  email: string;
-  phone: string;
-  avatar_url?: string;
-  created_at: string;
-  user_type: string;
-}
+import type { Profile as ProviderProfile } from '../../../../types/profiletype';
 
 interface ServiceListing {
   id: string;
@@ -191,10 +183,11 @@ export default function ProviderProfilePage() {
                         <Calendar className="w-5 h-5" />
                         <span className="text-sm">
                           Joined{' '}
-                          {new Date(provider.created_at).toLocaleDateString(
-                            'en-US',
-                            { month: 'short', year: 'numeric' }
-                          )}
+                          {provider.created_at &&
+                            new Date(provider.created_at).toLocaleDateString(
+                              'en-US',
+                              { month: 'short', year: 'numeric' }
+                            )}
                         </span>
                       </div>
                     </div>

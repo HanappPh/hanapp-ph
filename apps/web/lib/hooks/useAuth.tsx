@@ -3,6 +3,7 @@
 import type { Session, User } from '@supabase/supabase-js';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
+import type { Profile } from '../../types/profiletype';
 import { supabase } from '../supabase/client';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -10,14 +11,14 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 export type UserType = 'client' | 'provider' | 'both';
 export type ActiveRole = 'client' | 'provider';
 
-interface Profile {
-  id: string;
-  email: string;
-  full_name: string;
-  phone: string;
-  user_type: UserType;
-  phone_verified: boolean;
-}
+// interface Profile {
+//   id: string;
+//   email: string;
+//   full_name: string;
+//   phone: string;
+//   user_type: UserType;
+//   phone_verified: boolean;
+// }
 
 interface AuthContextType {
   user: User | null;

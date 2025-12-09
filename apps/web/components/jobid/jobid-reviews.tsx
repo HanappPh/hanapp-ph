@@ -113,7 +113,7 @@ function SellerProfileCard({
 
   const handleViewProfile = () => {
     if (providerId) {
-      router.push(`/provider/${providerId}`);
+      router.push(`/provider/profile?id=${providerId}`);
     } else {
       router.push('/profile');
     }
