@@ -24,7 +24,9 @@ export default function ProfilePage() {
   const providerId = searchParams.get('id');
 
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [listings, setListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const isViewingOtherProvider = !!providerId; // Check if viewing another provider
 
   useEffect(() => {
     const loadProviderProfile = async () => {
@@ -44,6 +46,22 @@ export default function ProfilePage() {
             const providerData = await response.json();
             setProfile(providerData);
           }
+
+          // Fetch provider's service listings
+          const listingsResponse = await fetch(
+            `${port}/api/service-listings?providerId=${providerId}`,
+            {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            }
+          );
+
+          if (listingsResponse.ok) {
+            const listingsData = await listingsResponse.json();
+            setListings(listingsData);
+          }
         } catch (error) {
           console.error('Failed to load provider profile:', error);
         } finally {
@@ -52,6 +70,7 @@ export default function ProfilePage() {
       } else {
         // Use the logged-in user's profile
         setProfile(authProfile || null);
+        setListings([]);
       }
     };
 
@@ -88,8 +107,14 @@ export default function ProfilePage() {
             accentColorLight="#FFDD8E"
             clickedColor="#f5c45e"
             profile={profile}
+            hideRoleToggle={isViewingOtherProvider}
           />
-          <MainContent initialSelected="Provider" profile={profile} />
+          <MainContent
+            initialSelected="Provider"
+            profile={profile}
+            hideEditButtons={isViewingOtherProvider}
+            providerListings={isViewingOtherProvider ? listings : undefined}
+          />
         </div>
       </div>
       {/* Mobile layout*/}
