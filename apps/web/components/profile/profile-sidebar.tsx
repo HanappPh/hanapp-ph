@@ -23,6 +23,7 @@ export function Sidebar({
   accentColorLight,
   clickedColor,
   profile,
+  hideRoleToggle = false,
 }: {
   initialSelected?: 'Provider' | 'Client';
   mainColorDark?: string;
@@ -35,6 +36,7 @@ export function Sidebar({
     full_name?: string;
     email?: string;
   } | null;
+  hideRoleToggle?: boolean;
 }) {
   const [selected, setSelected] = React.useState<'Provider' | 'Client'>(
     initialSelected ?? 'Client'
@@ -118,135 +120,141 @@ export function Sidebar({
         </div>
       </Card>
 
-      <div className="flex rounded-full bg-gray-100 p-1 my-4 transition-colors duration-300">
-        <Button
-          variant="ghost"
-          className={`flex-1 rounded-full transition-all duration-300 ${selected === 'Provider' ? 'bg-gradient-to-b text-white shadow' : 'bg-transparent text-gray-600'}`}
-          style={
-            selected === 'Provider'
-              ? {
-                  backgroundImage: `linear-gradient(to bottom, ${accentColorLight}, ${accentColorDark})`,
-                  color: '#fff',
-                }
-              : {}
-          }
-          onClick={() => handleRoleSwitch('Provider')}
-        >
-          Provider
-        </Button>
-        <Button
-          variant="ghost"
-          className={`flex-1 rounded-full transition-all duration-300 ${selected === 'Client' ? `bg-gradient-to-b text-white shadow` : 'bg-transparent text-gray-600'}`}
-          style={
-            selected === 'Client'
-              ? {
-                  backgroundImage: `linear-gradient(to bottom, ${mainColorLight}, ${mainColorDark})`,
-                  color: '#fff',
-                }
-              : {}
-          }
-          onClick={() => handleRoleSwitch('Client')}
-        >
-          Client
-        </Button>
-      </div>
+      {!hideRoleToggle && (
+        <div className="flex rounded-full bg-gray-100 p-1 my-4 transition-colors duration-300">
+          <Button
+            variant="ghost"
+            className={`flex-1 rounded-full transition-all duration-300 ${selected === 'Provider' ? 'bg-gradient-to-b text-white shadow' : 'bg-transparent text-gray-600'}`}
+            style={
+              selected === 'Provider'
+                ? {
+                    backgroundImage: `linear-gradient(to bottom, ${accentColorLight}, ${accentColorDark})`,
+                    color: '#fff',
+                  }
+                : {}
+            }
+            onClick={() => handleRoleSwitch('Provider')}
+          >
+            Provider
+          </Button>
+          <Button
+            variant="ghost"
+            className={`flex-1 rounded-full transition-all duration-300 ${selected === 'Client' ? `bg-gradient-to-b text-white shadow` : 'bg-transparent text-gray-600'}`}
+            style={
+              selected === 'Client'
+                ? {
+                    backgroundImage: `linear-gradient(to bottom, ${mainColorLight}, ${mainColorDark})`,
+                    color: '#fff',
+                  }
+                : {}
+            }
+            onClick={() => handleRoleSwitch('Client')}
+          >
+            Client
+          </Button>
+        </div>
+      )}
 
       {/* My Account Section */}
-      <div className="pt-5 mb-6">
-        <h4
-          className="text-lg font-semibold mb-4"
-          style={{ color: mainColorDark }}
-        >
-          My Account
-        </h4>
-        <nav className="space-y-2">
-          <Button
-            variant="ghost"
-            className="flex items-center gap-3 w-full justify-start pl-2 rounded-md"
-            style={{
-              background:
-                activeRole === 'provider' ? accentColorDark : clickedColor,
-              color: '#fff',
-            }}
+      {!hideRoleToggle && (
+        <div className="pt-5 mb-6">
+          <h4
+            className="text-lg font-semibold mb-4"
+            style={{ color: mainColorDark }}
           >
-            <User className="w-5 h-5" />
-            Profile
-          </Button>
-          <Button
-            variant="ghost"
-            className="flex items-center gap-3 w-full justify-start text-gray-600 pl-2 rounded-md"
-            style={{}}
-            onMouseOver={e =>
-              (e.currentTarget.style.background = hoverColor || '')
-            }
-            onMouseOut={e => (e.currentTarget.style.background = '')}
-          >
-            <Star className="w-5 h-5" />
-            Reviews
-          </Button>
-          <Button
-            variant="ghost"
-            className="flex items-center gap-3 w-full justify-start text-gray-600 pl-2 rounded-md"
-            style={{}}
-            onMouseOver={e =>
-              (e.currentTarget.style.background = hoverColor || '')
-            }
-            onMouseOut={e => (e.currentTarget.style.background = '')}
-          >
-            <Briefcase className="w-5 h-5" />
-            My Services
-          </Button>
-          <Button
-            variant="ghost"
-            className="flex items-center gap-3 w-full justify-start text-gray-600 pl-2 rounded-md"
-            style={{}}
-            onMouseOver={e =>
-              (e.currentTarget.style.background = hoverColor || '')
-            }
-            onMouseOut={e => (e.currentTarget.style.background = '')}
-          >
-            <DollarSign className="w-5 h-5" />
-            Earnings
-          </Button>
-          <Button
-            variant="ghost"
-            className="flex items-center gap-3 w-full justify-start text-gray-600 pl-2 rounded-md"
-            style={{}}
-            onMouseOver={e =>
-              (e.currentTarget.style.background = hoverColor || '')
-            }
-            onMouseOut={e => (e.currentTarget.style.background = '')}
-          >
-            <Shield className="w-5 h-5" />
-            Security
-          </Button>
-          <Button
-            variant="ghost"
-            className="flex items-center gap-3 w-full justify-start text-gray-600 pl-2 rounded-md"
-            style={{}}
-            onMouseOver={e =>
-              (e.currentTarget.style.background = hoverColor || '')
-            }
-            onMouseOut={e => (e.currentTarget.style.background = '')}
-          >
-            <CreditCard className="w-5 h-5" />
-            Payment Settings
-          </Button>
-        </nav>
-      </div>
+            My Account
+          </h4>
+          <nav className="space-y-2">
+            <Button
+              variant="ghost"
+              className="flex items-center gap-3 w-full justify-start pl-2 rounded-md"
+              style={{
+                background:
+                  activeRole === 'provider' ? accentColorDark : clickedColor,
+                color: '#fff',
+              }}
+            >
+              <User className="w-5 h-5" />
+              Profile
+            </Button>
+            <Button
+              variant="ghost"
+              className="flex items-center gap-3 w-full justify-start text-gray-600 pl-2 rounded-md"
+              style={{}}
+              onMouseOver={e =>
+                (e.currentTarget.style.background = hoverColor || '')
+              }
+              onMouseOut={e => (e.currentTarget.style.background = '')}
+            >
+              <Star className="w-5 h-5" />
+              Reviews
+            </Button>
+            <Button
+              variant="ghost"
+              className="flex items-center gap-3 w-full justify-start text-gray-600 pl-2 rounded-md"
+              style={{}}
+              onMouseOver={e =>
+                (e.currentTarget.style.background = hoverColor || '')
+              }
+              onMouseOut={e => (e.currentTarget.style.background = '')}
+            >
+              <Briefcase className="w-5 h-5" />
+              My Services
+            </Button>
+            <Button
+              variant="ghost"
+              className="flex items-center gap-3 w-full justify-start text-gray-600 pl-2 rounded-md"
+              style={{}}
+              onMouseOver={e =>
+                (e.currentTarget.style.background = hoverColor || '')
+              }
+              onMouseOut={e => (e.currentTarget.style.background = '')}
+            >
+              <DollarSign className="w-5 h-5" />
+              Earnings
+            </Button>
+            <Button
+              variant="ghost"
+              className="flex items-center gap-3 w-full justify-start text-gray-600 pl-2 rounded-md"
+              style={{}}
+              onMouseOver={e =>
+                (e.currentTarget.style.background = hoverColor || '')
+              }
+              onMouseOut={e => (e.currentTarget.style.background = '')}
+            >
+              <Shield className="w-5 h-5" />
+              Security
+            </Button>
+            <Button
+              variant="ghost"
+              className="flex items-center gap-3 w-full justify-start text-gray-600 pl-2 rounded-md"
+              style={{}}
+              onMouseOver={e =>
+                (e.currentTarget.style.background = hoverColor || '')
+              }
+              onMouseOut={e => (e.currentTarget.style.background = '')}
+            >
+              <CreditCard className="w-5 h-5" />
+              Payment Settings
+            </Button>
+          </nav>
+        </div>
+      )}
 
       {/* Logout Section */}
-      <div className="pt-4 border-t border-gray-200">
-        <Button
-          variant="ghost"
-          className="flex items-center gap-3 w-full justify-start text-red-600 pl-2 rounded-md hover:bg-red-50"
-          onClick={handleLogout}
-          disabled={isLoggingOut}
-        >
-          <LogOut className="w-5 h-5" />
-          {isLoggingOut ? 'Logging out...' : 'Logout'}
-        </Button>
-      </div>
+      {!hideRoleToggle && (
+        <div className="pt-4 border-t border-gray-200">
+          <Button
+            variant="ghost"
+            className="flex items-center gap-3 w-full justify-start text-red-600 pl-2 rounded-md hover:bg-red-50"
+            onClick={handleLogout}
+            disabled={isLoggingOut}
+          >
+            <LogOut className="w-5 h-5" />
+            {isLoggingOut ? 'Logging out...' : 'Logout'}
+          </Button>
+        </div>
+      )}
     </aside>
   );
 }
