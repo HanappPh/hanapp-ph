@@ -16,22 +16,25 @@ import { useState } from 'react';
 interface TermsModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onAccept?: () => void;
+  onAccept?: () => void | Promise<void>;
+  isSubmitting?: boolean;
 }
 
 export default function TermsModal({
   open,
   onOpenChange,
-  //   onAccept,
+  onAccept,
+  isSubmitting = false,
 }: TermsModalProps) {
   const [accepted, setAccepted] = useState(false);
 
-  //   const handleAccept = () => {
-  //     if (accepted) {
-  //       onAccept();
-  //       setAccepted(false);
-  //     }
-  //   };
+  const handleAccept = async () => {
+    if (accepted && onAccept) {
+      await onAccept();
+      setAccepted(false);
+      onOpenChange(false);
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -86,11 +89,11 @@ export default function TermsModal({
               Cancel
             </Button>
             <Button
-              // onClick={handleAccept}
-              disabled={!accepted}
+              onClick={handleAccept}
+              disabled={!accepted || isSubmitting}
               className="bg-hanapp-primary text-white hover:bg-hanapp-secondary transition-colors"
             >
-              Accept & Continue
+              {isSubmitting ? 'Processing...' : 'Accept & Continue'}
             </Button>
           </div>
         </DialogFooter>

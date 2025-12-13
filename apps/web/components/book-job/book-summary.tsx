@@ -18,6 +18,8 @@ interface CostBreakdownCardProps {
   selectedDate: Date;
   selectedTime: string;
   total: number;
+  onSubmitBooking?: () => void | Promise<void>;
+  isSubmitting?: boolean;
 }
 
 export function BookingSummaryCard({
@@ -27,6 +29,8 @@ export function BookingSummaryCard({
   selectedDate,
   selectedTime,
   total,
+  onSubmitBooking,
+  isSubmitting = false,
 }: CostBreakdownCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -121,7 +125,8 @@ export function BookingSummaryCard({
       <TermsModal
         open={isModalOpen}
         onOpenChange={setIsModalOpen}
-        // onAccept={handleAcceptTerms}
+        onAccept={onSubmitBooking}
+        isSubmitting={isSubmitting}
       />
     </>
   );

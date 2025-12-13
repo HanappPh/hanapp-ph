@@ -14,6 +14,7 @@ import { useState, useEffect } from 'react';
 
 import BookingActionModal from '../../../components/booking/booking-action-modal';
 import BookingCard from '../../../components/booking/booking-cards';
+import { BookingReviewModal } from '../../../components/booking/booking-review-modal';
 import {
   fetchSentApplications,
   fetchReceivedApplications,
@@ -46,6 +47,22 @@ interface BookingDetails {
   clientId?: string;
   serviceRequestId?: number | string;
   isProviderFinished?: boolean;
+  bookingGroupId?: string;
+  allServices?: Array<{
+    id: string;
+    title: string;
+    rate: number;
+    description?: string;
+    is_custom_service?: boolean;
+    custom_service_name?: string;
+    custom_service_description?: string;
+    listing_id?: string;
+    service_detail?: {
+      title: string;
+      description?: string;
+      rate: number;
+    };
+  }>;
 }
 
 // Hardcoded data as fallback
@@ -248,6 +265,26 @@ export default function BookingsPage() {
   const [selectedBooking, setSelectedBooking] = useState<BookingDetails | null>(
     null
   );
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [reviewModalData, setReviewModalData] = useState<{
+    id: string | number;
+    listingTitle: string;
+    providerName?: string;
+    clientName?: string;
+    selectedServices: Array<{
+      name: string;
+      price: number;
+      description?: string;
+    }>;
+    customServices: Array<{
+      name: string;
+      price: number;
+      description?: string;
+    }>;
+    schedule: { location: string; date: string; time: string };
+    total: number;
+    status: string;
+  } | null>(null);
 
   // Check if we need to refresh data and set active tab
   useEffect(() => {
@@ -262,6 +299,101 @@ export default function BookingsPage() {
       setRefreshTrigger(prev => prev + 1);
     }
   }, [searchParams]);
+
+  // Handler to open review modal with booking details
+  const handleBookingCardClick = async (booking: BookingDetails) => {
+    // Fetch listing details if this is a grouped booking
+    let listingTitle = booking.serviceName;
+
+    if (booking.allServices && booking.allServices.length > 0) {
+      const firstService = booking.allServices[0];
+
+      // Fetch listing title if listing_id exists
+      if (firstService.listing_id) {
+        try {
+          const apiUrl =
+            process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+          const response = await fetch(
+            `${apiUrl}/api/service-listings/${firstService.listing_id}/details`,
+            { cache: 'no-store' }
+          );
+          if (response.ok) {
+            const listing = await response.json();
+            listingTitle = listing.title || booking.serviceName;
+          }
+        } catch (error) {
+          console.error('Failed to fetch listing details:', error);
+        }
+      }
+
+      // Transform all services to modal format
+      const selectedServices = booking.allServices
+        .filter(req => !req.is_custom_service)
+        .map(req => ({
+          name: req.service_detail?.title || req.title,
+          price: req.rate,
+          description: req.service_detail?.description || req.description || '',
+        }));
+
+      const customServices = booking.allServices
+        .filter(req => req.is_custom_service)
+        .map(req => ({
+          name: req.custom_service_name || req.title,
+          price: req.rate,
+          description: req.custom_service_description || req.description || '',
+        }));
+
+      const modalData = {
+        id: booking.id,
+        listingTitle,
+        providerName:
+          booking.userRole === 'provider' ? undefined : booking.providerName,
+        clientName:
+          booking.userRole === 'provider' ? booking.providerName : undefined,
+        selectedServices,
+        customServices,
+        schedule: {
+          location: booking.location,
+          date: booking.date,
+          time: booking.time,
+        },
+        total: booking.price,
+        status: booking.status,
+      };
+
+      setReviewModalData(modalData);
+      setShowReviewModal(true);
+      return;
+    }
+
+    // Fallback for non-grouped bookings
+    const modalData = {
+      id: booking.id,
+      listingTitle: booking.serviceName,
+      providerName:
+        booking.userRole === 'provider' ? undefined : booking.providerName,
+      clientName:
+        booking.userRole === 'provider' ? booking.providerName : undefined,
+      selectedServices: [
+        {
+          name: booking.serviceName,
+          price: booking.price,
+          description: `Service scheduled for ${booking.date} at ${booking.time}`,
+        },
+      ],
+      customServices: [],
+      schedule: {
+        location: booking.location,
+        date: booking.date,
+        time: booking.time,
+      },
+      total: booking.price,
+      status: booking.status,
+    };
+
+    setReviewModalData(modalData);
+    setShowReviewModal(true);
+  };
 
   // Function to handle cancelling from requested tab (moves to cancelled)
   const handleCancelFromRequested = (bookingId: number | string) => {
@@ -290,39 +422,93 @@ export default function BookingsPage() {
   };
 
   // Function to handle confirming a booking (moves from received to ongoing)
-  const handleConfirm = (bookingId: number | string) => {
-    setBookingsData(prev => {
-      // Find the booking in received
-      const bookingToConfirm = prev.received.find(b => b.id === bookingId);
-      if (!bookingToConfirm) {
-        return prev;
+  const handleConfirm = async (bookingId: number | string) => {
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session?.access_token || !user?.id) {
+        return;
       }
 
-      // Update status to Accepted
-      const confirmedBooking = {
-        ...bookingToConfirm,
-        status: 'Accepted' as const,
-      };
+      // Find the booking to get the service request ID
+      const booking = bookingsData.received.find(b => b.id === bookingId);
+      if (!booking) {
+        return;
+      }
 
-      // Extract service request ID from the application ID if it exists
-      // Application IDs are in format "app-{id}", we need to find the matching service request
-      const serviceRequestId = bookingToConfirm.serviceId;
+      // Check if it's a service request (not a job application)
+      const isServiceRequest = !String(bookingId).startsWith('app-');
 
-      return {
-        ...prev,
-        // Remove from received tab
-        received: prev.received.filter(b => b.id !== bookingId),
-        // Remove from requested tab if there's a matching service request
-        requested: prev.requested.filter(
-          b => b.serviceId !== serviceRequestId && b.id !== serviceRequestId
-        ),
-        // Add to ongoing
-        ongoing: [confirmedBooking, ...prev.ongoing],
-      };
-    });
+      if (isServiceRequest) {
+        // Call the backend API to confirm the booking
+        // Use bookingGroupId for grouped bookings, otherwise use serviceRequestId
+        const confirmId =
+          booking.bookingGroupId || booking.serviceRequestId || bookingId;
 
-    // Trigger a refresh to sync with server state
-    setRefreshTrigger(prev => prev + 1);
+        const apiUrl =
+          process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+        const response = await fetch(
+          `${apiUrl}/api/service-requests/${confirmId}/confirm`,
+          {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${session.access_token}`,
+            },
+            body: JSON.stringify({ userId: user.id }),
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error('Failed to confirm booking');
+        }
+
+        await response.json();
+      }
+
+      // Update local state
+      setBookingsData(prev => {
+        // Find the booking in received
+        const bookingToConfirm = prev.received.find(b => b.id === bookingId);
+        if (!bookingToConfirm) {
+          return prev;
+        }
+
+        // Update status to Accepted
+        const confirmedBooking = {
+          ...bookingToConfirm,
+          status: 'Accepted' as const,
+        };
+
+        // For grouped bookings, also find and remove matching booking from requested tab
+        // Match by bookingGroupId for grouped bookings
+        const groupIdToMatch = bookingToConfirm.bookingGroupId || bookingId;
+
+        return {
+          ...prev,
+          // Remove from received tab
+          received: prev.received.filter(b => b.id !== bookingId),
+          // Remove from requested tab - match by booking group ID for grouped bookings
+          requested: prev.requested.filter(b => {
+            const bGroupId = b.bookingGroupId || b.id;
+            return bGroupId !== groupIdToMatch;
+          }),
+          // Add to ongoing
+          ongoing: [confirmedBooking, ...prev.ongoing],
+        };
+      });
+
+      // Wait a bit for database to propagate changes before refreshing
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Trigger a refresh to sync with server state
+      setRefreshTrigger(prev => prev + 1);
+    } catch (error) {
+      console.error('Error confirming booking:', error);
+      alert('Failed to confirm booking. Please try again.');
+    }
   };
 
   // Function to handle deleting a booking (moves from received to cancelled)
@@ -371,17 +557,21 @@ export default function BookingsPage() {
       return;
     }
 
-    // Update local state - match by serviceRequestId since that's what was updated in DB
+    // Update local state
     setFinishedBookings(prev => new Set(prev).add(selectedBooking.id));
 
     // Update the booking data to reflect the change
     setBookingsData(prev => ({
       ...prev,
-      ongoing: prev.ongoing.map(b =>
-        b.serviceRequestId === selectedBooking.serviceRequestId
-          ? { ...b, isProviderFinished: true }
-          : b
-      ),
+      ongoing: prev.ongoing.map(b => {
+        // Match by booking group ID if it exists, otherwise by service request ID
+        const matchesBooking = selectedBooking.bookingGroupId
+          ? b.bookingGroupId === selectedBooking.bookingGroupId
+          : b.serviceRequestId === selectedBooking.serviceRequestId ||
+            b.id === selectedBooking.id;
+
+        return matchesBooking ? { ...b, isProviderFinished: true } : b;
+      }),
     }));
 
     setShowFinishModal(false);
@@ -476,52 +666,166 @@ export default function BookingsPage() {
 
         const serviceRequests = await response.json();
 
+        // Fetch service requests where user is the provider
+        const providerUrl = `${apiUrl}/api/service-requests?providerId=${user.id}`;
+        const providerResponse = await fetch(providerUrl, {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          cache: 'no-store',
+        });
+
+        let providerServiceRequests = [];
+        if (providerResponse.ok) {
+          providerServiceRequests = await providerResponse.json();
+        }
+
+        // Group service requests by booking_group_id
+        type ServiceRequestType = (typeof serviceRequests)[0];
+        const groupedRequests = serviceRequests.reduce(
+          (
+            acc: Record<string, ServiceRequestType[]>,
+            request: ServiceRequestType
+          ) => {
+            const groupId = request.booking_group_id || request.id;
+            if (!acc[groupId]) {
+              acc[groupId] = [];
+            }
+            acc[groupId].push(request);
+            return acc;
+          },
+          {}
+        );
+
+        // Transform grouped service requests to BookingDetails format (client perspective)
+        const transformedServiceRequests: BookingDetails[] = (
+          Object.entries(groupedRequests) as [string, ServiceRequestType[]][]
+        ).map(([groupId, requests]) => {
+          const mainRequest = requests[0]; // Use first request for main details
+          const totalPrice = requests.reduce(
+            (sum: number, req: ServiceRequestType) => sum + (req.rate || 0),
+            0
+          );
+
+          // Check if ALL services in the group are finished by provider
+          const allServicesFinished = requests.every(
+            (req: ServiceRequestType) => req.is_provider_finished === true
+          );
+
+          // Map lowercase database status to capitalized UI status
+          const statusMap: Record<string, BookingDetails['status']> = {
+            pending: 'Pending',
+            approved: 'Accepted',
+            accepted: 'Accepted',
+            paid: 'Paid',
+            completed: 'Completed',
+            rejected: 'Rejected',
+            cancelled: 'Cancelled',
+          };
+
+          return {
+            id: groupId,
+            serviceId: mainRequest.id,
+            serviceName: mainRequest.listing?.title || mainRequest.title,
+            providerName: mainRequest.provider?.full_name || 'Unknown',
+            rating: 0, // Default for now
+            reviewCount: 0, // Default for now
+            price: totalPrice, // Sum of all services in the group
+            date: mainRequest.date,
+            time: `${mainRequest.time}${mainRequest.time_2 ? ' - ' + mainRequest.time_2 : ''}`,
+            location: mainRequest.job_location,
+            status: statusMap[mainRequest.status?.toLowerCase()] || 'Pending',
+            serviceImage:
+              mainRequest.images?.[0] || '/cleaning-service-provider.jpg',
+            providerImage:
+              mainRequest.provider?.avatar_url ||
+              '/cleaning-service-provider.jpg',
+            userRole: 'client' as const,
+            serviceRequestId: mainRequest.id,
+            clientId: mainRequest.client_id,
+            providerId: mainRequest.provider_id,
+            isProviderFinished: allServicesFinished,
+            bookingGroupId: groupId,
+            allServices: requests, // Store all services for the modal
+          };
+        });
+
+        // Group provider service requests by booking_group_id
+        const groupedProviderRequests = providerServiceRequests.reduce(
+          (
+            acc: Record<string, ServiceRequestType[]>,
+            request: ServiceRequestType
+          ) => {
+            const groupId = request.booking_group_id || request.id;
+            if (!acc[groupId]) {
+              acc[groupId] = [];
+            }
+            acc[groupId].push(request);
+            return acc;
+          },
+          {}
+        );
+
+        // Transform grouped provider service requests to BookingDetails format (provider perspective)
+        const transformedProviderServiceRequests: BookingDetails[] = (
+          Object.entries(groupedProviderRequests) as [
+            string,
+            ServiceRequestType[],
+          ][]
+        ).map(([groupId, requests]) => {
+          const mainRequest = requests[0]; // Use first request for main details
+          const totalPrice = requests.reduce(
+            (sum: number, req: ServiceRequestType) => sum + (req.rate || 0),
+            0
+          );
+
+          // Check if ALL services in the group are finished by provider
+          const allServicesFinished = requests.every(
+            (req: ServiceRequestType) => req.is_provider_finished === true
+          );
+
+          // Map lowercase database status to capitalized UI status
+          const statusMap: Record<string, BookingDetails['status']> = {
+            pending: 'Pending',
+            approved: 'Accepted',
+            accepted: 'Accepted',
+            paid: 'Paid',
+            completed: 'Completed',
+            rejected: 'Rejected',
+            cancelled: 'Cancelled',
+          };
+
+          return {
+            id: groupId,
+            serviceId: mainRequest.id,
+            serviceName: mainRequest.listing?.title || mainRequest.title,
+            providerName: mainRequest.users?.full_name || 'Unknown', // Show client name as providerName for display
+            rating: 0, // Default for now
+            reviewCount: 0, // Default for now
+            price: totalPrice, // Sum of all services in the group
+            date: mainRequest.date,
+            time: `${mainRequest.time}${mainRequest.time_2 ? ' - ' + mainRequest.time_2 : ''}`,
+            location: mainRequest.job_location,
+            status: statusMap[mainRequest.status?.toLowerCase()] || 'Pending',
+            serviceImage:
+              mainRequest.images?.[0] || '/cleaning-service-provider.jpg',
+            providerImage:
+              mainRequest.users?.avatar_url || '/cleaning-service-provider.jpg', // Show client image
+            userRole: 'provider' as const,
+            serviceRequestId: mainRequest.id,
+            clientId: mainRequest.client_id,
+            providerId: mainRequest.provider_id,
+            isProviderFinished: allServicesFinished,
+            bookingGroupId: groupId,
+            allServices: requests, // Store all services for the modal
+          };
+        });
+
         // Fetch job applications sent by the user (as provider)
         const sentApplications = await fetchSentApplications(user.id);
 
         // Fetch job applications received by the user (as client)
         const receivedApplications = await fetchReceivedApplications(user.id);
-
-        // Transform service requests to BookingDetails format
-        const transformedServiceRequests: BookingDetails[] =
-          serviceRequests.map(
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (request: any) => {
-              // Map lowercase database status to capitalized UI status
-              const statusMap: Record<string, BookingDetails['status']> = {
-                pending: 'Pending',
-                approved: 'Accepted',
-                accepted: 'Accepted',
-                paid: 'Paid',
-                completed: 'Completed',
-                rejected: 'Rejected',
-                cancelled: 'Cancelled',
-              };
-
-              return {
-                id: request.id,
-                serviceId: request.id,
-                serviceName: request.title,
-                providerName: request.users?.full_name || 'Unknown',
-                rating: 0, // Default for now
-                reviewCount: 0, // Default for now
-                price: request.rate,
-                date: request.date,
-                time: `${request.time} - ${request.time_2}`,
-                location: request.job_location,
-                status: statusMap[request.status?.toLowerCase()] || 'Pending',
-                serviceImage:
-                  request.images?.[0] || '/cleaning-service-provider.jpg',
-                providerImage:
-                  request.users?.avatar_url || '/cleaning-service-provider.jpg',
-                userRole: 'client' as const,
-                serviceRequestId: request.id,
-                clientId: request.client_id,
-                providerId: request.provider_id,
-                isProviderFinished: request.is_provider_finished || false,
-              };
-            }
-          );
 
         // Transform sent job applications to BookingDetails format
         const transformedSentApplications: BookingDetails[] =
@@ -654,6 +958,22 @@ export default function BookingsPage() {
           ),
         };
 
+        // Categorize provider service requests by status
+        const categorizedProviderServiceRequests = {
+          pending: transformedProviderServiceRequests.filter(
+            b => b.status === 'Pending'
+          ),
+          ongoing: transformedProviderServiceRequests.filter(
+            b => b.status === 'Accepted' || b.status === 'Paid'
+          ),
+          past: transformedProviderServiceRequests.filter(
+            b => b.status === 'Completed'
+          ),
+          cancelled: transformedProviderServiceRequests.filter(
+            b => b.status === 'Cancelled' || b.status === 'Rejected'
+          ),
+        };
+
         // Categorize sent applications by status
         const categorizedSentApplications = {
           pending: transformedSentApplications.filter(
@@ -694,24 +1014,28 @@ export default function BookingsPage() {
           ],
           received: [
             ...categorizedReceivedApplications.pending,
+            ...categorizedProviderServiceRequests.pending,
             ...hardcodedBookings.received,
           ],
           ongoing: [
             ...categorizedSentApplications.ongoing,
             ...categorizedReceivedApplications.ongoing,
             ...categorizedServiceRequests.ongoing,
+            ...categorizedProviderServiceRequests.ongoing,
             ...hardcodedBookings.ongoing,
           ],
           past: [
             ...categorizedSentApplications.past,
             ...categorizedReceivedApplications.past,
             ...categorizedServiceRequests.past,
+            ...categorizedProviderServiceRequests.past,
             ...hardcodedBookings.past,
           ],
           cancelled: [
             ...categorizedSentApplications.cancelled,
             ...categorizedReceivedApplications.cancelled,
             ...categorizedServiceRequests.cancelled,
+            ...categorizedProviderServiceRequests.cancelled,
             ...hardcodedBookings.cancelled,
           ],
         });
@@ -722,6 +1046,7 @@ export default function BookingsPage() {
           ...categorizedSentApplications.ongoing,
           ...categorizedReceivedApplications.ongoing,
           ...categorizedServiceRequests.ongoing,
+          ...categorizedProviderServiceRequests.ongoing,
         ].forEach(booking => {
           if (booking.isProviderFinished) {
             finishedIds.add(booking.id);
@@ -868,6 +1193,7 @@ export default function BookingsPage() {
                     {...booking}
                     tabContext="requested"
                     onDelete={() => handleCancelFromRequested(booking.id)}
+                    onClick={() => handleBookingCardClick(booking)}
                   ></BookingCard>
                 ))
               ) : (
@@ -895,6 +1221,7 @@ export default function BookingsPage() {
                     key={booking.id}
                     {...booking}
                     tabContext="received"
+                    onClick={() => handleBookingCardClick(booking)}
                     onConfirm={() => handleConfirm(booking.id)}
                     onDelete={() => handleDeleteFromReceived(booking.id)}
                   ></BookingCard>
@@ -924,6 +1251,7 @@ export default function BookingsPage() {
                     key={booking.id}
                     {...booking}
                     tabContext="ongoing"
+                    onClick={() => handleBookingCardClick(booking)}
                     onFinishBooking={() => handleFinishBooking(booking.id)}
                     onReleasePayment={() => handleReleasePayment(booking.id)}
                     isFinished={finishedBookings.has(booking.id)}
@@ -954,6 +1282,7 @@ export default function BookingsPage() {
                     key={booking.id}
                     {...booking}
                     tabContext="past"
+                    onClick={() => handleBookingCardClick(booking)}
                   />
                 ))
               ) : (
@@ -978,6 +1307,7 @@ export default function BookingsPage() {
                     key={booking.id}
                     {...booking}
                     tabContext="cancelled"
+                    onClick={() => handleBookingCardClick(booking)}
                   />
                 ))
               ) : (
@@ -1027,6 +1357,16 @@ export default function BookingsPage() {
           onSuccess={handleReleasePaymentSuccess}
         />
       )}
+
+      {/* Booking Review Modal */}
+      <BookingReviewModal
+        isOpen={showReviewModal}
+        onClose={() => {
+          setShowReviewModal(false);
+          setReviewModalData(null);
+        }}
+        bookingData={reviewModalData}
+      />
     </div>
   );
 }

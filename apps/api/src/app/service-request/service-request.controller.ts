@@ -33,8 +33,11 @@ export class ServiceRequestController {
   }
 
   @Get()
-  findAll(@Query('clientId') clientId?: string) {
-    return this.serviceRequestService.findAll(clientId);
+  findAll(
+    @Query('clientId') clientId?: string,
+    @Query('providerId') providerId?: string
+  ) {
+    return this.serviceRequestService.findAll(clientId, providerId);
   }
 
   @Get('category/:categoryId')
