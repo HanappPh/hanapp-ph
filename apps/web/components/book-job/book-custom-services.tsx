@@ -7,11 +7,11 @@ interface CustomServicesProps {
   customServices: Service[];
   addCustomService: () => void;
   updateCustomService: (
-    id: number,
+    id: string,
     field: keyof Service,
     value: string | number
   ) => void;
-  removeCustomService: (id: number) => void;
+  removeCustomService: (id: string) => void;
 }
 
 export function CustomServices({

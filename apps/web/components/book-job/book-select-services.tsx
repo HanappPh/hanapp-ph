@@ -3,7 +3,7 @@
 import { Checkbox } from '@hanapp-ph/commons';
 
 export interface Service {
-  id: number;
+  id: string;
   name: string;
   description: string;
   rate: number;
@@ -11,8 +11,8 @@ export interface Service {
 
 interface SelectServicesProps {
   services: Service[];
-  selectedServices: number[];
-  toggleService: (id: number) => void;
+  selectedServices: string[];
+  toggleService: (id: string) => void;
 }
 
 export function SelectServices({

@@ -14,6 +14,7 @@ import { useState, useEffect } from 'react';
 
 import BookingActionModal from '../../../components/booking/booking-action-modal';
 import BookingCard from '../../../components/booking/booking-cards';
+import { BookingReviewModal } from '../../../components/booking/booking-review-modal';
 import {
   fetchSentApplications,
   fetchReceivedApplications,
@@ -248,6 +249,26 @@ export default function BookingsPage() {
   const [selectedBooking, setSelectedBooking] = useState<BookingDetails | null>(
     null
   );
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [reviewModalData, setReviewModalData] = useState<{
+    id: string | number;
+    listingTitle: string;
+    providerName?: string;
+    clientName?: string;
+    selectedServices: Array<{
+      name: string;
+      price: number;
+      description?: string;
+    }>;
+    customServices: Array<{
+      name: string;
+      price: number;
+      description?: string;
+    }>;
+    schedule: { location: string; date: string; time: string };
+    total: number;
+    status: string;
+  } | null>(null);
 
   // Check if we need to refresh data and set active tab
   useEffect(() => {
@@ -262,6 +283,37 @@ export default function BookingsPage() {
       setRefreshTrigger(prev => prev + 1);
     }
   }, [searchParams]);
+
+  // Handler to open review modal with booking details
+  const handleBookingCardClick = (booking: BookingDetails) => {
+    // Transform booking data to match modal format
+    // For now, we'll show the main service as selected service
+    // In real implementation, you'd fetch actual service details from booking_group_id
+    const modalData = {
+      id: booking.id,
+      listingTitle: booking.serviceName,
+      providerName: activeTab === 'received' ? undefined : booking.providerName,
+      clientName: activeTab === 'received' ? booking.providerName : undefined, // Using providerName as clientName in received context
+      selectedServices: [
+        {
+          name: booking.serviceName,
+          price: booking.price,
+          description: `Service scheduled for ${booking.date} at ${booking.time}`,
+        },
+      ],
+      customServices: [], // Would be populated from actual booking data
+      schedule: {
+        location: booking.location,
+        date: booking.date,
+        time: booking.time,
+      },
+      total: booking.price,
+      status: booking.status,
+    };
+
+    setReviewModalData(modalData);
+    setShowReviewModal(true);
+  };
 
   // Function to handle cancelling from requested tab (moves to cancelled)
   const handleCancelFromRequested = (bookingId: number | string) => {
@@ -868,6 +920,7 @@ export default function BookingsPage() {
                     {...booking}
                     tabContext="requested"
                     onDelete={() => handleCancelFromRequested(booking.id)}
+                    onClick={() => handleBookingCardClick(booking)}
                   ></BookingCard>
                 ))
               ) : (
@@ -895,6 +948,7 @@ export default function BookingsPage() {
                     key={booking.id}
                     {...booking}
                     tabContext="received"
+                    onClick={() => handleBookingCardClick(booking)}
                     onConfirm={() => handleConfirm(booking.id)}
                     onDelete={() => handleDeleteFromReceived(booking.id)}
                   ></BookingCard>
@@ -924,6 +978,7 @@ export default function BookingsPage() {
                     key={booking.id}
                     {...booking}
                     tabContext="ongoing"
+                    onClick={() => handleBookingCardClick(booking)}
                     onFinishBooking={() => handleFinishBooking(booking.id)}
                     onReleasePayment={() => handleReleasePayment(booking.id)}
                     isFinished={finishedBookings.has(booking.id)}
@@ -954,6 +1009,7 @@ export default function BookingsPage() {
                     key={booking.id}
                     {...booking}
                     tabContext="past"
+                    onClick={() => handleBookingCardClick(booking)}
                   />
                 ))
               ) : (
@@ -978,6 +1034,7 @@ export default function BookingsPage() {
                     key={booking.id}
                     {...booking}
                     tabContext="cancelled"
+                    onClick={() => handleBookingCardClick(booking)}
                   />
                 ))
               ) : (
@@ -1027,6 +1084,16 @@ export default function BookingsPage() {
           onSuccess={handleReleasePaymentSuccess}
         />
       )}
+
+      {/* Booking Review Modal */}
+      <BookingReviewModal
+        isOpen={showReviewModal}
+        onClose={() => {
+          setShowReviewModal(false);
+          setReviewModalData(null);
+        }}
+        bookingData={reviewModalData}
+      />
     </div>
   );
 }
