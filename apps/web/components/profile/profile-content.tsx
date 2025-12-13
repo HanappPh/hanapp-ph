@@ -268,32 +268,6 @@ export function MainContent({
                 <span className="text-xl font-semibold text-gray-900 mb-6">
                   Favorite Providers
                 </span>
-                {!hideEditButtons && (
-                  <button className="flex items-center text-xs text-[#014182] font-semibold gap-1 hover:underline">
-                    Edit
-                    <svg
-                      width="16"
-                      height="16"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      className="inline-block ml-1"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 20h9"
-                      />
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z"
-                      />
-                    </svg>
-                  </button>
-                )}
               </div>
               <div className="flex overflow-x-auto pb-3 whitespace-nowrap gap-3">
                 {providers.map(p => (
@@ -349,47 +323,127 @@ export function MainContent({
           )}
 
           {/* Rating and Response Rate */}
-          <div className="space-y-4">
+          <div className="space-y-6">
             <Card className="p-4 bg-white border-none drop-shadow-md">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <div className="flex items-center space-x-2">
-                    <Star className="w-5 h-5 text-yellow-500 fill-current" />
-                    <span className="text-3xl font-bold text-gray-900">
-                      4.8
-                    </span>
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-semibold text-gray-900">
-                      Rating
-                    </h4>
-                    <p className="text-xs text-gray-500">8 reviews</p>
-                  </div>
-                </div>
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-6">
-                  See Reviews
-                </Button>
-              </div>
-            </Card>
-
-            <Card className="p-4 bg-white border-none drop-shadow-md">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
+              <div className="flex flex-wrap items-center gap-4">
+                <div className="flex items-center space-x-4 flex-1 min-w-[150px]">
                   <div className="flex items-center space-x-2">
                     <MessageCircle className="w-5 h-5 text-yellow-500" />
                     <span className="text-3xl font-bold text-gray-900">
                       98%
                     </span>
                   </div>
-                  <div>
-                    <h4 className="text-sm font-semibold text-gray-900">
-                      Response Rate
+                  <div className="flex flex-col justify-center h-full">
+                    <h4 className="text-sm font-semibold text-gray-900 leading-tight">
+                      Response
+                    </h4>
+                    <h4 className="text-sm font-semibold text-gray-900 leading-tight">
+                      Rate
                     </h4>
                   </div>
                 </div>
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-6">
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-6 shrink-0 w-[130px]">
                   {hideEditButtons ? 'Message' : 'See Chats'}
                 </Button>
+              </div>
+            </Card>
+
+            <Card className="p-4 bg-white border-none drop-shadow-md">
+              <div className="flex flex-wrap items-center gap-4 mb-4">
+                <div className="flex items-center gap-4 flex-1 min-w-[150px]">
+                  <div className="flex items-center space-x-2">
+                    <Star className="w-5 h-5 text-yellow-500 fill-current" />
+                    <span className="text-3xl font-bold text-gray-900">
+                      4.8
+                    </span>
+                  </div>
+                  <div className="flex flex-col justify-center h-full">
+                    <h4 className="text-sm font-semibold text-gray-900 leading-tight">
+                      Rating
+                    </h4>
+                    <p className="text-xs text-gray-500 leading-tight">
+                      8 reviews
+                    </p>
+                  </div>
+                </div>
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-6 shrink-0 w-[130px]">
+                  See All Reviews
+                </Button>
+              </div>
+
+              <div className="border-t border-gray-200">
+                {[
+                  {
+                    id: '1',
+                    name: 'Carla D.',
+                    rating: 5,
+                    comment:
+                      'Super linis ng gawa. Mabait at maayos kausap. Recommended!',
+                    date: '2 days ago',
+                  },
+                  {
+                    id: '2',
+                    name: 'Jonas R.',
+                    rating: 5,
+                    comment:
+                      'On time, mabilis, at maingat sa gamit. Hinga na ulit ang AC!',
+                    date: '1 week ago',
+                  },
+                  {
+                    id: '3',
+                    name: 'Maria S.',
+                    rating: 4,
+                    comment:
+                      'Very professional and thorough. AC is working like new again. Will book again next time!',
+                    date: '3 days ago',
+                  },
+                  {
+                    id: '4',
+                    name: 'John L.',
+                    rating: 5,
+                    comment: 'Life is often described as a journey',
+                    date: '5 days ago',
+                  },
+                  {
+                    id: '5',
+                    name: 'Lisa T.',
+                    rating: 4,
+                    comment:
+                      'Good work and fair pricing. AC is much cooler now. Thank you!',
+                    date: '1 week ago',
+                  },
+                ].map((review, index, array) => (
+                  <div key={review.id}>
+                    <div
+                      className={index === array.length - 1 ? 'pt-3' : 'py-3'}
+                    >
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="flex">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              className={`w-4 h-4 ${
+                                i < review.rating
+                                  ? 'text-yellow-500 fill-current'
+                                  : 'text-gray-300'
+                              }`}
+                            />
+                          ))}
+                        </div>
+                        <span className="text-yellow-500 font-semibold text-base">
+                          {review.rating}.0
+                        </span>
+                      </div>
+                      <p className="text-gray-700 text-sm line-clamp-2 mb-1">
+                        {review.comment}
+                      </p>
+                      <p className="text-gray-500 text-sm">- {review.name}</p>
+                    </div>
+                    {index < array.length - 1 && (
+                      <div className="border-t border-gray-200" />
+                    )}
+                  </div>
+                ))}
               </div>
             </Card>
           </div>
@@ -398,19 +452,25 @@ export function MainContent({
           {!hideEditButtons && (
             <div className="grid grid-cols-2 gap-4">
               <Card className="p-4 bg-white border-none drop-shadow-md text-center">
-                <h4 className="text-sm text-gray-600 mb-2">You appeared in</h4>
+                <h4 className="text-sm font-semibold text-gray-900 leading-tight mb-2">
+                  Profile searches
+                </h4>
                 <p className="text-3xl font-bold text-gray-900 mb-1">11</p>
-                <p className="text-xs text-gray-500 mb-3">searches this week</p>
+                <p className="text-xs text-gray-900 mb-3">
+                  people have searched your profile this week
+                </p>
                 <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-full">
                   See More
                 </Button>
               </Card>
 
               <Card className="p-4 bg-white border-none drop-shadow-md text-center">
-                <h4 className="text-sm text-gray-600 mb-2">Profile views</h4>
+                <h4 className="text-sm font-semibold text-gray-900 leading-tight mb-2">
+                  Profile views
+                </h4>
                 <p className="text-3xl font-bold text-gray-900 mb-1">4</p>
-                <p className="text-xs text-gray-500 mb-3">
-                  people checked your profile this week
+                <p className="text-xs text-gray-900 mb-3">
+                  people have checked your profile this week
                 </p>
                 <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-full">
                   See More
