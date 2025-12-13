@@ -86,7 +86,7 @@ export default function ReviewModal({
               htmlFor="review-comment"
               className="block text-sm font-semibold text-[#102E50] mb-2"
             >
-              Your Review (Optional)
+              Your Review
             </label>
             <textarea
               id="review-comment"
