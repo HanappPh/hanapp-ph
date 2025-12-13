@@ -42,39 +42,17 @@ export default function BookingActionModal({
 
     setIsProcessing(true);
     try {
-      // Extract the actual application ID (remove 'app-' prefix if it exists)
-      const actualBookingId = String(bookingId).replace('app-', '');
-
       if (action === 'confirm') {
-        // Update job application status to accepted
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/job-applications/${actualBookingId}/status`,
-          {
-            method: 'PATCH',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${session.access_token}`,
-            },
-            body: JSON.stringify({
-              status: 'accepted',
-              userId: user.id,
-            }),
-          }
-        );
+        // Check if it's a job application (starts with 'app-') or a service request
+        const isJobApplication = String(bookingId).startsWith('app-');
 
-        if (!response.ok) {
-          const error = await response.json();
-          throw new Error(error.message || 'Failed to confirm booking');
-        }
+        if (isJobApplication) {
+          // Extract the actual application ID (remove 'app-' prefix)
+          const actualBookingId = String(bookingId).replace('app-', '');
 
-        // Get the updated application to find the service_request_id
-        const updatedApplication = await response.json();
-        const serviceRequestId = updatedApplication.service_request_id;
-
-        // Update the service request status to accepted
-        if (serviceRequestId) {
-          const srResponse = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/service-requests/${serviceRequestId}`,
+          // Update job application status to accepted
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/job-applications/${actualBookingId}/status`,
             {
               method: 'PATCH',
               headers: {
@@ -83,16 +61,66 @@ export default function BookingActionModal({
               },
               body: JSON.stringify({
                 status: 'accepted',
+                userId: user.id,
               }),
             }
           );
 
-          if (!srResponse.ok) {
-            console.warn('Failed to update service request status');
-            // Don't throw here, the application was already accepted
+          if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Failed to confirm booking');
+          }
+
+          // Get the updated application to find the service_request_id
+          const updatedApplication = await response.json();
+          const serviceRequestId = updatedApplication.service_request_id;
+
+          // Update the service request status to accepted
+          if (serviceRequestId) {
+            const srResponse = await fetch(
+              `${process.env.NEXT_PUBLIC_API_URL}/api/service-requests/${serviceRequestId}`,
+              {
+                method: 'PATCH',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Bearer ${session.access_token}`,
+                },
+                body: JSON.stringify({
+                  status: 'accepted',
+                }),
+              }
+            );
+
+            if (!srResponse.ok) {
+              console.warn('Failed to update service request status');
+              // Don't throw here, the application was already accepted
+            }
+          }
+        } else {
+          // Direct service request confirmation (provider confirming a booking)
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/service-requests/${bookingId}/confirm`,
+            {
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${session.access_token}`,
+              },
+              body: JSON.stringify({
+                userId: user.id,
+              }),
+            }
+          );
+
+          if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Failed to confirm booking');
           }
         }
       } else if (action === 'delete') {
+        // Extract the actual application ID (remove 'app-' prefix)
+        const actualBookingId = String(bookingId).replace('app-', '');
+
         // Update job application status to rejected
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/api/job-applications/${actualBookingId}/status`,

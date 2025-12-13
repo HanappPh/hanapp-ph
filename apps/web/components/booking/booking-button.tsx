@@ -42,7 +42,7 @@ export default function BookingActionButton({
   onConfirm,
   onFinishBooking,
   onReleasePayment,
-  isFinished = false,
+  isFinished: _isFinished = false,
   userRole,
   isProviderFinished = false,
 }: BookingActionButtonProps) {
@@ -246,14 +246,15 @@ export default function BookingActionButton({
           <Button
             size="sm"
             className={
-              isFinished
-                ? 'bg-green-600 hover:bg-green-700 text-white'
+              isProviderFinished
+                ? 'bg-gray-400 text-white cursor-not-allowed'
                 : 'bg-hanapp-accent hover:bg-yellow-500 text-hanapp-secondary'
             }
+            disabled={isProviderFinished}
             onClick={onFinishBooking}
           >
             <Check className="w-4 h-4 mr-1" />
-            Finish Booking
+            {isProviderFinished ? 'Job Finished' : 'Finish Job'}
           </Button>
         )}
         {userRole === 'client' && (
