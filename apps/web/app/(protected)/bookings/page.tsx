@@ -57,6 +57,11 @@ interface BookingDetails {
     custom_service_name?: string;
     custom_service_description?: string;
     listing_id?: string;
+    service_detail?: {
+      title: string;
+      description?: string;
+      rate: number;
+    };
   }>;
 }
 
