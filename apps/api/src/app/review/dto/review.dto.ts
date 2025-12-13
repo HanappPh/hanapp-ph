@@ -12,6 +12,16 @@ export class CreateReviewDto {
   @IsOptional()
   service_listing_id?: string;
 
+  @ApiProperty({ required: false })
+  @IsString()
+  @IsOptional()
+  service_request_id?: string;
+
+  @ApiProperty({ required: false })
+  @IsString()
+  @IsOptional()
+  provider_id?: string;
+
   @ApiProperty()
   @IsNumber()
   rating!: number;

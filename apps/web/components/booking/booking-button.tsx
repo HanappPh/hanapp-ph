@@ -30,6 +30,7 @@ interface BookingActionButtonProps {
   isFinished?: boolean;
   userRole?: 'provider' | 'client';
   isProviderFinished?: boolean;
+  providerId?: string;
 }
 
 export default function BookingActionButton({
@@ -45,6 +46,7 @@ export default function BookingActionButton({
   isFinished: _isFinished = false,
   userRole,
   isProviderFinished = false,
+  providerId,
 }: BookingActionButtonProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -63,8 +65,32 @@ export default function BookingActionButton({
       return;
     }
 
+    if (!providerId) {
+      console.error('Provider ID is missing');
+      alert('Unable to submit review: Provider information is missing');
+      return;
+    }
+
     try {
       setIsSubmitting(true);
+
+      // Determine the service_request_id
+      let serviceRequestId: string | number;
+
+      if (typeof bookingId === 'string' && bookingId.startsWith('app-')) {
+        // For job applications, use the service request ID
+        serviceRequestId = serviceId;
+      } else {
+        // For direct bookings, use the booking ID
+        serviceRequestId = bookingId;
+      }
+
+      console.log('Submitting review with:', {
+        service_request_id: serviceRequestId,
+        provider_id: providerId,
+        rating: review.rating,
+      });
+
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/reviews`,
         {
@@ -74,23 +100,28 @@ export default function BookingActionButton({
             Authorization: `Bearer ${session.access_token}`,
           },
           body: JSON.stringify({
-            booking_id: bookingId,
-            service_listing_id: serviceId,
+            service_request_id: serviceRequestId,
+            provider_id: providerId,
             rating: review.rating,
             comment: review.comment || undefined,
           }),
         }
       );
 
-      const result = await response.json();
-
       if (!response.ok) {
-        console.error(result);
-        alert('Failed to submit review');
+        const errorData = await response.json();
+        console.error('Review submission error:', errorData);
+        alert(
+          `Failed to submit review: ${errorData.message || 'Unknown error'}`
+        );
         return;
       }
 
+      const result = await response.json();
+      console.log('Review submitted successfully:', result);
+
       alert('Thank you for your review!');
+      setIsReviewOpen(false);
     } catch (error) {
       console.error('Error submitting review:', error);
       alert('Something went wrong. Please try again.');
