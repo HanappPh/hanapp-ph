@@ -456,12 +456,9 @@ export function MainContent({
                   Profile searches
                 </h4>
                 <p className="text-3xl font-bold text-gray-900 mb-1">11</p>
-                <p className="text-xs text-gray-900 mb-3">
+                <p className="text-xs text-gray-900">
                   people have searched your profile this week
                 </p>
-                <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-full">
-                  See More
-                </Button>
               </Card>
 
               <Card className="p-4 bg-white border-none drop-shadow-md text-center">
@@ -469,12 +466,9 @@ export function MainContent({
                   Profile views
                 </h4>
                 <p className="text-3xl font-bold text-gray-900 mb-1">4</p>
-                <p className="text-xs text-gray-900 mb-3">
+                <p className="text-xs text-gray-900">
                   people have checked your profile this week
                 </p>
-                <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-full">
-                  See More
-                </Button>
               </Card>
             </div>
           )}
