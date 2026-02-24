@@ -1,16 +1,10 @@
 import { Badge, Button, Card } from '@hanapp-ph/commons';
-import {
-  Edit,
-  Calendar,
-  Mail,
-  Phone,
-  MapPin,
-  Star,
-  MessageCircle,
-} from 'lucide-react';
+import { Edit, Calendar, Mail, Phone, MapPin } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React from 'react';
+
+import { ProfileRating } from './profile-rating';
 // Example providers array (replace with real data as needed)
 const providers = [
   {
@@ -324,7 +318,7 @@ export function MainContent({
 
           {/* Rating and Response Rate */}
           <div className="space-y-6">
-            <Card className="p-4 bg-white border-none drop-shadow-md">
+            {/* <Card className="p-4 bg-white border-none drop-shadow-md">
               <div className="flex flex-wrap items-center gap-4">
                 <div className="flex items-center space-x-4 flex-1 min-w-[150px]">
                   <div className="flex items-center space-x-2">
@@ -346,106 +340,9 @@ export function MainContent({
                   {hideEditButtons ? 'Message' : 'See Chats'}
                 </Button>
               </div>
-            </Card>
+            </Card> */}
 
-            <Card className="p-4 bg-white border-none drop-shadow-md">
-              <div className="flex flex-wrap items-center gap-4 mb-4">
-                <div className="flex items-center gap-4 flex-1 min-w-[150px]">
-                  <div className="flex items-center space-x-2">
-                    <Star className="w-5 h-5 text-yellow-500 fill-current" />
-                    <span className="text-3xl font-bold text-gray-900">
-                      4.8
-                    </span>
-                  </div>
-                  <div className="flex flex-col justify-center h-full">
-                    <h4 className="text-sm font-semibold text-gray-900 leading-tight">
-                      Rating
-                    </h4>
-                    <p className="text-xs text-gray-500 leading-tight">
-                      8 reviews
-                    </p>
-                  </div>
-                </div>
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-6 shrink-0 w-[130px]">
-                  See All Reviews
-                </Button>
-              </div>
-
-              <div className="border-t border-gray-200">
-                {[
-                  {
-                    id: '1',
-                    name: 'Carla D.',
-                    rating: 5,
-                    comment:
-                      'Super linis ng gawa. Mabait at maayos kausap. Recommended!',
-                    date: '2 days ago',
-                  },
-                  {
-                    id: '2',
-                    name: 'Jonas R.',
-                    rating: 5,
-                    comment:
-                      'On time, mabilis, at maingat sa gamit. Hinga na ulit ang AC!',
-                    date: '1 week ago',
-                  },
-                  {
-                    id: '3',
-                    name: 'Maria S.',
-                    rating: 4,
-                    comment:
-                      'Very professional and thorough. AC is working like new again. Will book again next time!',
-                    date: '3 days ago',
-                  },
-                  {
-                    id: '4',
-                    name: 'John L.',
-                    rating: 5,
-                    comment: 'Life is often described as a journey',
-                    date: '5 days ago',
-                  },
-                  {
-                    id: '5',
-                    name: 'Lisa T.',
-                    rating: 4,
-                    comment:
-                      'Good work and fair pricing. AC is much cooler now. Thank you!',
-                    date: '1 week ago',
-                  },
-                ].map((review, index, array) => (
-                  <div key={review.id}>
-                    <div
-                      className={index === array.length - 1 ? 'pt-3' : 'py-3'}
-                    >
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="flex">
-                          {[...Array(5)].map((_, i) => (
-                            <Star
-                              key={i}
-                              className={`w-4 h-4 ${
-                                i < review.rating
-                                  ? 'text-yellow-500 fill-current'
-                                  : 'text-gray-300'
-                              }`}
-                            />
-                          ))}
-                        </div>
-                        <span className="text-yellow-500 font-semibold text-base">
-                          {review.rating}.0
-                        </span>
-                      </div>
-                      <p className="text-gray-700 text-sm line-clamp-2 mb-1">
-                        {review.comment}
-                      </p>
-                      <p className="text-gray-500 text-sm">- {review.name}</p>
-                    </div>
-                    {index < array.length - 1 && (
-                      <div className="border-t border-gray-200" />
-                    )}
-                  </div>
-                ))}
-              </div>
-            </Card>
+            <ProfileRating rating={4.8} reviewCount={8} />
           </div>
 
           {/* Activity Stats */}
