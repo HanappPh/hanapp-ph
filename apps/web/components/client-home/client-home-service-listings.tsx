@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Badge } from '@hanapp-ph/commons';
+import { Button } from '@hanapp-ph/commons';
 import { MapPin, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -15,6 +15,8 @@ export interface ServiceListing {
   price: string;
   category: string;
   image?: string;
+  description?: string;
+  services?: string[]; // Array of service names
 }
 
 interface ClientHomeServiceListingsProps {
@@ -117,76 +119,93 @@ export function ClientHomeServiceListings({
       </div>
 
       {/* Listings Grid */}
-      <div className="space-y-5">
+      <div>
         {loading ? (
           <div className="flex justify-center items-center py-10">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-hanapp-primary"></div>
           </div>
         ) : (
-          paginatedListings.map(listing => (
-            <div
-              key={listing.id}
-              className="flex gap-4 rounded-lg bg-white shadow-sm transition-all duration-200 ease-in-out hover:shadow-md hover:-translate-y-1 hover:scale-[1.01] cursor-pointer"
-              onClick={() => {
-                onViewListing?.(listing.id);
-                router.push(`/jobs/${listing.id}`);
-              }}
-            >
-              {/* Image */}
-              <div className="hidden md:block relative h-[155px] w-[155px] rounded-l-lg overflow-hidden">
-                <Image
-                  src={listing.image || '/placeholder.svg'}
-                  alt={listing.title}
-                  fill
-                  className="object-cover"
-                />
-              </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+            {paginatedListings.map(listing => (
+              <div
+                key={listing.id}
+                onClick={() => {
+                  onViewListing?.(listing.id);
+                  router.push(`/jobs/${listing.id}`);
+                }}
+                className="bg-white rounded-xl border border-gray-200 hover:shadow-lg hover:border-hanapp-primary transition-all cursor-pointer overflow-hidden h-40"
+              >
+                <div className="flex gap-0 relative h-full">
+                  {/* Image on the left */}
+                  <div className="relative w-44 h-full flex-shrink-0 rounded-l-xl overflow-hidden">
+                    <Image
+                      src={listing.image || '/placeholder.svg'}
+                      alt={listing.title}
+                      fill
+                      className="object-cover"
+                      sizes="176px"
+                      priority={false}
+                      quality={85}
+                    />
+                  </div>
 
-              {/* Content */}
-              <div className="flex flex-1 flex-col justify-between p-4">
-                <div>
-                  <div className="mb-1 flex items-start justify-between">
-                    <h3 className="text-xl sm:text-2xl font-semibold text-[#102e50]">
+                  {/* Content on the right */}
+                  <div className="flex-1 flex flex-col min-w-0 p-3 pb-3">
+                    {/* Title */}
+                    <h3 className="font-semibold text-base text-black mb-0.5">
                       {listing.title}
                     </h3>
-                    <Badge
-                      variant="outline"
-                      className="ml-2 border-gray-300 bg-white text-sm md:text-md text-[#102e50] hover:bg-gray-100 text-center"
-                    >
-                      {listing.category}
-                    </Badge>
-                  </div>
-                  <p className="mb-4 text-md text-[#014182FC]">
-                    {listing.provider}
-                  </p>
-                </div>
 
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-1 text-xs sm:text-sm text-[#102e50]">
-                      <MapPin className="h-3.5 w-3.5 text-[#102e50]" />
-                      <span>{listing.location}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          className="h-2.5 w-2.5 md:h-3.5 md:w-3.5 fill-amber-400 text-amber-400"
-                        />
-                      ))}
-                      <span className="ml-1 text-xs sm:text-sm text-[#102e50]">
-                        {listing.rating}
-                      </span>
-                    </div>
-                  </div>
+                    {/* Services - gray text */}
+                    {listing.services && listing.services.length > 0 && (
+                      <p className="text-sm text-gray-600 mb-0.5">
+                        {listing.services.join(' • ')}
+                      </p>
+                    )}
 
-                  <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#102e50]">
-                    {listing.price}
+                    {/* Description */}
+                    {listing.description && (
+                      <p className="text-xs text-gray-500 mb-1 line-clamp-1">
+                        {listing.description}
+                      </p>
+                    )}
+
+                    {/* Location */}
+                    <div className="flex items-center gap-1 text-xs text-gray-600 mb-1 mt-auto">
+                      <MapPin className="h-3 w-3 flex-shrink-0" />
+                      <span className="truncate">{listing.location}</span>
+                    </div>
+
+                    {/* Price and Rating on same line */}
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-sm font-medium text-[#014182FC]">
+                        {listing.price}
+                      </p>
+                      <div className="flex items-center gap-0.5 flex-shrink-0">
+                        {listing.rating > 0
+                          ? // Show filled stars if rating exists
+                            Array.from({
+                              length: Math.min(5, Math.floor(listing.rating)),
+                            }).map((_, i) => (
+                              <Star
+                                key={i}
+                                className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400"
+                              />
+                            ))
+                          : // Show empty stars if no rating
+                            Array.from({ length: 5 }).map((_, i) => (
+                              <Star
+                                key={i}
+                                className="h-3.5 w-3.5 text-gray-300"
+                              />
+                            ))}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))
+            ))}
+          </div>
         )}
 
         {!loading && paginatedListings.length === 0 && (
