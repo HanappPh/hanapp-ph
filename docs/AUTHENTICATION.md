@@ -270,7 +270,7 @@ SEMAPHORE_API_KEY=your-semaphore-api-key
 ### SMS Message Format
 
 ```
-Your HanApp verification code is: 123456. Valid for 5 minutes. Do not share this code.
+Your Hanapp verification code is: 123456. Valid for 5 minutes. Do not share this code.
 ```
 
 ### Phone Number Formats Supported
