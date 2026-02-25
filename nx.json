@@ -96,6 +96,5 @@
     "@nx/next": { "application": { "style": "tailwind", "linter": "eslint" } },
     "@nx/react": { "library": { "unitTestRunner": "jest" } }
   },
-  "workspaceLayout": { "appsDir": "apps", "libsDir": "libs" },
-  "nxCloudId": "68c72ce6c719da16ec2128ae"
+  "workspaceLayout": { "appsDir": "apps", "libsDir": "libs" }
 }

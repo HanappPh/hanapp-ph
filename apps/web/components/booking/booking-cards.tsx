@@ -39,11 +39,16 @@ interface BookingCardProps {
   isFinished?: boolean;
   userRole?: 'provider' | 'client';
   isProviderFinished?: boolean;
+  onClick?: () => void;
+  providerId?: string;
 }
 
 export default function BookingCard(booking: BookingCardProps) {
   return (
-    <Card className="mb-4">
+    <Card
+      className="mb-4 cursor-pointer hover:shadow-lg transition-shadow"
+      onClick={booking.onClick}
+    >
       <CardContent className="p-4">
         <div className="flex gap-3">
           <div className="hidden sm:block relative w-32 h-32 rounded-lg object-cover">
@@ -119,6 +124,7 @@ export default function BookingCard(booking: BookingCardProps) {
                 isFinished={booking.isFinished}
                 userRole={booking.userRole}
                 isProviderFinished={booking.isProviderFinished}
+                providerId={booking.providerId}
               ></BookingActionButton>
             </div>
           </div>

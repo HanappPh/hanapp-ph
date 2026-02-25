@@ -90,7 +90,7 @@ function AuthPageContent() {
       }
 
       // Generate temp password from normalized phone (last 4 digits)
-      const tempPassword = `HanApp${normalizedPhone.slice(-4)}!`;
+      const tempPassword = `Hanapp${normalizedPhone.slice(-4)}!`;
 
       const { data, error: signUpError } = await signUp(
         formData.email,
@@ -148,7 +148,7 @@ function AuthPageContent() {
           <div className="flex flex-col lg:flex-row min-h-[500px] sm:min-h-[600px]">
             {/* Left - Form */}
             <div className="flex-1 p-4 sm:p-6 lg:p-12 flex flex-col">
-              <SignInBrandHeader logoSrc="/logo.png" logoAlt="HanApp Logo" />
+              <SignInBrandHeader logoSrc="/logo.png" logoAlt="Hanapp Logo" />
               <div className="flex-1 mt-4 sm:mt-0">
                 <SignUpForm
                   ref={formRef}

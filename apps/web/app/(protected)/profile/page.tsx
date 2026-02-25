@@ -7,6 +7,7 @@ import { MobileProfileBottom } from '../../../components/profile-mobile/mobile-b
 import { MobileProfileDivider } from '../../../components/profile-mobile/mobile-divider';
 import { MobileProfileFavoriteProviders } from '../../../components/profile-mobile/mobile-fav-providers';
 import { MobileProfileHeader } from '../../../components/profile-mobile/mobile-header';
+import { MobileProfileImageUpload } from '../../../components/profile-mobile/mobile-image-upload';
 import { MobileProfileImage } from '../../../components/profile-mobile/mobile-images';
 import { MobileProfileInfo } from '../../../components/profile-mobile/mobile-info';
 import { MobileServicePreferences } from '../../../components/profile-mobile/mobile-service-preference';
@@ -17,7 +18,24 @@ import { useAuth } from '../../../lib/hooks/useAuth';
 export default function ProfilePage() {
   const [showDropdown, setShowDropdown] = React.useState(false);
   const [selectedTab, setSelectedTab] = React.useState('Profile');
-  const { profile, activeRole } = useAuth();
+  const { profile, activeRole, updateProfileAvatar } = useAuth();
+  const [currentAvatarUrl, setCurrentAvatarUrl] = React.useState(
+    profile?.avatar_url
+  );
+
+  // Update avatar URL when profile changes
+  React.useEffect(() => {
+    setCurrentAvatarUrl(profile?.avatar_url);
+  }, [profile?.avatar_url]);
+
+  const handleUploadSuccess = (newImageUrl: string) => {
+    setCurrentAvatarUrl(newImageUrl);
+    updateProfileAvatar(newImageUrl);
+  };
+
+  const handleUploadError = (error: string) => {
+    alert(`Upload failed: ${error}`);
+  };
 
   // Convert activeRole to the format expected by Sidebar
   const initialSelected = activeRole === 'provider' ? 'Provider' : 'Client';
@@ -52,7 +70,19 @@ export default function ProfilePage() {
       <main className="flex-1 flex flex-col items-center w-full px-0 pt-0 gap-0 md:hidden bg-white relative">
         {/* Mobile modular layout */}
         <MobileProfileHeader fromColor="#014182" toColor="#102E50" />
-        <MobileProfileImage />
+        {profile?.id ? (
+          <MobileProfileImageUpload
+            currentImageUrl={currentAvatarUrl}
+            userId={profile.id}
+            onUploadSuccess={handleUploadSuccess}
+            onUploadError={handleUploadError}
+          />
+        ) : (
+          <MobileProfileImage
+            avatarUrl={currentAvatarUrl}
+            isOwnProfile={true}
+          />
+        )}
         <MobileProfileInfo profile={profile} />
         <MobileProfileStats />
         <MobileProfileDivider />
