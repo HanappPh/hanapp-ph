@@ -11,7 +11,7 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { user, loading } = useAuth();
+  const { user, loading, roleReady } = useAuth();
   const router = useRouter();
   const [isRedirecting, setIsRedirecting] = useState(false);
 
@@ -24,8 +24,11 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     }
   }, [user, loading, router]);
 
-  // Show loading state while checking authentication or redirecting
-  if (loading || isRedirecting || !user) {
+  // Show loading state while:
+  //  • auth is being resolved (loading)
+  //  • we don't know the active role yet (roleReady)
+  //  • we are redirecting an unauthenticated visitor
+  if (loading || !roleReady || isRedirecting || !user) {
     return (
       <PageLoader
         message={
@@ -37,6 +40,6 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     );
   }
 
-  // Render protected content only when authenticated
+  // Render protected content only when authenticated and role is known
   return <>{children}</>;
 }
