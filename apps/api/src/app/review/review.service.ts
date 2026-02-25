@@ -85,21 +85,12 @@ export class ReviewsService {
         );
       }
 
-      // If service request doesn't exist, allow review directly with provider_id
+      // If service request doesn't exist, do not allow review creation
       if (!serviceRequest) {
-        console.log('Service request not found, using provider_id from DTO');
-
-        if (!dto.provider_id) {
-          throw new HttpException(
-            'Service request not found and no provider_id provided',
-            HttpStatus.BAD_REQUEST
-          );
-        }
-
-        // Use provider_id directly from DTO
-        providerId = dto.provider_id;
-        // Don't set serviceRequestId to avoid foreign key constraint violation
-        serviceRequestId = null;
+        throw new HttpException(
+          'Service request not found. You can only review services you have booked.',
+          HttpStatus.BAD_REQUEST
+        );
       } else {
         // Verify the user is the client who made the request
         if (serviceRequest.client_id !== userId) {
