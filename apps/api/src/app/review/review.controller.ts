@@ -18,6 +18,7 @@ import {
 import type { User } from '@supabase/supabase-js';
 
 import { CurrentUser } from '../decorators/current-user.decorator';
+import { Public } from '../decorators/public.decorator';
 import { AuthGuard } from '../guards/auth.guard';
 
 import { CreateReviewDto, UpdateReviewDto } from './dto/review.dto';
@@ -89,6 +90,7 @@ export class ReviewsController {
   // ===============================
   // GET REVIEWS BY SERVICE ID
   // ===============================
+  @Public()
   @Get('service/:serviceId')
   @ApiOperation({ summary: 'Get reviews by service ID (public)' })
   @ApiResponse({
@@ -102,6 +104,7 @@ export class ReviewsController {
   // ===============================
   // GET REVIEWS BY PROVIDER ID
   // ===============================
+  @Public()
   @Get('provider/:providerId') // temp route
   @ApiOperation({ summary: 'Get reviews by provider ID (public)' })
   @ApiResponse({
@@ -109,12 +112,13 @@ export class ReviewsController {
     description: 'Reviews retrieved successfully',
   })
   async getReviewsByProviderId(@Param('providerId') providerId: string) {
-    return this.reviewsService.getReviewsByServiceId(providerId);
+    return this.reviewsService.getReviewsByProviderId(providerId);
   }
 
   // ===============================
   // GET REVIEWS BY SERVICE LISTING ID
   // ===============================
+  @Public()
   @Get('listing/:listingId')
   @ApiOperation({ summary: 'Get reviews by service listing ID (public)' })
   @ApiResponse({

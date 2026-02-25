@@ -2,6 +2,7 @@
 import * as React from 'react';
 
 import { MainContent } from '../../../components/profile/profile-content';
+import { ReviewsContent } from '../../../components/profile/profile-reviews-content';
 import { Sidebar } from '../../../components/profile/profile-sidebar';
 import { MobileProfileBottom } from '../../../components/profile-mobile/mobile-bottom';
 import { MobileProfileDivider } from '../../../components/profile-mobile/mobile-divider';
@@ -17,6 +18,7 @@ import { useAuth } from '../../../lib/hooks/useAuth';
 export default function ProfilePage() {
   const [showDropdown, setShowDropdown] = React.useState(false);
   const [selectedTab, setSelectedTab] = React.useState('Profile');
+  const [currentDesktopTab, setCurrentDesktopTab] = React.useState('Profile');
   const { profile, activeRole } = useAuth();
 
   // Convert activeRole to the format expected by Sidebar
@@ -44,8 +46,16 @@ export default function ProfilePage() {
             accentColorLight="#FFDD8E"
             clickedColor="#102E50"
             profile={profile}
+            currentTab={currentDesktopTab}
+            onTabChange={setCurrentDesktopTab}
           />
-          <MainContent initialSelected={initialSelected} profile={profile} />
+          {currentDesktopTab === 'Profile' ? (
+            <MainContent initialSelected={initialSelected} profile={profile} />
+          ) : currentDesktopTab === 'Reviews' ? (
+            <ReviewsContent initialSelected={initialSelected} />
+          ) : (
+            <MainContent initialSelected={initialSelected} profile={profile} />
+          )}
         </div>
       </div>
       {/* Mobile layout*/}

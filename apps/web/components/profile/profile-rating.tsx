@@ -195,9 +195,6 @@ export function ProfileRating({
             </p>
           </div>
         </div>
-        <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-6 shrink-0 w-[130px]">
-          See All Reviews
-        </Button>
       </div>
 
       <div className="border-t border-gray-200">
