@@ -1,6 +1,9 @@
 // API client for service requests
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
+import { getCategoryName as getCategoryNameFromConstants } from '../constants/categories';
+import { getCategoryFillerImage } from '../utils/categoryImages';
+
 export interface ServiceRequest {
   id: string;
   client_id: string;
@@ -37,41 +40,24 @@ export interface JobListing {
   rating: number;
   category: string;
   price: string;
+  description?: string; // Job description from the client request
 }
 
-// Category mapping
-const getCategoryName = (categoryId: number): string => {
-  const categoryNames = {
-    1: 'Laundry',
-    2: 'Transportation',
-    3: 'Babysitting',
-    4: 'Errands',
-    5: 'Pet Care',
-    6: 'Catering',
-    7: 'Construction',
-    8: 'Plumbing',
-    9: 'Auto Repair',
-    10: 'Tech Support',
-    11: 'Gardening',
-    12: 'Legal',
-    13: 'Painting',
-    14: 'Home Services',
-    15: 'Electrical',
-    16: 'Moving',
-    17: 'Professional Services',
-  };
-  return categoryNames[categoryId as keyof typeof categoryNames] || 'Other';
-};
+// Use the centralized category name function
+const getCategoryName = getCategoryNameFromConstants;
 
 // Map service request to job listing format
 export const mapServiceRequestToJobListing = (
   serviceRequest: ServiceRequest
 ): JobListing => {
-  // Get first image if available, otherwise use default
+  // Get category name first to use for filler image
+  const categoryName = getCategoryName(serviceRequest.category_id);
+
+  // Get first image if available, otherwise use category-based filler
   const firstImage =
     serviceRequest.images && serviceRequest.images.length > 0
       ? serviceRequest.images[0]
-      : '/cleaning-service-provider.jpg';
+      : getCategoryFillerImage(categoryName);
 
   return {
     id: serviceRequest.id,
@@ -80,8 +66,9 @@ export const mapServiceRequestToJobListing = (
     provider: serviceRequest.users?.full_name || 'Unknown User',
     location: serviceRequest.job_location,
     rating: 4.5, // Default rating since we don't have ratings yet
-    category: getCategoryName(serviceRequest.category_id),
+    category: categoryName,
     price: `₱${serviceRequest.rate.toLocaleString()}`,
+    description: serviceRequest.description,
   };
 };
 
