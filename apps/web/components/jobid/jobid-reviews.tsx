@@ -110,6 +110,7 @@ function SellerProfileCard({
   providerId?: string;
 }) {
   const router = useRouter();
+  const [showImageModal, setShowImageModal] = useState(false);
 
   const handleViewProfile = () => {
     if (providerId) {
@@ -128,7 +129,10 @@ function SellerProfileCard({
 
         {/* Profile Image and Name */}
         <div className="flex items-center gap-3 mb-4">
-          <div className="relative w-20 h-20 rounded-full overflow-hidden bg-red-600 flex items-center justify-center flex-shrink-0">
+          <div
+            className="relative w-20 h-20 rounded-full overflow-hidden bg-red-600 flex items-center justify-center flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
+            onClick={() => profile.profileImage && setShowImageModal(true)}
+          >
             {profile.profileImage ? (
               <Image
                 src={profile.profileImage}
@@ -201,6 +205,25 @@ function SellerProfileCard({
           Visit profile
         </Button>
       </CardContent>
+
+      {/* Image Modal */}
+      {showImageModal && profile.profileImage && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4"
+          onClick={() => setShowImageModal(false)}
+        >
+          <div className="relative max-w-3xl max-h-full">
+            <Image
+              src={profile.profileImage}
+              alt={profile.name}
+              width={600}
+              height={600}
+              className="rounded-lg object-contain max-h-[90vh]"
+              onClick={e => e.stopPropagation()}
+            />
+          </div>
+        </div>
+      )}
     </Card>
   );
 }
