@@ -86,6 +86,7 @@ export class JobApplicationService {
         *,
         service_requests(
           id,
+          booking_id,
           title,
           description,
           rate,
@@ -126,6 +127,7 @@ export class JobApplicationService {
         *,
         service_requests(
           id,
+          booking_id,
           title,
           description,
           rate,

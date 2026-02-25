@@ -24,6 +24,7 @@ import { supabase } from '../../../lib/supabase/client';
 
 interface BookingDetails {
   id: number | string;
+  bookingId?: string;
   serviceId: number;
   serviceName: string;
   providerName: string;
@@ -254,7 +255,13 @@ export default function BookingsPage() {
     ongoing: BookingDetails[];
     past: BookingDetails[];
     cancelled: BookingDetails[];
-  }>(hardcodedBookings);
+  }>({
+    requested: [],
+    received: [],
+    ongoing: [],
+    past: [],
+    cancelled: [],
+  });
   const [isLoading, setIsLoading] = useState(true);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [finishedBookings, setFinishedBookings] = useState<
@@ -850,6 +857,7 @@ export default function BookingsPage() {
 
               return {
                 id: `app-${application.id}`,
+                bookingId: application.booking_id,
                 serviceId: serviceRequest?.id || 0,
                 serviceName: serviceRequest?.title || 'Unknown Service',
                 providerName: 'Client', // Will show client name, we don't have it in the query
@@ -900,6 +908,7 @@ export default function BookingsPage() {
 
               return {
                 id: `app-${application.id}`,
+                bookingId: application.booking_id,
                 serviceId: serviceRequest?.id || 0,
                 serviceName: serviceRequest?.title || 'Unknown Service',
                 providerName: 'Provider', // We don't have provider info in simplified query
@@ -1010,7 +1019,6 @@ export default function BookingsPage() {
           requested: [
             ...categorizedSentApplications.pending,
             ...categorizedServiceRequests.pending,
-            ...hardcodedBookings.requested,
           ],
           received: [
             ...categorizedReceivedApplications.pending,
@@ -1054,9 +1062,7 @@ export default function BookingsPage() {
         });
         setFinishedBookings(finishedIds);
       } catch (error) {
-        // Keep hardcoded data on error
         console.error('Error fetching bookings:', error);
-        setBookingsData(hardcodedBookings);
       } finally {
         setIsLoading(false);
       }
