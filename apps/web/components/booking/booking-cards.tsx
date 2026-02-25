@@ -13,6 +13,7 @@ import BookingStatusBadge from './booking-status';
 
 interface BookingCardProps {
   id: number | string; // Allow both for job applications
+  bookingId?: string; // Unique booking identifier
   serviceId: number | string;
   serviceName: string;
   providerName: string;
@@ -60,6 +61,11 @@ export default function BookingCard(booking: BookingCardProps) {
                 <h3 className="font-semibold text-hanapp-secondary text-lg">
                   {booking.serviceName}
                 </h3>
+                {booking.bookingId && (
+                  <p className="text-xs text-gray-500 font-mono mt-0.5">
+                    Booking ID: {booking.bookingId}
+                  </p>
+                )}
                 <div className="flex items-center gap-2 mt-1">
                   <Avatar className="w-6 h-6">
                     <AvatarImage
