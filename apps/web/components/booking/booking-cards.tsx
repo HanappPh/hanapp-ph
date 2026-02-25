@@ -13,6 +13,7 @@ import BookingStatusBadge from './booking-status';
 
 interface BookingCardProps {
   id: number | string; // Allow both for job applications
+  bookingId?: string; // Unique booking identifier
   serviceId: number | string;
   serviceName: string;
   providerName: string;
@@ -39,11 +40,16 @@ interface BookingCardProps {
   isFinished?: boolean;
   userRole?: 'provider' | 'client';
   isProviderFinished?: boolean;
+  onClick?: () => void;
+  providerId?: string;
 }
 
 export default function BookingCard(booking: BookingCardProps) {
   return (
-    <Card className="mb-4">
+    <Card
+      className="mb-4 cursor-pointer hover:shadow-lg transition-shadow"
+      onClick={booking.onClick}
+    >
       <CardContent className="p-4">
         <div className="flex gap-3">
           <div className="hidden sm:block relative w-32 h-32 rounded-lg object-cover">
@@ -60,6 +66,11 @@ export default function BookingCard(booking: BookingCardProps) {
                 <h3 className="font-semibold text-hanapp-secondary text-lg">
                   {booking.serviceName}
                 </h3>
+                {booking.bookingId && (
+                  <p className="text-xs text-gray-500 font-mono mt-0.5">
+                    Booking ID: {booking.bookingId}
+                  </p>
+                )}
                 <div className="flex items-center gap-2 mt-1">
                   <Avatar className="w-6 h-6">
                     <AvatarImage
@@ -119,6 +130,7 @@ export default function BookingCard(booking: BookingCardProps) {
                 isFinished={booking.isFinished}
                 userRole={booking.userRole}
                 isProviderFinished={booking.isProviderFinished}
+                providerId={booking.providerId}
               ></BookingActionButton>
             </div>
           </div>

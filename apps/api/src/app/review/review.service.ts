@@ -54,10 +54,10 @@ export class ReviewsService {
   // CREATE REVIEW
   // ======================================
   async createReview(dto: CreateReviewDto, userId: string) {
-    // Validate that either booking_id or service_listing_id is provided
-    if (!dto.booking_id && !dto.service_listing_id) {
+    // Validate that at least one identifier is provided
+    if (!dto.booking_id && !dto.service_listing_id && !dto.service_request_id) {
       throw new HttpException(
-        'Either booking_id or service_listing_id must be provided',
+        'Either booking_id, service_listing_id, or service_request_id must be provided',
         HttpStatus.BAD_REQUEST
       );
     }
@@ -65,9 +65,69 @@ export class ReviewsService {
     let providerId: string;
     let serviceId: string | null = null;
     let serviceListingId: string | null = null;
+    let serviceRequestId: string | null = null;
 
+    // Handle service request-based review (from bookings page)
+    if (dto.service_request_id) {
+      // Get provider_id and category from service_request
+      const { data: serviceRequest, error: requestError } =
+        await this.supabaseService
+          .from('service_requests')
+          .select('provider_id, category_id, client_id, status')
+          .eq('id', dto.service_request_id)
+          .maybeSingle();
+
+      if (requestError) {
+        console.error('Service request query error:', requestError);
+        throw new HttpException(
+          `Error querying service request: ${requestError.message}`,
+          HttpStatus.INTERNAL_SERVER_ERROR
+        );
+      }
+
+      // If service request doesn't exist, do not allow review creation
+      if (!serviceRequest) {
+        throw new HttpException(
+          'Service request not found. You can only review services you have booked.',
+          HttpStatus.BAD_REQUEST
+        );
+      } else {
+        // Verify the user is the client who made the request
+        if (serviceRequest.client_id !== userId) {
+          throw new HttpException(
+            'You can only review services you have booked',
+            HttpStatus.FORBIDDEN
+          );
+        }
+
+        // Use provider_id from DTO if provided, otherwise from service request
+        providerId = dto.provider_id || serviceRequest.provider_id;
+
+        if (!providerId) {
+          throw new HttpException(
+            'Provider not found for this service request',
+            HttpStatus.NOT_FOUND
+          );
+        }
+
+        serviceRequestId = dto.service_request_id;
+
+        // Try to find a matching service listing from the provider for this category
+        const { data: listing } = await this.supabaseService
+          .from('service_listings')
+          .select('id')
+          .eq('provider_id', providerId)
+          .eq('category_id', serviceRequest.category_id)
+          .maybeSingle();
+
+        // If we find a matching listing, attach the review to it
+        if (listing) {
+          serviceListingId = listing.id;
+        }
+      }
+    }
     // Handle booking-based review
-    if (dto.booking_id) {
+    else if (dto.booking_id) {
       // Validate booking ownership
       await this.validateBookingOwner(dto.booking_id, userId);
 
@@ -113,6 +173,7 @@ export class ReviewsService {
         booking_id: dto.booking_id ?? null,
         service_listing_id: serviceListingId,
         service_id: serviceId,
+        service_request_id: serviceRequestId,
         provider_id: providerId,
         client_id: userId,
         rating: dto.rating,

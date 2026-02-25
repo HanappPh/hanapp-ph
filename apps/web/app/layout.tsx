@@ -4,7 +4,7 @@ import './global.css';
 import { Providers } from './providers';
 
 export const metadata = {
-  title: 'HanApp PH',
+  title: 'Hanapp PH',
   description: 'Find trusted service providers in the Philippines',
 };
 

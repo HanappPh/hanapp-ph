@@ -13,6 +13,7 @@ import { X, MapPin, Upload, ImageIcon } from 'lucide-react';
 import React, { useState, useRef, useCallback } from 'react';
 
 import { Availability } from '../../app/(protected)/provider/jobs/create/page';
+import { getAllCategories } from '../../lib/constants/categories';
 import { supabase } from '../../lib/supabase/client';
 
 import { AvailabilityForm } from './post-availability';
@@ -24,7 +25,7 @@ export function CreateListingForm(props: {
 }) {
   const { onListingChange, resetTrigger = 0 } = props;
   const [serviceTitle, setServiceTitle] = useState<string>('');
-  const [category, setCategory] = useState<string>('Transport');
+  const [category, setCategory] = useState<string>(''); // Stores category integer ID (1-17)
   const [description, setDescription] = useState<string>('');
   const [dragActive, setDragActive] = useState(false);
   const [locations, setLocations] = useState<string[]>([]);
@@ -176,14 +177,16 @@ export function CreateListingForm(props: {
 
   const updateParent = useCallback(
     (updates: object) => {
-      onListingChange?.({
+      const updatedData = {
         service_title: serviceTitle,
         category,
         description,
         images: uploadedUrls,
         locations,
         ...updates,
-      });
+      };
+      console.log('Updating parent with:', updatedData);
+      onListingChange?.(updatedData);
     },
     [
       serviceTitle,
@@ -250,6 +253,7 @@ export function CreateListingForm(props: {
               <Select
                 value={category}
                 onValueChange={value => {
+                  console.log('Category selected:', value);
                   setCategory(value);
                   updateParent({ category: value });
                 }}
@@ -266,11 +270,14 @@ export function CreateListingForm(props: {
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="cleaning">Cleaning</SelectItem>
-                  <SelectItem value="tutoring">Tutoring</SelectItem>
-                  <SelectItem value="repair">Repair</SelectItem>
-                  <SelectItem value="delivery">Delivery</SelectItem>
-                  <SelectItem value="transport">Transport</SelectItem>
+                  {getAllCategories().map(cat => (
+                    <SelectItem
+                      key={cat.integerId}
+                      value={cat.integerId.toString()}
+                    >
+                      {cat.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>

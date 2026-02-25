@@ -13,18 +13,8 @@ import {
   fetchServiceRequestById,
   ServiceRequest,
 } from '../../../../../lib/api/serviceRequests';
+import { getCategoryName } from '../../../../../lib/constants/categories';
 import { useAuth } from '../../../../../lib/hooks/useAuth';
-
-// Category mapping
-const getCategoryName = (categoryId: number): string => {
-  const categoryNames = {
-    1: 'Cleaning',
-    2: 'Tutoring',
-    3: 'Repair',
-    4: 'Delivery',
-  };
-  return categoryNames[categoryId as keyof typeof categoryNames] || 'Other';
-};
 
 // Format date to "Month Year" format
 const formatMemberSince = (dateString: string): string => {
