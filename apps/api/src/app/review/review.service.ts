@@ -218,7 +218,15 @@ export class ReviewsService {
   async getReviewsByProviderId(providerId: string) {
     const { data, error } = await this.supabaseService
       .from('reviews')
-      .select('*')
+      .select(
+        `
+        *,
+        client:client_id (
+          full_name,
+          avatar_url
+        )
+      `
+      )
       .eq('provider_id', providerId)
       .order('created_at', { ascending: false }); // newest first
 

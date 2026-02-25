@@ -4,7 +4,10 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 
 import { MainContent } from '../../../../components/profile/profile-content';
+import { ProfileEarningsContent } from '../../../../components/profile/profile-earnings-content';
+import { ReviewsContent } from '../../../../components/profile/profile-reviews-content';
 import { Sidebar } from '../../../../components/profile/profile-sidebar';
+import { ProfileWorkContent } from '../../../../components/profile/profile-work-content';
 import { MobileProfileBottom } from '../../../../components/profile-mobile/mobile-bottom';
 import { MobileProfileDivider } from '../../../../components/profile-mobile/mobile-divider';
 import { MobileProfileHeader } from '../../../../components/profile-mobile/mobile-header';
@@ -13,43 +16,51 @@ import { MobileProfileInfo } from '../../../../components/profile-mobile/mobile-
 import { MobileServicePreferences } from '../../../../components/profile-mobile/mobile-service-preference';
 import { MobileProfileStats } from '../../../../components/profile-mobile/mobile-stats';
 import { MobileProfileTabs } from '../../../../components/profile-mobile/mobile-tabs';
+import { trackProviderProfileView } from '../../../../lib/api/profileMetrics';
+import type { ServiceListingResponse } from '../../../../lib/api/serviceListings';
 import { useAuth } from '../../../../lib/hooks/useAuth';
 import type { Profile } from '../../../../types/profiletype';
 
 export default function ProfilePage() {
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedTab, setSelectedTab] = useState('Profile');
+  const [currentDesktopTab, setCurrentDesktopTab] = useState('Profile');
   const { profile: authProfile } = useAuth();
   const searchParams = useSearchParams();
   const providerId = searchParams.get('id');
+  const targetProviderId = providerId || authProfile?.id;
 
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [listings, setListings] = useState<any[]>([]);
+  const [listings, setListings] = useState<ServiceListingResponse[]>([]);
   const [loading, setLoading] = useState(false);
   const isViewingOtherProvider = !!providerId; // Check if viewing another provider
 
   useEffect(() => {
     const loadProviderProfile = async () => {
-      // If providerId exists in query params, fetch that provider's profile
-      if (providerId) {
+      if (targetProviderId) {
         try {
           setLoading(true);
           const port = process.env.NEXT_PUBLIC_API_URL;
-          const response = await fetch(`${port}/api/user/${providerId}`, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          });
 
-          if (response.ok) {
-            const providerData = await response.json();
-            setProfile(providerData);
+          if (providerId) {
+            const response = await fetch(`${port}/api/user/${providerId}`, {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            });
+
+            if (response.ok) {
+              const providerData = await response.json();
+              setProfile(providerData);
+            }
+          } else {
+            setProfile(authProfile || null);
           }
 
           // Fetch provider's service listings
           const listingsResponse = await fetch(
-            `${port}/api/service-listings?providerId=${providerId}`,
+            `${port}/api/service-listings?providerId=${targetProviderId}`,
             {
               method: 'GET',
               headers: {
@@ -75,7 +86,15 @@ export default function ProfilePage() {
     };
 
     loadProviderProfile();
-  }, [providerId, authProfile]);
+  }, [providerId, targetProviderId, authProfile]);
+
+  useEffect(() => {
+    if (!providerId || !authProfile?.id || authProfile.id === providerId) {
+      return;
+    }
+
+    trackProviderProfileView(providerId, authProfile.id);
+  }, [providerId, authProfile?.id]);
 
   if (loading) {
     return (
@@ -108,13 +127,33 @@ export default function ProfilePage() {
             clickedColor="#f5c45e"
             profile={profile}
             hideRoleToggle={isViewingOtherProvider}
+            currentTab={currentDesktopTab}
+            onTabChange={setCurrentDesktopTab}
           />
-          <MainContent
-            initialSelected="Provider"
-            profile={profile}
-            hideEditButtons={isViewingOtherProvider}
-            providerListings={isViewingOtherProvider ? listings : undefined}
-          />
+          {currentDesktopTab === 'Profile' ? (
+            <MainContent
+              initialSelected="Provider"
+              profile={profile}
+              hideEditButtons={isViewingOtherProvider}
+              providerListings={isViewingOtherProvider ? listings : undefined}
+            />
+          ) : currentDesktopTab === 'Reviews' ? (
+            <ReviewsContent
+              initialSelected="Provider"
+              providerId={profile?.id || providerId || undefined}
+            />
+          ) : currentDesktopTab === 'MyServices' ? (
+            <ProfileWorkContent role="Provider" serviceListings={listings} />
+          ) : currentDesktopTab === 'Earnings' ? (
+            <ProfileEarningsContent />
+          ) : (
+            <MainContent
+              initialSelected="Provider"
+              profile={profile}
+              hideEditButtons={isViewingOtherProvider}
+              providerListings={isViewingOtherProvider ? listings : undefined}
+            />
+          )}
         </div>
       </div>
       {/* Mobile layout*/}
