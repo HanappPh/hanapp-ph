@@ -102,14 +102,14 @@ export class ReviewsController {
   // ===============================
   // GET REVIEWS BY PROVIDER ID
   // ===============================
-  @Get('provider/:providerId') // temp route
+  @Get('provider/:providerId')
   @ApiOperation({ summary: 'Get reviews by provider ID (public)' })
   @ApiResponse({
     status: 200,
     description: 'Reviews retrieved successfully',
   })
   async getReviewsByProviderId(@Param('providerId') providerId: string) {
-    return this.reviewsService.getReviewsByServiceId(providerId);
+    return this.reviewsService.getReviewsByProviderId(providerId);
   }
 
   // ===============================
