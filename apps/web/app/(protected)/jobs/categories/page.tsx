@@ -13,10 +13,12 @@ import React, {
 // import { CategoriesHeader } from '../../../../components/categories/categories-header';
 import { CategoriesSidebar } from '../../../../components/categories/categories-sidebar';
 import CategoriesJobCard from '../../../../components/categories-job-card';
+import { fetchServiceListings } from '../../../../lib/api/serviceListings';
 import {
   fetchServiceRequestsForJobListings,
   type JobListing,
 } from '../../../../lib/api/serviceRequests';
+import { getAllCategoryNames } from '../../../../lib/constants/categories';
 import { useAuth } from '../../../../lib/hooks/useAuth';
 
 // Type definition
@@ -31,189 +33,8 @@ type Job = {
   categories: string[];
 };
 
-// Data
-const categories = [
-  'Laundry',
-  'Transportation',
-  'Babysitting',
-  'Errands',
-  'Pet Care',
-  'Catering',
-  'Construction',
-  'Plumbing',
-  'Auto Repair',
-  'Tech Support',
-  'Gardening',
-  'Legal',
-  'Painting',
-  'Home Services',
-  'Electrical',
-  'Moving',
-  'Professional Services',
-];
-
-const jobs: Job[] = [
-  {
-    id: '1',
-    title: 'Labada per kilo',
-    category: 'Laundry',
-    location: 'Baluag, Bulacan',
-    price: '₱2.6k',
-    rating: 3,
-    image: '/woman-doing-laundry-service.jpg',
-    categories: ['Laundry', 'Home Services'],
-  },
-  {
-    id: '2',
-    title: 'Lipat bahay Luzon area only',
-    category: 'Transportation',
-    location: 'Baluag, Bulacan',
-    price: '₱2.6k',
-    rating: 4,
-    image: '/moving-truck-and-movers.jpg',
-    categories: ['Transportation', 'Moving'],
-  },
-  {
-    id: '3',
-    title: 'Stay out yaya daily rate',
-    category: 'Babysitting',
-    location: 'Baluag, Bulacan',
-    price: '₱650',
-    rating: 5,
-    image: '/nanny-with-child.jpg',
-    categories: ['Babysitting', 'Childcare'],
-  },
-  {
-    id: '4',
-    title: 'Delivery rider baliwag area',
-    category: 'Errands',
-    location: 'Baluag, Bulacan',
-    price: '₱300',
-    rating: 5,
-    image: '/delivery-rider-on-motorcycle.jpg',
-    categories: ['Errands', 'Delivery'],
-  },
-  {
-    id: '5',
-    title: 'Home service dog grooming',
-    category: 'Pet Care',
-    location: 'Baluag, Bulacan',
-    price: '₱2.6k',
-    rating: 3,
-    image: '/dog-groomer-with-pet.jpg',
-    categories: ['Pet Care', 'Grooming'],
-  },
-  {
-    id: '6',
-    title: 'Catering services for events',
-    category: 'Catering',
-    location: 'Baluag, Bulacan',
-    price: '₱50k',
-    rating: 5,
-    image: '/catering-buffet-food-service.jpg',
-    categories: ['Catering', 'Events'],
-  },
-  {
-    id: '7',
-    title: 'Panday with own tools',
-    category: 'Construction',
-    location: 'Baluag, Bulacan',
-    price: '₱700',
-    rating: 2,
-    image: '/construction-worker-tools.jpg',
-    categories: ['Construction', 'Handyman'],
-  },
-  {
-    id: '8',
-    title: 'Declogging drain home service',
-    category: 'Plumbing',
-    location: 'Baluag, Bulacan',
-    price: '₱3k',
-    rating: 4,
-    image: '/plumber-fixing-drain.png',
-    categories: ['Plumbing', 'Home Services'],
-  },
-  {
-    id: '9',
-    title: 'Auto repair home service',
-    category: 'Auto Repair',
-    location: 'Baluag, Bulacan',
-    price: '₱650',
-    rating: 5,
-    image: '/mechanic-repairing-car.jpg',
-    categories: ['Auto Repair', 'Automotive'],
-  },
-  {
-    id: '10',
-    title: 'Unlock iphone ipad',
-    category: 'Tech Support',
-    location: 'Baluag, Bulacan',
-    price: '₱800',
-    rating: 5,
-    image: '/phone-and-tablet-repair.png',
-    categories: ['Tech Support', 'Electronics'],
-  },
-  {
-    id: '11',
-    title: 'Grass cutting landscaping',
-    category: 'Gardening',
-    location: 'Baluag, Bulacan',
-    price: '₱1.8k',
-    rating: 5,
-    image: '/landscaper-cutting-grass.jpg',
-    categories: ['Gardening', 'Landscaping'],
-  },
-  {
-    id: '12',
-    title: 'Notary Public 24/7 legal services',
-    category: 'Legal',
-    location: 'Baluag, Bulacan',
-    price: '₱800',
-    rating: 5,
-    image: '/notary-public-professional.jpg',
-    categories: ['Legal', 'Professional Services'],
-  },
-  {
-    id: '13',
-    title: 'House painting interior and exterior',
-    category: 'Painting',
-    location: 'Baluag, Bulacan',
-    price: '₱5k',
-    rating: 4,
-    image: '/house-cleaning-service.png',
-    categories: ['Painting', 'Home Services'],
-  },
-  {
-    id: '14',
-    title: 'General home repairs and maintenance',
-    category: 'Home Services',
-    location: 'Baluag, Bulacan',
-    price: '₱1.5k',
-    rating: 5,
-    image: '/cleaning-service-provider.jpg',
-    categories: ['Home Services', 'Maintenance'],
-  },
-  {
-    id: '15',
-    title: 'Electrician for home wiring and repairs',
-    category: 'Electrical',
-    location: 'Baluag, Bulacan',
-    price: '₱2k',
-    rating: 5,
-    image: '/construction-worker-tools.jpg',
-    categories: ['Electrical', 'Home Services'],
-  },
-  {
-    id: '16',
-    title: 'Moving and packing services',
-    category: 'Moving',
-    location: 'Baluag, Bulacan',
-    price: '₱3.5k',
-    rating: 4,
-    image: '/moving-truck-and-movers.jpg',
-    categories: ['Moving', 'Transportation'],
-  },
-];
+// Get categories from centralized constant
+const categories = getAllCategoryNames();
 
 type SortOption = 'location' | 'rating' | 'price-high-low' | 'price-low-high';
 
@@ -225,11 +46,16 @@ function CategoriesPageContent() {
   const [sortBy, setSortBy] = useState<SortOption>('location');
   const [searchQuery, setSearchQuery] = useState('');
   const [clientJobRequests, setClientJobRequests] = useState<JobListing[]>([]);
+  const [providerServiceListings, setProviderServiceListings] = useState<Job[]>(
+    []
+  );
   const [loadingJobRequests, setLoadingJobRequests] = useState(false);
+  const [loadingServiceListings, setLoadingServiceListings] = useState(false);
 
-  // Fetch client job requests when in provider mode
+  // Fetch data based on active role
   useEffect(() => {
     if (activeRole === 'provider') {
+      // Providers see client job requests
       const fetchJobRequests = async () => {
         setLoadingJobRequests(true);
         try {
@@ -242,6 +68,53 @@ function CategoriesPageContent() {
         }
       };
       fetchJobRequests();
+    } else {
+      // Clients see provider service listings
+      const fetchListings = async () => {
+        setLoadingServiceListings(true);
+        try {
+          const listings = await fetchServiceListings();
+          // Transform service listings to Job format
+          const transformedListings: Job[] = listings.map(listing => {
+            // Get first service area or default location
+            const location =
+              listing.service_areas && listing.service_areas.length > 0
+                ? listing.service_areas[0]
+                : 'Location not specified';
+
+            // Format price
+            const price = listing.price_from
+              ? `From ₱${listing.price_from.toLocaleString()}`
+              : 'Price varies';
+
+            // Get first image or default
+            const image =
+              listing.images && listing.images.length > 0
+                ? listing.images[0]
+                : '/cleaning-service-provider.jpg';
+
+            // Get category name
+            const categoryName = listing.category?.name || 'Other';
+
+            return {
+              id: listing.id,
+              title: listing.title,
+              category: categoryName,
+              location,
+              price,
+              rating: listing.rating || 0,
+              image,
+              categories: [categoryName],
+            };
+          });
+          setProviderServiceListings(transformedListings);
+        } catch (error) {
+          console.error('Error fetching service listings:', error);
+        } finally {
+          setLoadingServiceListings(false);
+        }
+      };
+      fetchListings();
     }
   }, [activeRole]);
 
@@ -260,9 +133,9 @@ function CategoriesPageContent() {
         categories: [listing.category], // Convert single category to array
       }));
     }
-    // Client mode: use the hardcoded provider listings
-    return jobs;
-  }, [activeRole, clientJobRequests]);
+    // Client mode: use fetched provider service listings
+    return providerServiceListings;
+  }, [activeRole, clientJobRequests, providerServiceListings]);
 
   // Initialize search query and category from URL parameters
   useEffect(() => {
@@ -534,11 +407,16 @@ function CategoriesPageContent() {
                 </div>
               </div>
 
-              {loadingJobRequests && activeRole === 'provider' ? (
+              {(loadingJobRequests && activeRole === 'provider') ||
+              (loadingServiceListings && activeRole === 'client') ? (
                 <div className="bg-gray-50 rounded-lg p-6 sm:p-12 text-center border border-gray-200">
                   <div className="flex justify-center items-center gap-2">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-hanapp-primary"></div>
-                    <p className="text-gray-600">Loading job requests...</p>
+                    <p className="text-gray-600">
+                      {activeRole === 'provider'
+                        ? 'Loading job requests...'
+                        : 'Loading services...'}
+                    </p>
                   </div>
                 </div>
               ) : filteredJobs.length === 0 ? (

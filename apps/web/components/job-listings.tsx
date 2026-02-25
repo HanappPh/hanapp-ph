@@ -1,5 +1,5 @@
 'use client';
-import { Button, Badge } from '@hanapp-ph/commons';
+import { Button } from '@hanapp-ph/commons';
 import { MapPin, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -9,6 +9,7 @@ import {
   fetchServiceRequestsForJobListings,
   JobListing,
 } from '../lib/api/serviceRequests';
+import { getCategoryFillerImage } from '../lib/utils/categoryImages';
 
 const filterButtons = ['Show all', 'Near Me', 'Top Picks', 'Book Again'];
 const JOBS_PER_PAGE = 5;
@@ -25,7 +26,12 @@ export function JobListings() {
       try {
         setLoading(true);
         const fetchedJobs = await fetchServiceRequestsForJobListings();
-        setJobs(fetchedJobs);
+        // Add category-based filler images if no image is provided
+        const jobsWithImages = fetchedJobs.map(job => ({
+          ...job,
+          image: job.image || getCategoryFillerImage(job.category),
+        }));
+        setJobs(jobsWithImages);
       } catch (error) {
         console.error('Error loading jobs:', error);
       } finally {
@@ -112,72 +118,76 @@ export function JobListings() {
         </Button> */}
       </div>
 
-      <div className="space-y-5">
+      <div>
         {loading ? (
           <div className="flex justify-center items-center py-10">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-hanapp-primary"></div>
           </div>
         ) : (
-          paginatedJobs.map(job => (
-            <div
-              key={job.id}
-              onClick={() => router.push(`provider/jobs/${job.id}`)}
-              className="flex gap-4 rounded-lg bg-white shadow-sm transition-all duration-200 ease-in-out hover:shadow-md hover:-translate-y-1 hover:scale-[1.01] cursor-pointer"
-            >
-              <div className="hidden md:block relative h-[155px] w-[155px] rounded-l-lg overflow-hidden">
-                <Image
-                  src={job.image || '/placeholder.svg'}
-                  alt={job.title}
-                  fill
-                  className="object-cover"
-                />
-              </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+            {paginatedJobs.map(job => (
+              <div
+                key={job.id}
+                onClick={() => router.push(`provider/jobs/${job.id}`)}
+                className="bg-white rounded-xl border border-gray-200 hover:shadow-lg hover:border-hanapp-primary transition-all cursor-pointer overflow-hidden h-40"
+              >
+                <div className="flex gap-0 relative h-full">
+                  {/* Image on the left */}
+                  <div className="relative w-44 h-full flex-shrink-0 rounded-l-xl overflow-hidden">
+                    <Image
+                      src={job.image || '/placeholder.svg'}
+                      alt={job.title}
+                      fill
+                      className="object-cover"
+                      sizes="176px"
+                      priority={false}
+                      quality={85}
+                    />
+                  </div>
 
-              {/* Content */}
-              <div className="flex flex-1 flex-col justify-between p-4">
-                <div>
-                  <div className="mb-1 flex items-start justify-between">
-                    <h3 className="text-xl sm:text-2xl font-semibold text-[#102e50]">
+                  {/* Content on the right */}
+                  <div className="flex-1 flex flex-col min-w-0 p-3 pb-3">
+                    {/* Title */}
+                    <h3 className="font-semibold text-base text-black mb-0.5">
                       {job.title}
                     </h3>
-                    <Badge
-                      variant="outline"
-                      className="ml-2 border-gray-300 bg-white text-sm md:text-md text-[#102e50] hover:bg-gray-100 text-center"
-                    >
-                      {job.category}
-                    </Badge>
-                  </div>
-                  <p className="mb-4 text-md text-[#014182FC]">
-                    {job.provider}
-                  </p>
-                </div>
 
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-1 text-xs sm:text-sm text-[#102e50]">
-                      <MapPin className="h-3.5 w-3.5 text-[#102e50]" />
-                      <span>{job.location}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          className="h-2.5 w-2.5 md:h-3.5 md:w-3.5 fill-amber-400 text-amber-400"
-                        />
-                      ))}
-                      <span className="ml-1 text-xs sm:text-sm text-[#102e50]">
-                        {job.rating}
-                      </span>
-                    </div>
-                  </div>
+                    {/* Job Description */}
+                    {job.description && (
+                      <p className="text-xs text-gray-500 mb-1 line-clamp-1">
+                        {job.description}
+                      </p>
+                    )}
 
-                  <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#102e50]">
-                    {job.price}
+                    {/* Location */}
+                    <div className="flex items-center gap-1 text-xs text-gray-600 mb-1 mt-auto">
+                      <MapPin className="h-3 w-3 flex-shrink-0" />
+                      <span className="truncate">{job.location}</span>
+                    </div>
+
+                    {/* Price and Rating on same line */}
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-sm font-medium text-[#014182FC]">
+                        {job.price}
+                      </p>
+                      <div className="flex items-center gap-0.5 flex-shrink-0">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <Star
+                            key={i}
+                            className={`h-3.5 w-3.5 ${
+                              i < Math.floor(job.rating)
+                                ? 'fill-yellow-400 text-yellow-400'
+                                : 'text-gray-300'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))
+            ))}
+          </div>
         )}
 
         {!loading && paginatedJobs.length === 0 && (
