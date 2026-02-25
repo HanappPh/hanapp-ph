@@ -104,7 +104,6 @@ export class ReviewsController {
   // ===============================
   // GET REVIEWS BY PROVIDER ID
   // ===============================
-  @Public()
   @Get('provider/:providerId') // temp route
   @ApiOperation({ summary: 'Get reviews by provider ID (public)' })
   @ApiResponse({

@@ -68,9 +68,6 @@ export class ServiceListingService {
       const providerIds = [
         ...new Set(data.map(listing => listing.provider_id)),
       ];
-      const categoryIds = [
-        ...new Set(data.map(listing => listing.category_id)),
-      ];
       const listingIds = data.map(listing => listing.id);
 
       const { data: providers } = await supabase
@@ -78,10 +75,26 @@ export class ServiceListingService {
         .select('id, full_name, avatar_url')
         .in('id', providerIds);
 
-      const { data: categories } = await supabase
-        .from('categories')
-        .select('id, name')
-        .in('id', categoryIds);
+      // Category mapping for integer IDs (1-17)
+      const categoryNames: Record<number, string> = {
+        1: 'Laundry',
+        2: 'Transportation',
+        3: 'Babysitting',
+        4: 'Errands',
+        5: 'Pet Care',
+        6: 'Catering',
+        7: 'Construction',
+        8: 'Plumbing',
+        9: 'Auto Repair',
+        10: 'Tech Support',
+        11: 'Gardening',
+        12: 'Legal',
+        13: 'Painting',
+        14: 'Home Services',
+        15: 'Electrical',
+        16: 'Moving',
+        17: 'Professional Services',
+      };
 
       // Fetch ratings for all listings
       const { data: ratings } = await supabase
@@ -89,20 +102,49 @@ export class ServiceListingService {
         .select('*')
         .in('service_listing_id', listingIds);
 
+      // Fetch service details to calculate minimum price for each listing
+      const { data: serviceDetails } = await supabase
+        .from('service_listing_details')
+        .select('listing_id, title, rate')
+        .in('listing_id', listingIds);
+
+      // Create a map of listing_id to minimum service rate and service names
+      const minPriceMap = new Map<string, number>();
+      const serviceNamesMap = new Map<string, string[]>();
+      if (serviceDetails) {
+        serviceDetails.forEach(service => {
+          // Track minimum price
+          const currentMin = minPriceMap.get(service.listing_id);
+          if (!currentMin || service.rate < currentMin) {
+            minPriceMap.set(service.listing_id, service.rate);
+          }
+          // Track service names
+          const existingNames = serviceNamesMap.get(service.listing_id) || [];
+          serviceNamesMap.set(service.listing_id, [
+            ...existingNames,
+            service.title,
+          ]);
+        });
+      }
+
       // Create maps for quick lookup
       const providerMap = new Map(providers?.map(p => [p.id, p]) || []);
-      const categoryMap = new Map(categories?.map(c => [c.id, c]) || []);
       const ratingsMap = new Map(
         ratings?.map(r => [r.service_listing_id, r]) || []
       );
 
-      // Attach provider, category, and rating data to each listing
+      // Attach provider, category, rating data, calculated minimum price, and service names to each listing
       return data.map(listing => ({
         ...listing,
         provider: providerMap.get(listing.provider_id) || null,
-        category: categoryMap.get(listing.category_id) || null,
+        category: {
+          id: listing.category_id,
+          name: categoryNames[listing.category_id] || 'Other',
+        },
         rating: ratingsMap.get(listing.id)?.average_rating || 0,
         review_count: ratingsMap.get(listing.id)?.review_count || 0,
+        price_from: listing.price_from || minPriceMap.get(listing.id) || null,
+        service_names: serviceNamesMap.get(listing.id) || [],
       }));
     }
 
@@ -150,12 +192,30 @@ export class ServiceListingService {
       .eq('id', listing.provider_id)
       .single();
 
-    // Fetch category info
-    const { data: category } = await supabase
-      .from('categories')
-      .select('id, name')
-      .eq('id', listing.category_id)
-      .single();
+    // Map category ID to name (integer IDs 1-17)
+    const categoryNames: Record<number, string> = {
+      1: 'Laundry',
+      2: 'Transportation',
+      3: 'Babysitting',
+      4: 'Errands',
+      5: 'Pet Care',
+      6: 'Catering',
+      7: 'Construction',
+      8: 'Plumbing',
+      9: 'Auto Repair',
+      10: 'Tech Support',
+      11: 'Gardening',
+      12: 'Legal',
+      13: 'Painting',
+      14: 'Home Services',
+      15: 'Electrical',
+      16: 'Moving',
+      17: 'Professional Services',
+    };
+    const category = {
+      id: listing.category_id,
+      name: categoryNames[listing.category_id] || 'Other',
+    };
 
     // Fetch all services for this listing
     const { data: services } = await supabase

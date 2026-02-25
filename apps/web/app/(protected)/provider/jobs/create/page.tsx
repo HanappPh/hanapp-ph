@@ -118,12 +118,18 @@ export default function CreateServicePage() {
     listingData: Listing,
     accessToken: string
   ) => {
-    if (
-      !listingData.service_title ||
-      !listingData.category ||
-      !listingData.description
-    ) {
-      throw new Error('Please fill in all required listing information');
+    console.log('Posting listing with data:', listingData);
+
+    if (!listingData.service_title) {
+      throw new Error('Please enter a service title');
+    }
+
+    if (!listingData.category || listingData.category.trim() === '') {
+      throw new Error('Please select a service category');
+    }
+
+    if (!listingData.description) {
+      throw new Error('Please enter a service description');
     }
 
     // if (!listingData.contact_number) {
@@ -142,17 +148,17 @@ export default function CreateServicePage() {
       throw new Error('You must be logged in to create a service listing');
     }
 
-    // Map category name to ID - in real app, fetch from API or use a constant map
-
     const payload = {
       providerId: user.id, // must exist
-      categoryId: '6e51140f-6299-49f3-b7a3-a6d034398cff', // hardcoded for now
+      categoryId: parseInt(listingData.category, 10), // Integer ID (1-17)
       title: listingData.service_title,
       description: listingData.description,
       availabilitySchedule: JSON.stringify(listingData.availability),
       serviceAreas: listingData.locations,
       images: listingData.images, // array of uploaded image URLs
     };
+
+    console.log('Sending payload to API:', payload);
 
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
@@ -187,12 +193,13 @@ export default function CreateServicePage() {
 
   const handlePostServices = async (
     services: ServiceType[],
-    accessToken: string
+    accessToken: string,
+    currentListingId: string
   ) => {
     if (services.length === 0 || !Array.isArray(services)) {
       throw new Error('Please add at least one service');
     }
-    if (!listingId) {
+    if (!currentListingId) {
       throw new Error('Invalid listing ID');
     }
 
@@ -213,7 +220,7 @@ export default function CreateServicePage() {
           rate: Number(service.rate),
           charge: service.rate_type,
           isAddon: service.is_addon,
-          listingId,
+          listingId: currentListingId,
         };
 
         const apiUrl =
@@ -257,12 +264,20 @@ export default function CreateServicePage() {
     }
 
     // Validate that both listing data and services are ready
-    if (
-      !listingData.service_title ||
-      !listingData.category ||
-      !listingData.description
-    ) {
-      alert('Please complete the listing information first.');
+    if (!listingData.service_title) {
+      alert('Please enter a service title.');
+      setViewMode('listing');
+      return;
+    }
+
+    if (!listingData.category || listingData.category.trim() === '') {
+      alert('Please select a service category.');
+      setViewMode('listing');
+      return;
+    }
+
+    if (!listingData.description) {
+      alert('Please enter a service description.');
       setViewMode('listing');
       return;
     }
@@ -285,7 +300,11 @@ export default function CreateServicePage() {
       }
 
       // Step 2: Post all services
-      await handlePostServices(services, session.access_token);
+      await handlePostServices(
+        services,
+        session.access_token,
+        currentListingId!
+      );
 
       // Success - both listing and services posted
       alert('Your service listing has been posted successfully!');
@@ -328,6 +347,7 @@ export default function CreateServicePage() {
                 if (
                   !listingData.service_title ||
                   !listingData.category ||
+                  listingData.category.trim() === '' ||
                   !listingData.description
                 ) {
                   alert('Please fill in the listing details first');
@@ -340,6 +360,7 @@ export default function CreateServicePage() {
                   ? 'bg-amber-400 text-gray-900'
                   : listingData.service_title &&
                       listingData.category &&
+                      listingData.category.trim() !== '' &&
                       listingData.description
                     ? 'text-gray-600 hover:text-gray-900'
                     : 'text-gray-400 cursor-not-allowed'
@@ -347,6 +368,7 @@ export default function CreateServicePage() {
               disabled={
                 !listingData.service_title ||
                 !listingData.category ||
+                listingData.category.trim() === '' ||
                 !listingData.description
               }
             >
@@ -370,13 +392,15 @@ export default function CreateServicePage() {
           </div>
         )}
 
-        {services.length > 0 && listingData.service_title && (
-          <div className="max-w-4xl mx-auto mb-4 p-4 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800">
-            <strong>Ready to post!</strong> You have {services.length} service
-            {services.length > 1 ? 's' : ''} added. Check the terms and click
-            &quot;Post Complete Listing&quot; to publish.
-          </div>
-        )}
+        {services.length > 0 &&
+          listingData.service_title &&
+          listingData.category && (
+            <div className="max-w-4xl mx-auto mb-4 p-4 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800">
+              <strong>Ready to post!</strong> You have {services.length} service
+              {services.length > 1 ? 's' : ''} added. Check the terms and click
+              &quot;Post Complete Listing&quot; to publish.
+            </div>
+          )}
 
         <div className="max-w-4xl mx-auto">
           <div className={viewMode === 'listing' ? 'block' : 'hidden'}>
@@ -463,6 +487,7 @@ export default function CreateServicePage() {
               !agreedToTerms ||
               !listingData.service_title ||
               !listingData.category ||
+              listingData.category.trim() === '' ||
               !listingData.description ||
               !listingData.locations ||
               listingData.locations.length === 0 ||

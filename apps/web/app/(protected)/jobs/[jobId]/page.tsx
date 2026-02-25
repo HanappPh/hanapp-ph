@@ -31,14 +31,14 @@ export default function ClientJobPage() {
 
   const { session } = useAuth();
 
-  // Fetch reviews for the service listing
+  // Fetch reviews for the provider
   const fetchReviews = useCallback(
-    async (listingId: string) => {
+    async (providerId: string) => {
       try {
         const apiUrl =
           process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
         const response = await fetch(
-          `${apiUrl}/api/reviews/listing/${listingId}`,
+          `${apiUrl}/api/reviews/provider/${providerId}`,
           {
             method: 'GET',
             headers: {
@@ -67,9 +67,9 @@ export default function ClientJobPage() {
         const data = await fetchServiceListingDetails(jobId);
         setListing(data);
 
-        // Fetch reviews for this service listing
-        if (data?.id) {
-          await fetchReviews(data.id);
+        // Fetch reviews for this provider
+        if (data?.provider_id) {
+          await fetchReviews(data.provider_id);
         }
       } catch (error) {
         console.error('Failed to load listing details:', error);
@@ -355,185 +355,34 @@ export default function ClientJobPage() {
     'Service warranty: 7 days for workmanship issues',
   ];
 
-  // Hardcoded reviews as fallback
-  const fallbackReviews = [
-    {
-      id: '1',
-      name: 'Carla D.',
-      rating: 5,
-      comment: 'Super linis ng gawa. Mabait at maayos kausap. Recommended!',
-      date: '2 days ago',
-      isEditable: false,
-    },
-    {
-      id: '2',
-      name: 'Jonas R.',
-      rating: 5,
-      comment: 'On time, mabilis, at maingat sa gamit. Hinga na ulit ang AC!',
-      date: '1 week ago',
-      isEditable: false,
-    },
-    {
-      id: '3',
-      name: 'Maria S.',
-      rating: 4,
-      comment:
-        'Very professional and thorough. AC is working like new again. Will book again next time!',
-      date: '3 days ago',
-      isEditable: false,
-    },
-    {
-      id: '4',
-      name: 'John L.',
-      rating: 5,
-      comment: 'Life is often described as a journey',
-      date: '5 days ago',
-      isEditable: false,
-    },
-    {
-      id: '5',
-      name: 'Lisa T.',
-      rating: 4,
-      comment: 'Good work and fair pricing. AC is much cooler now. Thank you!',
-      date: '1 week ago',
-      isEditable: false,
-    },
-    {
-      id: '6',
-      name: 'Mark P.',
-      rating: 5,
-      comment:
-        'Amazing service! Very detailed cleaning and the technician explained everything clearly.',
-      date: '4 days ago',
-      isEditable: false,
-    },
-    {
-      id: '7',
-      name: 'Anna C.',
-      rating: 5,
-      comment:
-        'Fast, reliable, and affordable. My AC feels brand new! Will definitely use this service again.',
-      date: '6 days ago',
-      isEditable: false,
-    },
-    {
-      id: '8',
-      name: 'Roberto M.',
-      rating: 4,
-      comment:
-        'Professional work and clean up after service. Good value for money.',
-      date: '1 week ago',
-      isEditable: false,
-    },
-    {
-      id: '9',
-      name: 'Grace F.',
-      rating: 5,
-      comment:
-        'Superb cleaning service! Very thorough and the AC is working perfectly now.',
-      date: '3 days ago',
-      isEditable: false,
-    },
-    {
-      id: '10',
-      name: 'David K.',
-      rating: 4,
-      comment:
-        'Great service and very friendly technician. AC maintenance was done efficiently.',
-      date: '2 days ago',
-      isEditable: false,
-    },
-    {
-      id: '11',
-      name: 'Sarah W.',
-      rating: 5,
-      comment:
-        'Outstanding work! Very detailed and professional. Highly satisfied with the service.',
-      date: '1 week ago',
-      isEditable: false,
-    },
-    {
-      id: '12',
-      name: 'Miguel A.',
-      rating: 5,
-      comment:
-        'Excellent AC cleaning service! Very thorough and my unit is running much better now.',
-      date: '5 days ago',
-      isEditable: false,
-    },
-    {
-      id: '13',
-      name: 'Ella V.',
-      rating: 5,
-      comment: 'Quick response and very professional. Highly recommended!',
-      date: '2 days ago',
-      isEditable: false,
-    },
-    {
-      id: '14',
-      name: 'Paul G.',
-      rating: 4,
-      comment: 'Good service, technician was polite and efficient.',
-      date: '3 days ago',
-      isEditable: false,
-    },
-    {
-      id: '15',
-      name: 'Nina S.',
-      rating: 5,
-      comment: 'AC is working perfectly after the cleaning. Will book again!',
-      date: '1 day ago',
-      isEditable: false,
-    },
-    {
-      id: '16',
-      name: 'Leo M.',
-      rating: 4,
-      comment: 'Technician arrived on time and did a thorough job.',
-      date: '4 days ago',
-      isEditable: false,
-    },
-    {
-      id: '17',
-      name: 'Jessa T.',
-      rating: 5,
-      comment: 'Very satisfied with the service. Friendly staff!',
-      date: '2 days ago',
-      isEditable: false,
-    },
-    {
-      id: '18',
-      name: 'Rico D.',
-      rating: 5,
-      comment: 'Excellent job! My AC is now running smoothly.',
-      date: '3 days ago',
-      isEditable: false,
-    },
-  ];
+  // Transform database reviews to UI format
+  const reviews = dbReviews.map((review, index) => ({
+    id: review.id || `${index + 1}`,
+    name: review.client?.full_name || 'Anonymous',
+    rating: review.rating || 5,
+    comment: review.comment || '',
+    date: review.created_at
+      ? new Date(review.created_at).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+        })
+      : 'Recently',
+    isEditable: false,
+  }));
 
-  // Use database reviews if available, otherwise use fallback
-  const reviews =
-    dbReviews && dbReviews.length > 0
-      ? dbReviews.map((review, index) => ({
-          id: review.id || `${index + 1}`,
-          name: review.client?.full_name || 'Anonymous',
-          rating: review.rating || 5,
-          comment: review.comment || '',
-          date: review.created_at
-            ? new Date(review.created_at).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-              })
-            : 'Recently',
-          isEditable: false,
-        }))
-      : fallbackReviews;
+  // Calculate average rating from reviews
+  const averageRating =
+    reviews.length > 0
+      ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length
+      : 0;
+
+  const totalReviews = reviews.length;
 
   const handleReviewSubmitted = () => {
     // Refresh reviews after submission
-    if (listing?.id) {
-      fetchReviews(listing.id);
+    if (listing?.provider_id) {
+      fetchReviews(listing.provider_id);
     }
   };
 
@@ -588,8 +437,8 @@ export default function ClientJobPage() {
 
   const serviceHeaderData = {
     title: listing?.title || 'Service Listing',
-    rating: listing?.rating || 0,
-    totalReviews: listing?.review_count || 0,
+    rating: averageRating,
+    totalReviews,
     responseTime: '24 hours',
     location: listing?.service_areas?.[0] || 'Location not specified',
   };

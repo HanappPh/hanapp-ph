@@ -34,9 +34,9 @@ export class CreateServiceListingDto {
   @IsNotEmpty()
   providerId!: string;
 
-  @IsUUID()
+  @IsNumber()
   @IsNotEmpty()
-  categoryId!: string;
+  categoryId!: number;
 
   @IsString()
   @IsNotEmpty()

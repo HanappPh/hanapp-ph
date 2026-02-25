@@ -14,6 +14,8 @@ import React from 'react';
 
 import { useAuth } from '../../lib/hooks/useAuth';
 
+import { ProfileImageUpload } from './profile-image-upload';
+
 export function Sidebar({
   initialSelected,
   mainColorDark,
@@ -35,8 +37,10 @@ export function Sidebar({
   accentColorLight?: string;
   clickedColor?: string;
   profile: {
+    id?: string;
     full_name?: string;
     email?: string;
+    avatar_url?: string;
   } | null;
   hideRoleToggle?: boolean;
   currentTab?: string;
@@ -46,8 +50,12 @@ export function Sidebar({
     initialSelected ?? 'Client'
   );
   const [isLoggingOut, setIsLoggingOut] = React.useState(false);
+  const [showImageModal, setShowImageModal] = React.useState(false);
+  const [currentAvatarUrl, setCurrentAvatarUrl] = React.useState(
+    profile?.avatar_url
+  );
   const router = useRouter();
-  const { switchRole, activeRole, signOut } = useAuth();
+  const { switchRole, activeRole, signOut, updateProfileAvatar } = useAuth();
 
   // Sync local state with prop changes (when user navigates back to profile)
   React.useEffect(() => {
@@ -55,6 +63,20 @@ export function Sidebar({
       setSelected(initialSelected);
     }
   }, [initialSelected]);
+
+  // Update avatar URL when profile changes
+  React.useEffect(() => {
+    setCurrentAvatarUrl(profile?.avatar_url);
+  }, [profile?.avatar_url]);
+
+  const handleUploadSuccess = (newImageUrl: string) => {
+    setCurrentAvatarUrl(newImageUrl);
+    updateProfileAvatar(newImageUrl);
+  };
+
+  const handleUploadError = (error: string) => {
+    alert(`Upload failed: ${error}`);
+  };
 
   const handleRoleSwitch = (role: 'Provider' | 'Client') => {
     const newRole = role.toLowerCase() as 'provider' | 'client';
@@ -101,24 +123,57 @@ export function Sidebar({
       {/* Profile Card */}
       <Card className="p-6 mb-6 shadow-md">
         <div className="text-center">
-          <div className="w-48 h-48 mx-auto mb-4 rounded-full overflow-hidden">
-            {/* Profile Picture */}
-            <Image
-              src="/profile-pic.png"
-              alt="Client Profile"
-              width={150}
-              height={150}
-              className="w-full h-full object-cover"
-              priority
-            />
-          </div>
+          {/* Profile Picture with Upload (only for own profile) */}
+          {!hideRoleToggle && profile?.id ? (
+            <div className="mb-4">
+              <ProfileImageUpload
+                currentImageUrl={currentAvatarUrl}
+                userId={profile.id}
+                onUploadSuccess={handleUploadSuccess}
+                onUploadError={handleUploadError}
+              />
+            </div>
+          ) : (
+            <div
+              className={`w-48 h-48 mx-auto mb-4 rounded-full overflow-hidden ${
+                currentAvatarUrl
+                  ? 'cursor-pointer hover:opacity-80 transition-opacity'
+                  : ''
+              }`}
+              onClick={() => currentAvatarUrl && setShowImageModal(true)}
+            >
+              <Image
+                src={currentAvatarUrl || '/profile-pic.png'}
+                alt="Profile"
+                width={192}
+                height={192}
+                className="w-full h-full object-cover"
+                priority
+              />
+            </div>
+          )}
+
+          {/* Full-size image modal */}
+          {showImageModal && currentAvatarUrl && (
+            <div
+              className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4"
+              onClick={() => setShowImageModal(false)}
+            >
+              <div className="relative max-w-3xl max-h-full">
+                <Image
+                  src={currentAvatarUrl}
+                  alt="Profile"
+                  width={600}
+                  height={600}
+                  className="rounded-lg object-contain max-h-[90vh]"
+                  onClick={e => e.stopPropagation()}
+                />
+              </div>
+            </div>
+          )}
           <h3 className="text-xl font-semibold text-gray-900 mb-2">
             {displayName}
           </h3>
-          <div className="flex items-center justify-center space-x-2 mb-4">
-            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-            <span className="text-sm text-gray-600">Active</span>
-          </div>
 
           {/* Toggle Buttons */}
         </div>
