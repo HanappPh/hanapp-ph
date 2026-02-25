@@ -23,6 +23,7 @@ import { supabase } from '../../../lib/supabase/client';
 
 interface BookingDetails {
   id: number | string;
+  bookingId?: string;
   serviceId: number;
   serviceName: string;
   providerName: string;
@@ -48,185 +49,6 @@ interface BookingDetails {
   isProviderFinished?: boolean;
 }
 
-// Hardcoded data as fallback
-const hardcodedBookings = {
-  requested: [
-    {
-      id: 8,
-      serviceId: 1,
-      serviceName: 'Garden Maintenance',
-      providerName: 'Green Thumb Services',
-      providerImage: '/landscaper-cutting-grass.jpg',
-      rating: 4.5,
-      reviewCount: 67,
-      price: 500,
-      date: '2024-01-18',
-      time: '8:00 AM',
-      location: 'Paranaque City',
-      status: 'Pending' as const,
-      serviceImage: '/landscaper-cutting-grass.jpg',
-    },
-    {
-      id: 9,
-      serviceId: 2,
-      serviceName: 'Computer Repair',
-      providerName: 'Tech Solutions',
-      providerImage: '/phone-and-tablet-repair.png',
-      rating: 4.7,
-      reviewCount: 134,
-      price: 750,
-      date: '2024-01-20',
-      time: '3:00 PM',
-      location: 'Makati City',
-      status: 'Pending' as const,
-      serviceImage: '/phone-and-tablet-repair.png',
-    },
-  ],
-  received: [
-    {
-      id: 10,
-      serviceId: 3,
-      serviceName: 'Photography Session',
-      providerName: 'Capture Moments',
-      providerImage: '/woman-using-phone.jpg',
-      rating: 4.9,
-      reviewCount: 178,
-      price: 1200,
-      date: '2024-01-22',
-      time: '10:00 AM',
-      location: 'BGC, Taguig',
-      status: 'Pending' as const,
-      serviceImage: '/woman-using-phone.jpg',
-    },
-    {
-      id: 11,
-      serviceId: 4,
-      serviceName: 'Massage Therapy',
-      providerName: 'Relax & Heal Spa',
-      providerImage: '/nanny-with-child.jpg',
-      rating: 4.8,
-      reviewCount: 92,
-      price: 800,
-      date: '2024-01-25',
-      time: '2:00 PM',
-      location: 'Ortigas, Pasig',
-      status: 'Pending' as const,
-      serviceImage: '/woman-smiling.jpg',
-    },
-  ],
-  ongoing: [
-    {
-      id: 1,
-      serviceId: 5,
-      serviceName: 'House Cleaning',
-      providerName: 'Joven Salon',
-      providerImage: '/cleaning-service-provider.jpg',
-      rating: 4.9,
-      reviewCount: 127,
-      price: 450,
-      date: '2024-01-15',
-      time: '10:00 AM',
-      location: 'Makati, Manila',
-      status: 'Accepted' as const,
-      serviceImage: '/house-cleaning-service.png',
-    },
-    {
-      id: 2,
-      serviceId: 6,
-      serviceName: 'Tutoring Session',
-      providerName: 'Maria Santos',
-      providerImage: '/tutor-teacher.jpg',
-      rating: 4.8,
-      reviewCount: 89,
-      price: 350,
-      date: '2024-01-16',
-      time: '2:00 PM',
-      location: 'Quezon City',
-      status: 'Pending' as const,
-      serviceImage: '/tutoring-education.jpg',
-    },
-    {
-      id: 3,
-      serviceId: 6,
-      serviceName: 'Tutoring Session',
-      providerName: 'Maria Santos',
-      providerImage: '/tutor-teacher.jpg',
-      rating: 4.8,
-      reviewCount: 89,
-      price: 350,
-      date: '2024-01-16',
-      time: '2:00 PM',
-      location: 'Quezon City',
-      status: 'Paid' as const,
-      serviceImage: '/tutoring-education.jpg',
-    },
-  ],
-  past: [
-    {
-      id: 4,
-      serviceId: 7,
-      serviceName: 'Laundry Service',
-      providerName: 'Clean Express',
-      providerImage: '/laundry-service.png',
-      rating: 4.7,
-      reviewCount: 203,
-      price: 280,
-      date: '2024-01-10',
-      time: '9:00 AM',
-      location: 'Pasig City',
-      status: 'Completed' as const,
-      serviceImage: '/laundry-washing.jpg',
-    },
-    {
-      id: 5,
-      serviceId: 8,
-      serviceName: 'Home Repair',
-      providerName: 'Fix It Pro',
-      providerImage: '/handyman-repair.jpg',
-      rating: 4.9,
-      reviewCount: 156,
-      price: 650,
-      date: '2024-01-08',
-      time: '1:00 PM',
-      location: 'Taguig City',
-      status: 'Completed' as const,
-      serviceImage: '/home-repair-tools.jpg',
-    },
-  ],
-  cancelled: [
-    {
-      id: 6,
-      serviceId: 9,
-      serviceName: 'Pet Grooming',
-      providerName: 'Paws & Claws',
-      providerImage: '/pet-grooming.png',
-      rating: 4.6,
-      reviewCount: 94,
-      price: 400,
-      date: '2024-01-12',
-      time: '11:00 AM',
-      location: 'Mandaluyong',
-      status: 'Cancelled' as const,
-      serviceImage: '/pet-grooming-dog.jpg',
-    },
-    {
-      id: 7,
-      serviceId: 9,
-      serviceName: 'Pet Grooming',
-      providerName: 'Paws & Claws',
-      providerImage: '/pet-grooming.png',
-      rating: 4.6,
-      reviewCount: 94,
-      price: 400,
-      date: '2024-01-12',
-      time: '11:00 AM',
-      location: 'Mandaluyong',
-      status: 'Rejected' as const,
-      serviceImage: '/pet-grooming-dog.jpg',
-    },
-  ],
-};
-
 export default function BookingsPage() {
   const [activeTab, setActiveTab] = useState('requested'); // Default to requested tab
   const { user } = useAuth();
@@ -237,7 +59,13 @@ export default function BookingsPage() {
     ongoing: BookingDetails[];
     past: BookingDetails[];
     cancelled: BookingDetails[];
-  }>(hardcodedBookings);
+  }>({
+    requested: [],
+    received: [],
+    ongoing: [],
+    past: [],
+    cancelled: [],
+  });
   const [isLoading, setIsLoading] = useState(true);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [finishedBookings, setFinishedBookings] = useState<
@@ -500,6 +328,7 @@ export default function BookingsPage() {
 
               return {
                 id: request.id,
+                bookingId: request.booking_id,
                 serviceId: request.id,
                 serviceName: request.title,
                 providerName: request.users?.full_name || 'Unknown',
@@ -546,6 +375,7 @@ export default function BookingsPage() {
 
               return {
                 id: `app-${application.id}`,
+                bookingId: application.booking_id,
                 serviceId: serviceRequest?.id || 0,
                 serviceName: serviceRequest?.title || 'Unknown Service',
                 providerName: 'Client', // Will show client name, we don't have it in the query
@@ -596,6 +426,7 @@ export default function BookingsPage() {
 
               return {
                 id: `app-${application.id}`,
+                bookingId: application.booking_id,
                 serviceId: serviceRequest?.id || 0,
                 serviceName: serviceRequest?.title || 'Unknown Service',
                 providerName: 'Provider', // We don't have provider info in simplified query
@@ -690,29 +521,22 @@ export default function BookingsPage() {
           requested: [
             ...categorizedSentApplications.pending,
             ...categorizedServiceRequests.pending,
-            ...hardcodedBookings.requested,
           ],
-          received: [
-            ...categorizedReceivedApplications.pending,
-            ...hardcodedBookings.received,
-          ],
+          received: [...categorizedReceivedApplications.pending],
           ongoing: [
             ...categorizedSentApplications.ongoing,
             ...categorizedReceivedApplications.ongoing,
             ...categorizedServiceRequests.ongoing,
-            ...hardcodedBookings.ongoing,
           ],
           past: [
             ...categorizedSentApplications.past,
             ...categorizedReceivedApplications.past,
             ...categorizedServiceRequests.past,
-            ...hardcodedBookings.past,
           ],
           cancelled: [
             ...categorizedSentApplications.cancelled,
             ...categorizedReceivedApplications.cancelled,
             ...categorizedServiceRequests.cancelled,
-            ...hardcodedBookings.cancelled,
           ],
         });
 
@@ -729,9 +553,7 @@ export default function BookingsPage() {
         });
         setFinishedBookings(finishedIds);
       } catch (error) {
-        // Keep hardcoded data on error
         console.error('Error fetching bookings:', error);
-        setBookingsData(hardcodedBookings);
       } finally {
         setIsLoading(false);
       }
