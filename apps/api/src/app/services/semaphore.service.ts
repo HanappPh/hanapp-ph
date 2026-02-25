@@ -29,7 +29,7 @@ export class SemaphoreService {
       // Format phone number to PH format (e.g., 639171234567)
       const formattedPhone = this.formatPhoneNumber(phoneNumber);
 
-      const message = `Your HanApp verification code is: ${otp}. Valid for 5 minutes. Do not share this code.`;
+      const message = `Your Hanapp verification code is: ${otp}. Valid for 5 minutes. Do not share this code.`;
 
       const response = await fetch(this.apiUrl, {
         method: 'POST',
@@ -40,7 +40,7 @@ export class SemaphoreService {
           apikey: this.apiKey,
           number: formattedPhone,
           message,
-          sendername: 'HanApp',
+          sendername: 'Hanapp',
         }),
       });
 

@@ -1,22 +1,108 @@
 'use client';
+import { useSearchParams } from 'next/navigation';
 import * as React from 'react';
+import { useEffect, useState } from 'react';
 
 import { MainContent } from '../../../../components/profile/profile-content';
 import { Sidebar } from '../../../../components/profile/profile-sidebar';
 import { MobileProfileBottom } from '../../../../components/profile-mobile/mobile-bottom';
 import { MobileProfileDivider } from '../../../../components/profile-mobile/mobile-divider';
 import { MobileProfileHeader } from '../../../../components/profile-mobile/mobile-header';
+import { MobileProfileImageUpload } from '../../../../components/profile-mobile/mobile-image-upload';
 import { MobileProfileImage } from '../../../../components/profile-mobile/mobile-images';
 import { MobileProfileInfo } from '../../../../components/profile-mobile/mobile-info';
 import { MobileServicePreferences } from '../../../../components/profile-mobile/mobile-service-preference';
 import { MobileProfileStats } from '../../../../components/profile-mobile/mobile-stats';
 import { MobileProfileTabs } from '../../../../components/profile-mobile/mobile-tabs';
 import { useAuth } from '../../../../lib/hooks/useAuth';
+import type { Profile } from '../../../../types/profiletype';
 
 export default function ProfilePage() {
-  const [showDropdown, setShowDropdown] = React.useState(false);
-  const [selectedTab, setSelectedTab] = React.useState('Profile');
-  const { profile } = useAuth();
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [selectedTab, setSelectedTab] = useState('Profile');
+  const { profile: authProfile, updateProfileAvatar } = useAuth();
+  const searchParams = useSearchParams();
+  const providerId = searchParams.get('id');
+
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [listings, setListings] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const isViewingOtherProvider = !!providerId; // Check if viewing another provider
+
+  const [currentAvatarUrl, setCurrentAvatarUrl] = React.useState(
+    profile?.avatar_url
+  );
+
+  // Update avatar URL when profile changes
+  React.useEffect(() => {
+    setCurrentAvatarUrl(profile?.avatar_url);
+  }, [profile?.avatar_url]);
+
+  const handleUploadSuccess = (newImageUrl: string) => {
+    setCurrentAvatarUrl(newImageUrl);
+    updateProfileAvatar(newImageUrl);
+  };
+
+  const handleUploadError = (error: string) => {
+    alert(`Upload failed: ${error}`);
+  };
+
+  useEffect(() => {
+    const loadProviderProfile = async () => {
+      // If providerId exists in query params, fetch that provider's profile
+      if (providerId) {
+        try {
+          setLoading(true);
+          const port = process.env.NEXT_PUBLIC_API_URL;
+          const response = await fetch(`${port}/api/user/${providerId}`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+
+          if (response.ok) {
+            const providerData = await response.json();
+            setProfile(providerData);
+          }
+
+          // Fetch provider's service listings
+          const listingsResponse = await fetch(
+            `${port}/api/service-listings?providerId=${providerId}`,
+            {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            }
+          );
+
+          if (listingsResponse.ok) {
+            const listingsData = await listingsResponse.json();
+            setListings(listingsData);
+          }
+        } catch (error) {
+          console.error('Failed to load provider profile:', error);
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        // Use the logged-in user's profile
+        setProfile(authProfile || null);
+        setListings([]);
+      }
+    };
+
+    loadProviderProfile();
+  }, [providerId, authProfile]);
+
+  if (loading) {
+    return (
+      <div className="bg-[#F3F5F9] flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#102E50]"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-[#F3F5F9] flex flex-col">
@@ -40,15 +126,33 @@ export default function ProfilePage() {
             accentColorLight="#FFDD8E"
             clickedColor="#f5c45e"
             profile={profile}
+            hideRoleToggle={isViewingOtherProvider}
           />
-          <MainContent initialSelected="Provider" profile={profile} />
+          <MainContent
+            initialSelected="Provider"
+            profile={profile}
+            hideEditButtons={isViewingOtherProvider}
+            providerListings={isViewingOtherProvider ? listings : undefined}
+          />
         </div>
       </div>
       {/* Mobile layout*/}
       <main className="flex flex-col items-center w-full px-0 pt-0 gap-0 md:hidden bg-white relative">
         {/* Mobile modular layout */}
         <MobileProfileHeader fromColor="#FFDD8E" toColor="#F5C45E" />
-        <MobileProfileImage />
+        {!isViewingOtherProvider && profile?.id ? (
+          <MobileProfileImageUpload
+            currentImageUrl={currentAvatarUrl}
+            userId={profile.id}
+            onUploadSuccess={handleUploadSuccess}
+            onUploadError={handleUploadError}
+          />
+        ) : (
+          <MobileProfileImage
+            avatarUrl={currentAvatarUrl}
+            isOwnProfile={!isViewingOtherProvider}
+          />
+        )}
         <MobileProfileInfo profile={profile} />
         <MobileProfileStats />
         <MobileProfileDivider />
