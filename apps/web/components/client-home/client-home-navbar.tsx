@@ -24,6 +24,7 @@ export function ClientHomeNavbar({
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const { activeRole, profile } = useAuth();
   const isProvider = activeRole === 'provider';
+  const avatarUrl = profile?.avatar_url;
 
   const handleNotificationClick = () => {
     setIsNotificationsOpen(!isNotificationsOpen);
@@ -173,14 +174,28 @@ export function ClientHomeNavbar({
               {/* Profile Avatar */}
               <button
                 onClick={handleProfileClick}
-                className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold text-sm hover:opacity-80 transition-colors cursor-pointer ${
-                  isProvider
-                    ? 'bg-[#F5C45E] text-gray-900'
-                    : 'bg-blue-900 text-white'
-                }`}
+                className="w-8 h-8 rounded-full overflow-hidden hover:opacity-80 transition-opacity cursor-pointer flex-shrink-0"
                 aria-label="Profile"
               >
-                {getUserInitials()}
+                {avatarUrl ? (
+                  <Image
+                    src={avatarUrl}
+                    alt="Profile"
+                    width={32}
+                    height={32}
+                    className="w-8 h-8 object-cover rounded-full"
+                  />
+                ) : (
+                  <span
+                    className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold text-sm ${
+                      isProvider
+                        ? 'bg-[#F5C45E] text-gray-900'
+                        : 'bg-blue-900 text-white'
+                    }`}
+                  >
+                    {getUserInitials()}
+                  </span>
+                )}
               </button>
             </div>
           </div>

@@ -1,7 +1,13 @@
 'use client';
 
 import type { Session, User } from '@supabase/supabase-js';
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
 import type { Profile } from '../../types/profiletype';
 import { supabase } from '../supabase/client';
@@ -11,20 +17,14 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 export type UserType = 'client' | 'provider' | 'both';
 export type ActiveRole = 'client' | 'provider';
 
-// interface Profile {
-//   id: string;
-//   email: string;
-//   full_name: string;
-//   phone: string;
-//   user_type: UserType;
-//   phone_verified: boolean;
-// }
-
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   profile: Profile | null;
   activeRole: ActiveRole;
+  /** True once activeRole has been definitively resolved (localStorage + profile). Use
+   *  this anywhere you need to gate role-sensitive rendering to avoid flashes. */
+  roleReady: boolean;
   loading: boolean;
   switchRole: (role: ActiveRole) => void;
   sendOTP: (
@@ -50,7 +50,11 @@ interface AuthContextType {
     password: string
   ) => Promise<{ data: User | null; error: { message: string } | null }>;
   signOut: () => Promise<{ error: { message: string } | null }>;
-  fetchProfile: (userId: string) => Promise<void>;
+  fetchProfile: (userId: string) => Promise<Profile | null>;
+  /** Immediately updates the avatar_url in the in-memory profile so every
+   *  component that reads `profile` (navbar, sidebar, etc.) re-renders without
+   *  needing a full page reload. */
+  updateProfileAvatar: (avatarUrl: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -60,12 +64,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [activeRole, setActiveRole] = useState<ActiveRole>('client');
+  /** Flips to true once switchRole is called or the initial role has been resolved. */
+  const [roleReady, setRoleReady] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Fetch user profile
-  const fetchProfile = async (userId: string) => {
+  // Tracks whether we are already processing a session change, preventing
+  // the duplicate calls that arise from getSession() + onAuthStateChange(INITIAL_SESSION).
+  const sessionHandledRef = useRef(false);
+
+  // ─── Profile fetch (pure data – does NOT touch activeRole) ───────────────────
+  const fetchProfile = async (userId: string): Promise<Profile | null> => {
     try {
-      // Get the current session to extract the access token
       const {
         data: { session: currentSession },
       } = await supabase.auth.getSession();
@@ -74,8 +83,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
       };
-
-      // Add authorization header if token exists
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
       }
@@ -85,74 +92,143 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
 
       if (response.ok) {
-        const data = await response.json();
+        const data: Profile = await response.json();
         setProfile(data);
-
-        // Use saved role from localStorage if available, otherwise default to client
-        const savedRole = localStorage.getItem('activeRole') as ActiveRole;
-        if (savedRole && (savedRole === 'client' || savedRole === 'provider')) {
-          setActiveRole(savedRole);
-        } else {
-          // Default to client role
-          setActiveRole('client');
-        }
+        return data;
       } else {
         console.error(
           'Failed to fetch profile:',
           response.status,
           response.statusText
         );
+        return null;
       }
     } catch (error) {
       console.error('Failed to fetch profile:', error);
+      return null;
     }
   };
 
-  // Initialize auth state
-  useEffect(() => {
-    // Check active session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchProfile(session.user.id);
-      }
-      setLoading(false);
-    });
+  // ─── Role determination (single source of truth) ─────────────────────────────
+  // Priority: localStorage > user_type from DB > default 'client'
+  const determineRole = (profileData: Profile | null) => {
+    const savedRole = localStorage.getItem('activeRole') as ActiveRole | null;
 
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchProfile(session.user.id);
+    if (savedRole === 'client' || savedRole === 'provider') {
+      // Guard: a pure 'client' user_type must not be stuck in provider mode
+      if (profileData?.user_type === 'client' && savedRole === 'provider') {
+        localStorage.setItem('activeRole', 'client');
+        setActiveRole('client');
+      } else {
+        setActiveRole(savedRole);
+      }
+    } else if (profileData?.user_type === 'provider') {
+      // First login ever: default providers to provider mode
+      localStorage.setItem('activeRole', 'provider');
+      setActiveRole('provider');
+    } else {
+      setActiveRole('client');
+    }
+
+    setRoleReady(true);
+  };
+
+  // ─── Auth initialisation ─────────────────────────────────────────────────────
+  // We use onAuthStateChange as the single source of truth.
+  // getSession() is kept only as a fast-path to avoid an extra round-trip on
+  // first load; the sessionHandledRef guard prevents the double-execution that
+  // would otherwise occur when onAuthStateChange also fires INITIAL_SESSION.
+  useEffect(() => {
+    let isMounted = true;
+
+    const handleSession = async (sess: Session | null) => {
+      if (!isMounted) {
+        return;
+      }
+
+      setSession(sess);
+      setUser(sess?.user ?? null);
+
+      if (sess?.user) {
+        const profileData = await fetchProfile(sess.user.id);
+        if (!isMounted) {
+          return;
+        }
+        determineRole(profileData);
       } else {
         setProfile(null);
         setActiveRole('client');
+        setRoleReady(true);
       }
-      setLoading(false);
+
+      if (isMounted) {
+        setLoading(false);
+      }
+    };
+
+    // Eagerly check the current session so we don't have to wait for the
+    // onAuthStateChange INITIAL_SESSION event (avoids a perceptible flash).
+    supabase.auth.getSession().then(({ data: { session: sess } }) => {
+      if (!sessionHandledRef.current) {
+        sessionHandledRef.current = true;
+        handleSession(sess);
+      }
     });
 
-    return () => subscription.unsubscribe();
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, sess) => {
+      if (!isMounted) {
+        return;
+      }
+
+      // INITIAL_SESSION is already handled by getSession() above.
+      // Skip it only when we have already processed the eager check.
+      if (event === 'INITIAL_SESSION' && sessionHandledRef.current) {
+        return;
+      }
+
+      // TOKEN_REFRESHED: session rotated but user hasn't changed — just keep
+      // the session object up-to-date without re-fetching the profile.
+      if (event === 'TOKEN_REFRESHED') {
+        setSession(sess);
+        return;
+      }
+
+      // All other events (SIGNED_IN, SIGNED_OUT, USER_UPDATED, etc.)
+      sessionHandledRef.current = true;
+
+      if (event === 'SIGNED_OUT') {
+        setSession(null);
+        setUser(null);
+        setProfile(null);
+        setActiveRole('client');
+        setRoleReady(true);
+        setLoading(false);
+        return;
+      }
+
+      handleSession(sess);
+    });
+
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Switch between client and provider role
-  const switchRole = (role: ActiveRole) => {
-    // eslint-disable-next-line no-console
-    console.log('✅ Switching activeRole to:', role);
-    setActiveRole(role);
-    localStorage.setItem('activeRole', role);
+  // ─── Avatar update (in-memory only, no refetch needed) ─────────────────────
+  const updateProfileAvatar = (avatarUrl: string) => {
+    setProfile(prev => (prev ? { ...prev, avatar_url: avatarUrl } : prev));
   };
 
-  // Load active role from localStorage on mount
-  useEffect(() => {
-    const savedRole = localStorage.getItem('activeRole') as ActiveRole;
-    if (savedRole && (savedRole === 'client' || savedRole === 'provider')) {
-      setActiveRole(savedRole);
-    }
-  }, []);
+  // ─── Role switching ───────────────────────────────────────────────────────────
+  const switchRole = (role: ActiveRole) => {
+    setActiveRole(role);
+    setRoleReady(true);
+    localStorage.setItem('activeRole', role);
+  };
 
   // ============================================
   // AUTHENTICATION METHODS
@@ -238,7 +314,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
             setSession(sessionData.session);
             setUser(sessionData.user);
-            await fetchProfile(sessionData.user.id);
+            const profileData = await fetchProfile(sessionData.user.id);
+            determineRole(profileData);
+            // Mark session as handled so the onAuthStateChange SIGNED_IN event
+            // that fires next doesn't re-run fetchProfile + determineRole.
+            sessionHandledRef.current = true;
+            setLoading(false);
           }
         }
       }
@@ -317,7 +398,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (signInData.session) {
         setSession(signInData.session);
         setUser(signInData.session.user);
-        await fetchProfile(signInData.session.user.id);
+        const profileData = await fetchProfile(signInData.session.user.id);
+        determineRole(profileData);
+        sessionHandledRef.current = true;
+        setLoading(false);
       }
 
       return { data: data.user, error: null };
@@ -355,7 +439,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         setSession(data.session);
         setUser(data.user);
-        await fetchProfile(data.user.id);
+        const profileData = await fetchProfile(data.user.id);
+        determineRole(profileData);
+        sessionHandledRef.current = true;
+        setLoading(false);
       }
 
       return { data: data.user, error: null };
@@ -396,6 +483,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       await supabase.auth.signOut();
       localStorage.removeItem('activeRole');
+      sessionHandledRef.current = false;
 
       // Redirect to home page after successful logout
       window.location.href = '/';
@@ -411,6 +499,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     session,
     profile,
     activeRole,
+    roleReady,
     loading,
     switchRole,
     sendOTP,
@@ -419,6 +508,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signIn,
     signOut,
     fetchProfile,
+    updateProfileAvatar,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

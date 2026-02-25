@@ -8,6 +8,7 @@ import { Sidebar } from '../../../../components/profile/profile-sidebar';
 import { MobileProfileBottom } from '../../../../components/profile-mobile/mobile-bottom';
 import { MobileProfileDivider } from '../../../../components/profile-mobile/mobile-divider';
 import { MobileProfileHeader } from '../../../../components/profile-mobile/mobile-header';
+import { MobileProfileImageUpload } from '../../../../components/profile-mobile/mobile-image-upload';
 import { MobileProfileImage } from '../../../../components/profile-mobile/mobile-images';
 import { MobileProfileInfo } from '../../../../components/profile-mobile/mobile-info';
 import { MobileServicePreferences } from '../../../../components/profile-mobile/mobile-service-preference';
@@ -19,7 +20,7 @@ import type { Profile } from '../../../../types/profiletype';
 export default function ProfilePage() {
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedTab, setSelectedTab] = useState('Profile');
-  const { profile: authProfile } = useAuth();
+  const { profile: authProfile, updateProfileAvatar } = useAuth();
   const searchParams = useSearchParams();
   const providerId = searchParams.get('id');
 
@@ -27,6 +28,24 @@ export default function ProfilePage() {
   const [listings, setListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const isViewingOtherProvider = !!providerId; // Check if viewing another provider
+
+  const [currentAvatarUrl, setCurrentAvatarUrl] = React.useState(
+    profile?.avatar_url
+  );
+
+  // Update avatar URL when profile changes
+  React.useEffect(() => {
+    setCurrentAvatarUrl(profile?.avatar_url);
+  }, [profile?.avatar_url]);
+
+  const handleUploadSuccess = (newImageUrl: string) => {
+    setCurrentAvatarUrl(newImageUrl);
+    updateProfileAvatar(newImageUrl);
+  };
+
+  const handleUploadError = (error: string) => {
+    alert(`Upload failed: ${error}`);
+  };
 
   useEffect(() => {
     const loadProviderProfile = async () => {
@@ -121,7 +140,19 @@ export default function ProfilePage() {
       <main className="flex flex-col items-center w-full px-0 pt-0 gap-0 md:hidden bg-white relative">
         {/* Mobile modular layout */}
         <MobileProfileHeader fromColor="#FFDD8E" toColor="#F5C45E" />
-        <MobileProfileImage />
+        {!isViewingOtherProvider && profile?.id ? (
+          <MobileProfileImageUpload
+            currentImageUrl={currentAvatarUrl}
+            userId={profile.id}
+            onUploadSuccess={handleUploadSuccess}
+            onUploadError={handleUploadError}
+          />
+        ) : (
+          <MobileProfileImage
+            avatarUrl={currentAvatarUrl}
+            isOwnProfile={!isViewingOtherProvider}
+          />
+        )}
         <MobileProfileInfo profile={profile} />
         <MobileProfileStats />
         <MobileProfileDivider />
