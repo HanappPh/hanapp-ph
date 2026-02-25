@@ -1,15 +1,10 @@
 import { Badge, Button, Card } from '@hanapp-ph/commons';
-import {
-  Edit,
-  Calendar,
-  Mail,
-  Phone,
-  MapPin,
-  Star,
-  MessageCircle,
-} from 'lucide-react';
+import { Edit, Calendar, Mail, Phone, MapPin } from 'lucide-react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import React from 'react';
+
+import { ProfileRating } from './profile-rating';
 // Example providers array (replace with real data as needed)
 const providers = [
   {
@@ -41,6 +36,8 @@ const providers = [
 export function MainContent({
   initialSelected,
   profile,
+  hideEditButtons = false,
+  providerListings,
 }: {
   initialSelected?: 'Provider' | 'Client';
   profile: {
@@ -48,7 +45,11 @@ export function MainContent({
     email?: string;
     phone_number?: string;
   } | null;
+  hideEditButtons?: boolean;
+  providerListings?: any[];
 }) {
+  const router = useRouter();
+  const [showAllListings, setShowAllListings] = React.useState(false);
   const displayName = profile?.full_name || 'User';
   const displayEmail = profile?.email || 'Not provided';
   const displayPhone = profile?.phone_number || 'Not provided';
@@ -63,13 +64,15 @@ export function MainContent({
               <h2 className="text-xl font-semibold text-gray-900">
                 Profile Information
               </h2>
-              <Button
-                variant="ghost"
-                className="text-blue-600 hover:text-blue-700"
-              >
-                <Edit className="w-4 h-4 mr-2" />
-                Edit
-              </Button>
+              {!hideEditButtons && (
+                <Button
+                  variant="ghost"
+                  className="text-blue-600 hover:text-blue-700"
+                >
+                  <Edit className="w-4 h-4 mr-2" />
+                  Edit
+                </Button>
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-6">
@@ -155,43 +158,102 @@ export function MainContent({
             </div>
           </Card>
 
-          {/* Recent Activity */}
-          <Card className="p-6 bg-white border-none drop-shadow-md">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">
-              Recent Activity
-            </h2>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-orange-50 rounded-lg border border-orange-200">
-                <div className="flex items-center space-x-4">
-                  <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
-                  <div>
-                    <h4 className="font-medium text-gray-900">
-                      Laundry - Booking Request
-                    </h4>
-                    <p className="text-sm text-gray-600">
-                      Martin Santos • 5 mins ago
-                    </p>
-                  </div>
-                </div>
-                <Badge className="bg-orange-500 text-white p-2">Pending</Badge>
+          {/* Recent Activity or Provider Listings */}
+          {providerListings ? (
+            <Card className="p-6 bg-white border-none drop-shadow-md">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-gray-900">
+                  Service Listings ({providerListings.length})
+                </h2>
+                {providerListings.length > 3 && (
+                  <Button
+                    variant="ghost"
+                    className="text-[#102E50] hover:text-[#0a1f35] font-semibold"
+                    onClick={() => setShowAllListings(!showAllListings)}
+                  >
+                    {showAllListings ? 'Show Less' : 'See All'}
+                  </Button>
+                )}
               </div>
+              <div className="space-y-4">
+                {providerListings.length > 0 ? (
+                  (showAllListings
+                    ? providerListings
+                    : providerListings.slice(0, 3)
+                  ).map(listing => (
+                    <div
+                      key={listing.id}
+                      className="flex items-center p-4 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors cursor-pointer"
+                      onClick={() => router.push(`/jobs/${listing.id}`)}
+                    >
+                      <div className="flex items-center space-x-4 flex-1">
+                        {listing.images?.[0] && (
+                          <Image
+                            src={listing.images[0]}
+                            alt={listing.title}
+                            width={60}
+                            height={60}
+                            className="rounded-lg object-cover"
+                          />
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-medium text-gray-900 truncate">
+                            {listing.title}
+                          </h4>
+                          <p className="text-sm text-gray-600 truncate">
+                            {listing.description}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500 text-center py-4">
+                    No postings available
+                  </p>
+                )}
+              </div>
+            </Card>
+          ) : (
+            <Card className="p-6 bg-white border-none drop-shadow-md">
+              <h2 className="text-xl font-semibold text-gray-900 mb-6">
+                Recent Activity
+              </h2>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-4 bg-orange-50 rounded-lg border border-orange-200">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                    <div>
+                      <h4 className="font-medium text-gray-900">
+                        Laundry - Booking Request
+                      </h4>
+                      <p className="text-sm text-gray-600">
+                        Martin Santos • 5 mins ago
+                      </p>
+                    </div>
+                  </div>
+                  <Badge className="bg-orange-500 text-white p-2">
+                    Pending
+                  </Badge>
+                </div>
 
-              <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200">
-                <div className="flex items-center space-x-4">
-                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                  <div>
-                    <h4 className="font-medium text-gray-900">
-                      Babysitting Completed
-                    </h4>
-                    <p className="text-sm text-gray-600">
-                      Jemma Lee • 5 hours ago
-                    </p>
+                <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                    <div>
+                      <h4 className="font-medium text-gray-900">
+                        Babysitting Completed
+                      </h4>
+                      <p className="text-sm text-gray-600">
+                        Jemma Lee • 5 hours ago
+                      </p>
+                    </div>
                   </div>
+                  <Badge className="bg-green-600 text-white p-2">₱856.00</Badge>
                 </div>
-                <Badge className="bg-green-600 text-white p-2">₱856.00</Badge>
               </div>
-            </div>
-          </Card>
+            </Card>
+          )}
 
           {/* Favorite Providers Section (Web version) */}
           {initialSelected === 'Client' && (
@@ -200,30 +262,6 @@ export function MainContent({
                 <span className="text-xl font-semibold text-gray-900 mb-6">
                   Favorite Providers
                 </span>
-                <button className="flex items-center text-xs text-[#014182] font-semibold gap-1 hover:underline">
-                  Edit
-                  <svg
-                    width="16"
-                    height="16"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    className="inline-block ml-1"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 20h9"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z"
-                    />
-                  </svg>
-                </button>
               </div>
               <div className="flex overflow-x-auto pb-3 whitespace-nowrap gap-3">
                 {providers.map(p => (
@@ -271,7 +309,7 @@ export function MainContent({
         {/* Right Sidebar */}
         <div className="space-y-6">
           {/* Total Earnings (visible only for Provider) */}
-          {initialSelected !== 'Client' && (
+          {initialSelected !== 'Client' && !hideEditButtons && (
             <Card className="border-none p-6 bg-gradient-to-b from-[#FFDD8E] to-[#F5C45E] drop-shadow-md">
               <h3 className="text-sm text-gray-600 mb-2">Total Earnings</h3>
               <p className="text-3xl font-bold text-[#102E50]">₱ 12,450.00</p>
@@ -279,54 +317,58 @@ export function MainContent({
           )}
 
           {/* Rating and Response Rate */}
-          <div className="grid grid-cols-2 gap-4">
-            <Card className="p-4 bg-white border-none drop-shadow-md">
-              <h4 className="text-sm text-gray-600 mb-2">Rating</h4>
-              <div className="flex items-center space-x-2 mb-1">
-                <Star className="w-5 h-5 text-yellow-500 fill-current" />
-                <span className="text-2xl font-bold text-gray-900">4.8</span>
+          <div className="space-y-6">
+            {/* <Card className="p-4 bg-white border-none drop-shadow-md">
+              <div className="flex flex-wrap items-center gap-4">
+                <div className="flex items-center space-x-4 flex-1 min-w-[150px]">
+                  <div className="flex items-center space-x-2">
+                    <MessageCircle className="w-5 h-5 text-yellow-500" />
+                    <span className="text-3xl font-bold text-gray-900">
+                      98%
+                    </span>
+                  </div>
+                  <div className="flex flex-col justify-center h-full">
+                    <h4 className="text-sm font-semibold text-gray-900 leading-tight">
+                      Response
+                    </h4>
+                    <h4 className="text-sm font-semibold text-gray-900 leading-tight">
+                      Rate
+                    </h4>
+                  </div>
+                </div>
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-6 shrink-0 w-[130px]">
+                  {hideEditButtons ? 'Message' : 'See Chats'}
+                </Button>
               </div>
-              <p className="text-xs text-gray-500">8 reviews</p>
-              <Button className="w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white rounded-full">
-                See Reviews
-              </Button>
-            </Card>
+            </Card> */}
 
-            <Card className="p-4 bg-white border-none drop-shadow-md">
-              <h4 className="text-sm text-gray-600 mb-2">Response Rate</h4>
-              <div className="flex items-center space-x-2 mb-1">
-                <MessageCircle className="w-5 h-5 text-yellow-500" />
-                <span className="text-2xl font-bold text-gray-900">98%</span>
-              </div>
-              <p className="text-xs text-gray-500">18 conversations</p>
-              <Button className="w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white rounded-full">
-                See Chats
-              </Button>
-            </Card>
+            <ProfileRating rating={4.8} reviewCount={8} />
           </div>
 
           {/* Activity Stats */}
-          <div className="grid grid-cols-2 gap-4">
-            <Card className="p-4 bg-white border-none drop-shadow-md text-center">
-              <h4 className="text-sm text-gray-600 mb-2">You appeared in</h4>
-              <p className="text-3xl font-bold text-gray-900 mb-1">11</p>
-              <p className="text-xs text-gray-500 mb-3">searches this week</p>
-              <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-full">
-                See More
-              </Button>
-            </Card>
+          {!hideEditButtons && (
+            <div className="grid grid-cols-2 gap-4">
+              <Card className="p-4 bg-white border-none drop-shadow-md text-center">
+                <h4 className="text-sm font-semibold text-gray-900 leading-tight mb-2">
+                  Profile searches
+                </h4>
+                <p className="text-3xl font-bold text-gray-900 mb-1">11</p>
+                <p className="text-xs text-gray-900">
+                  people have searched your profile this week
+                </p>
+              </Card>
 
-            <Card className="p-4 bg-white border-none drop-shadow-md text-center">
-              <h4 className="text-sm text-gray-600 mb-2">Profile views</h4>
-              <p className="text-3xl font-bold text-gray-900 mb-1">4</p>
-              <p className="text-xs text-gray-500 mb-3">
-                people checked your profile this week
-              </p>
-              <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-full">
-                See More
-              </Button>
-            </Card>
-          </div>
+              <Card className="p-4 bg-white border-none drop-shadow-md text-center">
+                <h4 className="text-sm font-semibold text-gray-900 leading-tight mb-2">
+                  Profile views
+                </h4>
+                <p className="text-3xl font-bold text-gray-900 mb-1">4</p>
+                <p className="text-xs text-gray-900">
+                  people have checked your profile this week
+                </p>
+              </Card>
+            </div>
+          )}
         </div>
       </div>
     </main>
