@@ -6,6 +6,7 @@ import { fetchProviderReviews } from '../../lib/api/reviews';
 import { ProfileRating } from './profile-rating';
 
 export function ReviewsContent({
+  initialSelected,
   providerId,
 }: {
   initialSelected?: 'Provider' | 'Client';
@@ -82,6 +83,7 @@ export function ReviewsContent({
           rating={reviewStats.averageRating}
           reviewCount={reviewStats.reviewCount}
           reviews={reviews}
+          initialSelected={initialSelected}
         />
       </div>
     </main>

@@ -87,6 +87,19 @@ export class ReviewsController {
     return this.reviewsService.deleteReview(reviewId, user.id);
   }
 
+  @ApiBearerAuth('JWT-auth')
+  @Get('me/service-requests')
+  @ApiOperation({
+    summary: 'Get reviewed service request IDs of current user',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Reviewed service request IDs retrieved successfully',
+  })
+  async getMyReviewedServiceRequestIds(@CurrentUser() user: User) {
+    return this.reviewsService.getMyReviewedServiceRequestIds(user.id);
+  }
+
   // ===============================
   // GET REVIEWS BY SERVICE ID
   // ===============================
@@ -104,6 +117,7 @@ export class ReviewsController {
   // ===============================
   // GET REVIEWS BY PROVIDER ID
   // ===============================
+  @Public()
   @Get('provider/:providerId') // temp route
   @ApiOperation({ summary: 'Get reviews by provider ID (public)' })
   @ApiResponse({

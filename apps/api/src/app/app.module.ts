@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 
+import { ActivityEventsModule } from './activity-events/activity-events.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { JobApplicationModule } from './job-application/job-application.module';
@@ -21,6 +22,7 @@ import { UserModule } from './user/user.module';
     ReviewsModule,
     JobApplicationModule, // Job application management
     ProfileMetricsModule,
+    ActivityEventsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

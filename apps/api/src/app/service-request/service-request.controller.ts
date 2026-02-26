@@ -70,6 +70,16 @@ export class ServiceRequestController {
     return this.serviceRequestService.confirmBooking(id, userId, token);
   }
 
+  @Patch(':id/reject')
+  rejectBooking(
+    @Param('id') id: string,
+    @Body('userId') userId: string,
+    @Headers('authorization') authHeader?: string
+  ) {
+    const token = authHeader?.replace('Bearer ', '');
+    return this.serviceRequestService.rejectBooking(id, userId, token);
+  }
+
   @Patch(':id/finish')
   finishBooking(
     @Param('id') id: string,

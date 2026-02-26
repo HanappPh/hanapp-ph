@@ -17,7 +17,6 @@ import { MobileProfileInfo } from '../../../../components/profile-mobile/mobile-
 import { MobileServicePreferences } from '../../../../components/profile-mobile/mobile-service-preference';
 import { MobileProfileStats } from '../../../../components/profile-mobile/mobile-stats';
 import { MobileProfileTabs } from '../../../../components/profile-mobile/mobile-tabs';
-import { trackProviderProfileView } from '../../../../lib/api/profileMetrics';
 import type { ServiceListingResponse } from '../../../../lib/api/serviceListings';
 import { useAuth } from '../../../../lib/hooks/useAuth';
 import type { Profile } from '../../../../types/profiletype';
@@ -107,14 +106,6 @@ export default function ProfilePage() {
     loadProviderProfile();
   }, [providerId, targetProviderId, authProfile]);
 
-  useEffect(() => {
-    if (!providerId || !authProfile?.id || authProfile.id === providerId) {
-      return;
-    }
-
-    trackProviderProfileView(providerId, authProfile.id);
-  }, [providerId, authProfile?.id]);
-
   if (loading) {
     return (
       <div className="bg-[#F3F5F9] flex items-center justify-center min-h-screen">
@@ -155,6 +146,7 @@ export default function ProfilePage() {
               profile={profile}
               hideEditButtons={isViewingOtherProvider}
               providerListings={isViewingOtherProvider ? listings : undefined}
+              servicePreferenceListings={listings}
             />
           ) : currentDesktopTab === 'Reviews' ? (
             <ReviewsContent
@@ -171,6 +163,7 @@ export default function ProfilePage() {
               profile={profile}
               hideEditButtons={isViewingOtherProvider}
               providerListings={isViewingOtherProvider ? listings : undefined}
+              servicePreferenceListings={listings}
             />
           )}
         </div>
