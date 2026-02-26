@@ -327,6 +327,114 @@ export class ServiceRequestService {
     return result;
   }
 
+  private async logBookingActivityEvent(
+    supabase: ReturnType<SupabaseService['getClient']>,
+    requestIdOrGroupId: string,
+    actorId: string,
+    eventType:
+      | 'booking_confirmed'
+      | 'booking_deleted'
+      | 'booking_finished'
+      | 'payment_released'
+  ) {
+    const { data: groupedRequests } = await supabase
+      .from('service_requests')
+      .select(
+        `
+        id,
+        booking_group_id,
+        client_id,
+        provider_id,
+        listing_id,
+        custom_service_name,
+        is_custom_service,
+        listing:service_listings(title),
+        service_detail:service_listing_details(title)
+      `
+      )
+      .or(
+        `id.eq.${requestIdOrGroupId},booking_group_id.eq.${requestIdOrGroupId}`
+      );
+
+    if (!groupedRequests || groupedRequests.length === 0) {
+      return;
+    }
+
+    const mainRequest = groupedRequests[0];
+    const clientId = mainRequest.client_id as string;
+    const providerId = mainRequest.provider_id as string;
+
+    const actorRole = actorId === providerId ? 'provider' : 'client';
+    const targetUserId = actorRole === 'provider' ? clientId : providerId;
+    const targetRole = actorRole === 'provider' ? 'client' : 'provider';
+
+    const participantIds = [clientId, providerId];
+    const { data: participants } = await supabase
+      .from('users')
+      .select('id, full_name')
+      .in('id', participantIds);
+
+    const participantMap = new Map(
+      (participants || []).map(participant => [participant.id, participant])
+    );
+
+    const clientName = participantMap.get(clientId)?.full_name || 'Client';
+    const providerName =
+      participantMap.get(providerId)?.full_name || 'Provider';
+
+    const listingTitle =
+      (mainRequest.listing as { title?: string } | null)?.title || null;
+
+    const serviceNames = groupedRequests
+      .map(request => {
+        if (request.is_custom_service) {
+          return request.custom_service_name as string | null;
+        }
+
+        return (
+          (request.service_detail as { title?: string } | null)?.title || null
+        );
+      })
+      .filter((serviceName): serviceName is string => !!serviceName);
+
+    let eventTitle = 'Booking updated';
+    let eventDescription = `Updated booking for ${listingTitle || 'service listing'}`;
+
+    if (eventType === 'booking_confirmed') {
+      eventTitle = 'Booking request confirmed';
+      eventDescription = `Confirmed booking for ${listingTitle || 'service listing'}`;
+    } else if (eventType === 'booking_deleted') {
+      eventTitle = 'Booking request deleted';
+      eventDescription = `Deleted booking for ${listingTitle || 'service listing'}`;
+    } else if (eventType === 'booking_finished') {
+      eventTitle = 'Job marked as finished';
+      eventDescription = `Marked job as finished for ${listingTitle || 'service listing'}`;
+    } else if (eventType === 'payment_released') {
+      eventTitle = 'Payment released';
+      eventDescription = `Released payment for ${listingTitle || 'service listing'}`;
+    }
+
+    await supabase.from('activity_events').insert({
+      actor_id: actorId,
+      target_user_id: eventType === 'booking_deleted' ? null : targetUserId,
+      event_type: eventType,
+      title: eventTitle,
+      description: eventDescription,
+      visibility: eventType === 'booking_deleted' ? 'private' : 'shared',
+      service_request_id: mainRequest.id,
+      listing_id: mainRequest.listing_id,
+      metadata: {
+        booking_group_id: mainRequest.booking_group_id || mainRequest.id,
+        listing_title: listingTitle,
+        service_names: serviceNames,
+        client_name: clientName,
+        provider_name: providerName,
+        actor_role: actorRole,
+        target_role: targetRole,
+      },
+    });
+  }
+
   // Confirm a booking (provider or client accepts, moves to ongoing)
   async confirmBooking(id: string, userId: string, token?: string) {
     // Use service role client to bypass RLS for updates, but verify permissions first
@@ -389,6 +497,13 @@ export class ServiceRequestService {
         );
       }
 
+      await this.logBookingActivityEvent(
+        supabase,
+        firstRequest.booking_group_id || firstRequest.id,
+        userId,
+        'booking_confirmed'
+      );
+
       return data;
     }
 
@@ -422,6 +537,13 @@ export class ServiceRequestService {
         );
       }
 
+      await this.logBookingActivityEvent(
+        supabase,
+        serviceRequest.booking_group_id,
+        userId,
+        'booking_confirmed'
+      );
+
       return data;
     }
 
@@ -444,18 +566,142 @@ export class ServiceRequestService {
       );
     }
 
+    await this.logBookingActivityEvent(
+      supabase,
+      id,
+      userId,
+      'booking_confirmed'
+    );
+
+    return data;
+  }
+
+  async rejectBooking(id: string, userId: string, token?: string) {
+    const userClient = token
+      ? this.supabaseService.createUserClient(token)
+      : this.supabaseService.getClient();
+    const supabase = this.supabaseService.getClient();
+
+    const { data: serviceRequest, error: fetchError } = await userClient
+      .from('service_requests')
+      .select('id, client_id, provider_id, booking_group_id')
+      .eq('id', id)
+      .single();
+
+    if (fetchError || !serviceRequest) {
+      const { data: groupedRequests, error: groupError } = await userClient
+        .from('service_requests')
+        .select('id, client_id, provider_id, booking_group_id')
+        .eq('booking_group_id', id)
+        .limit(1);
+
+      if (groupError || !groupedRequests || groupedRequests.length === 0) {
+        throw new HttpException(
+          'Service request not found',
+          HttpStatus.NOT_FOUND
+        );
+      }
+
+      const firstRequest = groupedRequests[0];
+
+      if (firstRequest.provider_id !== userId) {
+        throw new HttpException(
+          'Only the provider can reject this booking',
+          HttpStatus.FORBIDDEN
+        );
+      }
+
+      const { data, error } = await supabase
+        .from('service_requests')
+        .update({
+          status: 'rejected',
+          updated_at: new Date().toISOString(),
+        })
+        .eq('booking_group_id', id)
+        .select();
+
+      if (error) {
+        throw new HttpException(
+          'Failed to reject booking',
+          HttpStatus.INTERNAL_SERVER_ERROR
+        );
+      }
+
+      await this.logBookingActivityEvent(
+        supabase,
+        firstRequest.booking_group_id || firstRequest.id,
+        userId,
+        'booking_deleted'
+      );
+
+      return data;
+    }
+
+    if (serviceRequest.provider_id !== userId) {
+      throw new HttpException(
+        'Only the provider can reject this booking',
+        HttpStatus.FORBIDDEN
+      );
+    }
+
+    if (serviceRequest.booking_group_id) {
+      const { data, error } = await supabase
+        .from('service_requests')
+        .update({
+          status: 'rejected',
+          updated_at: new Date().toISOString(),
+        })
+        .eq('booking_group_id', serviceRequest.booking_group_id)
+        .select();
+
+      if (error) {
+        throw new HttpException(
+          'Failed to reject booking',
+          HttpStatus.INTERNAL_SERVER_ERROR
+        );
+      }
+
+      await this.logBookingActivityEvent(
+        supabase,
+        serviceRequest.booking_group_id,
+        userId,
+        'booking_deleted'
+      );
+
+      return data;
+    }
+
+    const { data, error } = await supabase
+      .from('service_requests')
+      .update({
+        status: 'rejected',
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      throw new HttpException(
+        'Failed to reject booking',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+
+    await this.logBookingActivityEvent(supabase, id, userId, 'booking_deleted');
+
     return data;
   }
 
   // Finish a booking (provider marks service as complete, awaiting payment)
-  async finishBooking(id: string, _providerId: string, _token?: string) {
+  async finishBooking(id: string, providerId: string, _token?: string) {
     // Use service role client to bypass RLS
     const supabase = this.supabaseService.getClient();
 
     // Get the service request
     const { data: serviceRequest, error: fetchError } = await supabase
       .from('service_requests')
-      .select('id, booking_group_id')
+      .select('id, booking_group_id, provider_id')
       .eq('id', id)
       .single();
 
@@ -463,6 +709,13 @@ export class ServiceRequestService {
       throw new HttpException(
         'Service request not found',
         HttpStatus.NOT_FOUND
+      );
+    }
+
+    if (serviceRequest.provider_id !== providerId) {
+      throw new HttpException(
+        'You do not have permission to finish this booking',
+        HttpStatus.FORBIDDEN
       );
     }
 
@@ -484,6 +737,13 @@ export class ServiceRequestService {
         );
       }
 
+      await this.logBookingActivityEvent(
+        supabase,
+        serviceRequest.booking_group_id,
+        providerId,
+        'booking_finished'
+      );
+
       return data;
     }
 
@@ -504,6 +764,13 @@ export class ServiceRequestService {
         HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
+
+    await this.logBookingActivityEvent(
+      supabase,
+      id,
+      providerId,
+      'booking_finished'
+    );
 
     return data;
   }
@@ -560,6 +827,13 @@ export class ServiceRequestService {
         );
       }
 
+      await this.logBookingActivityEvent(
+        supabase,
+        serviceRequest.booking_group_id,
+        clientId,
+        'payment_released'
+      );
+
       return data;
     }
 
@@ -581,17 +855,25 @@ export class ServiceRequestService {
       );
     }
 
+    await this.logBookingActivityEvent(
+      supabase,
+      id,
+      clientId,
+      'payment_released'
+    );
+
     return data;
   }
 
   async createBooking(createBookingDto: CreateBookingDto, token: string) {
-    const supabase = this.supabaseService.createUserClient(token);
+    const userSupabase = this.supabaseService.createUserClient(token);
+    const supabase = this.supabaseService.getClient();
 
     // Get the authenticated user
     const {
       data: { user },
       error: authError,
-    } = await supabase.auth.getUser();
+    } = await userSupabase.auth.getUser();
 
     if (authError || !user) {
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
@@ -600,19 +882,10 @@ export class ServiceRequestService {
     // Generate a booking_group_id to link all services in this booking
     const bookingGroupId = crypto.randomUUID();
 
-    // Fetch service listing details to get title and category
+    // Fetch service listing details
     const { data: listing, error: listingError } = await supabase
       .from('service_listings')
-      .select(
-        `
-        title,
-        category_id,
-        categories:category_id (
-          id,
-          name
-        )
-      `
-      )
+      .select('title, category_id')
       .eq('id', createBookingDto.listingId)
       .single();
 
@@ -623,6 +896,41 @@ export class ServiceRequestService {
       );
     }
 
+    const serviceDetailIds = createBookingDto.services
+      .filter(service => !service.isCustom && !!service.serviceDetailId)
+      .map(service => service.serviceDetailId as string);
+
+    const uniqueServiceDetailIds = [...new Set(serviceDetailIds)];
+
+    const serviceDetailsMap = new Map<
+      string,
+      {
+        id: string;
+        title: string;
+        description: string | null;
+        listing_id: string;
+      }
+    >();
+
+    if (uniqueServiceDetailIds.length > 0) {
+      const { data: serviceDetails, error: serviceDetailsError } =
+        await supabase
+          .from('service_listing_details')
+          .select('id, listing_id, title, description')
+          .in('id', uniqueServiceDetailIds);
+
+      if (serviceDetailsError) {
+        throw new HttpException(
+          `Failed to fetch service details: ${serviceDetailsError.message}`,
+          HttpStatus.INTERNAL_SERVER_ERROR
+        );
+      }
+
+      (serviceDetails || []).forEach(serviceDetail => {
+        serviceDetailsMap.set(serviceDetail.id, serviceDetail);
+      });
+    }
+
     // Map category UUID to integer ID for service_requests table
     // This is a temporary solution - ideally service_requests should use UUID
     // For now, we'll use a default category ID of 14 (Home Services)
@@ -630,16 +938,38 @@ export class ServiceRequestService {
 
     // Prepare service request rows for insertion
     const serviceRequestRows = createBookingDto.services.map(service => {
+      const serviceDetail = service.serviceDetailId
+        ? serviceDetailsMap.get(service.serviceDetailId)
+        : null;
+
+      if (!service.isCustom) {
+        if (!service.serviceDetailId || !serviceDetail) {
+          throw new HttpException(
+            'Invalid service detail selected',
+            HttpStatus.BAD_REQUEST
+          );
+        }
+
+        if (serviceDetail.listing_id !== createBookingDto.listingId) {
+          throw new HttpException(
+            'Selected service does not belong to this listing',
+            HttpStatus.BAD_REQUEST
+          );
+        }
+      }
+
       const baseRow = {
         booking_group_id: bookingGroupId,
         client_id: user.id,
         provider_id: createBookingDto.providerId,
         listing_id: createBookingDto.listingId,
         category_id: categoryIdInteger,
-        title: service.isCustom ? service.customServiceName : listing.title, // Use listing title for regular services
+        title: service.isCustom
+          ? service.customServiceName
+          : serviceDetail?.title || listing.title,
         description: service.isCustom
           ? service.customServiceDescription || ''
-          : `Service from ${listing.title}`,
+          : serviceDetail?.description || `Service from ${listing.title}`,
         rate: service.rate,
         contact: createBookingDto.contactInfo,
         job_location: createBookingDto.location,
@@ -672,8 +1002,23 @@ export class ServiceRequestService {
       return baseRow;
     });
 
+    const requestedServiceNames = createBookingDto.services
+      .map(service => {
+        if (service.isCustom) {
+          return service.customServiceName || null;
+        }
+
+        const serviceDetail = service.serviceDetailId
+          ? serviceDetailsMap.get(service.serviceDetailId)
+          : null;
+        return serviceDetail?.title || null;
+      })
+      .filter(
+        (name): name is string => typeof name === 'string' && name.length > 0
+      );
+
     // Insert all service requests
-    const { data, error } = await supabase
+    const { data, error } = await userSupabase
       .from('service_requests')
       .insert(serviceRequestRows)
       .select();
@@ -684,6 +1029,45 @@ export class ServiceRequestService {
         HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
+
+    const firstRequestId = data?.[0]?.id;
+
+    const participantIds = [user.id, createBookingDto.providerId];
+    const { data: participants } = await supabase
+      .from('users')
+      .select('id, full_name')
+      .in('id', participantIds);
+
+    const participantMap = new Map(
+      (participants || []).map(participant => [participant.id, participant])
+    );
+
+    const clientName = participantMap.get(user.id)?.full_name || 'Client';
+    const providerName =
+      participantMap.get(createBookingDto.providerId)?.full_name || 'Provider';
+
+    const eventRow = {
+      actor_id: user.id,
+      target_user_id: createBookingDto.providerId,
+      event_type: 'booking_requested',
+      title: 'Booking request sent',
+      description: `Requested service from ${listing.title}`,
+      visibility: 'shared',
+      service_request_id: firstRequestId || null,
+      listing_id: createBookingDto.listingId,
+      metadata: {
+        booking_group_id: bookingGroupId,
+        total_services: createBookingDto.services.length,
+        listing_title: listing.title,
+        service_names: requestedServiceNames,
+        client_name: clientName,
+        provider_name: providerName,
+        actor_role: 'client',
+        target_role: 'provider',
+      },
+    };
+
+    await supabase.from('activity_events').insert(eventRow);
 
     return {
       success: true,

@@ -10,7 +10,7 @@ import {
   DialogTitle,
 } from '@hanapp-ph/commons';
 import { MessageCircle, CreditCard, X, Check, Trash2 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useAuth } from '../../lib/hooks/useAuth';
 
@@ -31,6 +31,7 @@ interface BookingActionButtonProps {
   userRole?: 'provider' | 'client';
   isProviderFinished?: boolean;
   providerId?: string;
+  hasReviewed?: boolean;
 }
 
 export default function BookingActionButton({
@@ -47,6 +48,7 @@ export default function BookingActionButton({
   userRole,
   isProviderFinished = false,
   providerId,
+  hasReviewed = false,
 }: BookingActionButtonProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -54,7 +56,12 @@ export default function BookingActionButton({
   const [isDeleting, setIsDeleting] = useState(false);
   const [isReviewOpen, setIsReviewOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [hasRated, setHasRated] = useState(hasReviewed);
   const { session } = useAuth();
+
+  useEffect(() => {
+    setHasRated(hasReviewed);
+  }, [hasReviewed]);
 
   const handleSubmitReview = async (review: {
     rating: number;
@@ -74,16 +81,7 @@ export default function BookingActionButton({
     try {
       setIsSubmitting(true);
 
-      // Determine the service_request_id
-      let serviceRequestId: string | number;
-
-      if (typeof bookingId === 'string' && bookingId.startsWith('app-')) {
-        // For job applications, use the service request ID
-        serviceRequestId = serviceId;
-      } else {
-        // For direct bookings, use the booking ID
-        serviceRequestId = bookingId;
-      }
+      const serviceRequestId = serviceId;
 
       console.log('Submitting review with:', {
         service_request_id: serviceRequestId,
@@ -109,7 +107,36 @@ export default function BookingActionButton({
       );
 
       if (!response.ok) {
-        const errorData = await response.json();
+        let errorData: { message?: string } = {};
+        const responseText = await response.text();
+        if (responseText) {
+          try {
+            errorData = JSON.parse(responseText);
+          } catch {
+            errorData = { message: responseText };
+          }
+        }
+
+        const normalizedMessage = (
+          Array.isArray((errorData as { message?: unknown }).message)
+            ? (errorData as { message?: unknown[] }).message?.join(', ')
+            : errorData.message
+        )
+          ?.toString()
+          .toLowerCase();
+
+        const isAlreadyReviewed =
+          response.status === 409 ||
+          normalizedMessage?.includes('already submitted a review') ||
+          normalizedMessage?.includes('already gave a review') ||
+          normalizedMessage?.includes('already reviewed');
+
+        if (isAlreadyReviewed) {
+          setHasRated(true);
+          setIsReviewOpen(false);
+          return;
+        }
+
         console.error('Review submission error:', errorData);
         alert(
           `Failed to submit review: ${errorData.message || 'Unknown error'}`
@@ -122,6 +149,7 @@ export default function BookingActionButton({
 
       alert('Thank you for your review!');
       setIsReviewOpen(false);
+      setHasRated(true);
     } catch (error) {
       console.error('Error submitting review:', error);
       alert('Something went wrong. Please try again.');
@@ -311,14 +339,19 @@ export default function BookingActionButton({
   // Default behavior for past and cancelled tabs
   switch (status) {
     case 'Completed':
+      if (userRole !== 'client') {
+        return null;
+      }
+
       return (
         <div className="flex gap-2 mt-3">
           <Button
             size="sm"
             className="bg-hanapp-primary hover:bg-hanapp-secondary text-white"
             onClick={() => setIsReviewOpen(true)}
+            disabled={hasRated}
           >
-            Rate Service
+            {hasRated ? 'Rated' : 'Rate Service'}
           </Button>
           <ReviewModal
             isOpen={isReviewOpen}
@@ -337,6 +370,10 @@ export default function BookingActionButton({
       );
     case 'Cancelled':
     case 'Rejected':
+      if (userRole !== 'client') {
+        return null;
+      }
+
       return (
         <div className="flex gap-2 mt-3">
           <Button

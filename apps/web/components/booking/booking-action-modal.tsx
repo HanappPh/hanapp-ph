@@ -118,28 +118,48 @@ export default function BookingActionModal({
           }
         }
       } else if (action === 'delete') {
-        // Extract the actual application ID (remove 'app-' prefix)
-        const actualBookingId = String(bookingId).replace('app-', '');
+        const isJobApplication = String(bookingId).startsWith('app-');
 
-        // Update job application status to rejected
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/job-applications/${actualBookingId}/status`,
-          {
-            method: 'PATCH',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${session.access_token}`,
-            },
-            body: JSON.stringify({
-              status: 'rejected',
-              userId: user.id,
-            }),
+        if (isJobApplication) {
+          const actualBookingId = String(bookingId).replace('app-', '');
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/job-applications/${actualBookingId}/status`,
+            {
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${session.access_token}`,
+              },
+              body: JSON.stringify({
+                status: 'rejected',
+                userId: user.id,
+              }),
+            }
+          );
+
+          if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Failed to delete booking');
           }
-        );
+        } else {
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/service-requests/${bookingId}/reject`,
+            {
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${session.access_token}`,
+              },
+              body: JSON.stringify({
+                userId: user.id,
+              }),
+            }
+          );
 
-        if (!response.ok) {
-          const error = await response.json();
-          throw new Error(error.message || 'Failed to delete booking');
+          if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Failed to delete booking');
+          }
         }
       } else if (action === 'finish') {
         // Provider marks booking as finished

@@ -62,6 +62,72 @@ const CATEGORY_MAP: Record<number, string> = {
   17: 'Professional Services',
 };
 
+const DAY_ORDER = [
+  'monday',
+  'tuesday',
+  'wednesday',
+  'thursday',
+  'friday',
+  'saturday',
+  'sunday',
+] as const;
+
+const DAY_LABEL: Record<(typeof DAY_ORDER)[number], string> = {
+  monday: 'Monday',
+  tuesday: 'Tuesday',
+  wednesday: 'Wednesday',
+  thursday: 'Thursday',
+  friday: 'Friday',
+  saturday: 'Saturday',
+  sunday: 'Sunday',
+};
+
+const formatTime = (time: string) => {
+  const [hoursRaw, minutesRaw] = time.split(':');
+  const hours = Number(hoursRaw);
+  const minutes = Number(minutesRaw);
+
+  if (Number.isNaN(hours) || Number.isNaN(minutes)) {
+    return time;
+  }
+
+  const suffix = hours >= 12 ? 'PM' : 'AM';
+  const twelveHour = hours % 12 || 12;
+  return `${twelveHour}:${String(minutes).padStart(2, '0')} ${suffix}`;
+};
+
+const formatAvailabilityDays = (
+  availability: Exclude<
+    NonNullable<ServiceListingResponse['availability_schedule']>,
+    string
+  >
+) => {
+  const availableSlots = DAY_ORDER.flatMap(day => {
+    const slot = availability[day] as
+      | { available?: boolean; start?: string; end?: string }
+      | undefined;
+
+    if (!slot?.available || !slot.start || !slot.end) {
+      return [];
+    }
+
+    return [
+      {
+        day,
+        hours: `${formatTime(slot.start)} - ${formatTime(slot.end)}`,
+      },
+    ];
+  });
+
+  if (availableSlots.length === 0) {
+    return null;
+  }
+
+  return availableSlots
+    .map(slot => `${DAY_LABEL[slot.day]} (${slot.hours})`)
+    .join(', ');
+};
+
 const formatAvailability = (
   availability: ServiceListingResponse['availability_schedule']
 ) => {
@@ -70,6 +136,19 @@ const formatAvailability = (
   }
 
   if (typeof availability === 'string') {
+    try {
+      const parsedAvailability = JSON.parse(availability) as Exclude<
+        NonNullable<ServiceListingResponse['availability_schedule']>,
+        string
+      >;
+      const formattedParsedDays = formatAvailabilityDays(parsedAvailability);
+      if (formattedParsedDays) {
+        return formattedParsedDays;
+      }
+    } catch {
+      return availability;
+    }
+
     return availability;
   }
 
@@ -83,6 +162,11 @@ const formatAvailability = (
 
   if (availability.days?.length && availability.hours) {
     return `${availability.days.join(', ')} • ${availability.hours}`;
+  }
+
+  const formattedDays = formatAvailabilityDays(availability);
+  if (formattedDays) {
+    return formattedDays;
   }
 
   return 'Not specified';
@@ -146,17 +230,26 @@ export function ProfileWorkContent({
     acceptedAreas: listing.service_areas || [],
     availability: formatAvailability(listing.availability_schedule),
     image: listing.images?.[0] || '/cleaning-service-provider.jpg',
-    details: [
-      {
-        id: `${listing.id}-base`,
-        title: listing.title,
-        description: listing.description || 'No service detail description',
-        rate:
-          typeof listing.price_from === 'number'
-            ? `₱${listing.price_from.toLocaleString()}`
-            : 'Rate not specified',
-      },
-    ],
+    details:
+      listing.services && listing.services.length > 0
+        ? listing.services.map(service => ({
+            id: service.id,
+            title: service.title,
+            description: service.description || 'No service detail description',
+            rate:
+              typeof service.rate === 'number'
+                ? `₱${service.rate.toLocaleString()}${service.charge ? ` / ${service.charge}` : ''}`
+                : 'Rate not specified',
+          }))
+        : (listing.service_names || []).map((serviceName, index) => ({
+            id: `${listing.id}-service-${index}`,
+            title: serviceName,
+            description: 'No service detail description',
+            rate:
+              typeof listing.price_from === 'number'
+                ? `₱${listing.price_from.toLocaleString()}`
+                : 'Rate not specified',
+          })),
   }));
 
   return (
@@ -167,41 +260,42 @@ export function ProfileWorkContent({
             My Services
           </h2>
           {providerListings.length === 0 ? (
-            <p className="text-sm text-gray-600">No service listings yet.</p>
+            <p className="text-base text-gray-600">No service listings yet.</p>
           ) : (
             <div className="space-y-4">
               {providerListings.map(listing => (
                 <div
                   key={listing.id}
-                  className="rounded-lg border border-gray-200 p-4"
+                  className="rounded-lg border border-gray-200 p-5"
                 >
                   <div className="flex items-start justify-between gap-4 mb-3">
-                    <div className="flex items-start gap-3">
+                    <div className="flex items-start gap-4">
                       <Image
                         src={listing.image}
                         alt={listing.title}
-                        width={80}
-                        height={80}
-                        className="w-20 h-20 rounded-lg object-cover"
+                        width={96}
+                        height={96}
+                        className="w-24 h-24 rounded-lg object-cover"
                       />
                       <div>
-                        <p className="text-xs text-gray-500">{listing.id}</p>
-                        <h3 className="font-semibold text-gray-900">
+                        <h3 className="text-xl font-semibold text-gray-900">
                           {listing.title}
                         </h3>
-                        <span className="mt-1 inline-flex items-center rounded-md bg-[#EFF6FF] px-3 py-1 text-xs font-medium text-[#1E40AF] cursor-default select-none">
+                        <span className="mt-2 inline-flex items-center rounded-md bg-[#EFF6FF] px-3 py-1.5 text-sm font-medium text-[#1E40AF] cursor-default select-none">
                           {listing.category}
                         </span>
-                        <p className="text-sm text-gray-600 mt-2">
+                        <p className="text-base text-gray-600 mt-2">
                           {listing.description}
                         </p>
-                        <p className="text-xs text-gray-600 mt-2">
+                        <p className="text-sm text-gray-600 mt-2">
                           <span className="font-semibold text-gray-700">
                             Accepted areas:
                           </span>{' '}
-                          {listing.acceptedAreas.join(', ')}
+                          {listing.acceptedAreas.length > 0
+                            ? listing.acceptedAreas.join(', ')
+                            : 'Not specified'}
                         </p>
-                        <p className="text-xs text-gray-600 mt-1">
+                        <p className="text-sm text-gray-600 mt-1">
                           <span className="font-semibold text-gray-700">
                             Availability:
                           </span>{' '}
@@ -212,29 +306,29 @@ export function ProfileWorkContent({
                     <div className="flex items-center gap-2">
                       <Button
                         variant="outline"
-                        className="text-xs px-3 py-1 h-auto border-[#102E50] text-[#102E50]"
+                        className="text-sm px-4 py-1.5 h-auto border-[#102E50] text-[#102E50]"
                       >
                         Edit
                       </Button>
                     </div>
                   </div>
 
-                  <div className="rounded-md border border-gray-100 bg-gray-50 p-3">
-                    <div className="space-y-2">
+                  <div className="rounded-md border border-gray-100 bg-gray-50 p-4">
+                    <div className="space-y-3">
                       {listing.details.map(detail => (
                         <div
                           key={detail.id}
-                          className="flex items-center justify-between rounded-md bg-white px-3 py-2"
+                          className="flex items-center justify-between rounded-md bg-white px-4 py-3"
                         >
                           <div>
-                            <span className="text-sm text-gray-900">
+                            <span className="text-base text-gray-900">
                               {detail.title}
                             </span>
-                            <p className="text-xs text-gray-600">
+                            <p className="text-sm text-gray-600">
                               {detail.description}
                             </p>
                           </div>
-                          <span className="inline-flex items-center rounded-md bg-[#F5C45E] px-3 py-1 text-xs font-medium text-[#102E50] cursor-default select-none">
+                          <span className="inline-flex items-center rounded-md bg-[#F5C45E] px-3 py-1.5 text-sm font-medium text-[#102E50] cursor-default select-none">
                             {detail.rate}
                           </span>
                         </div>

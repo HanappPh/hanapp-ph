@@ -73,7 +73,9 @@ export class ReviewsService {
       const { data: serviceRequest, error: requestError } =
         await this.supabaseService
           .from('service_requests')
-          .select('provider_id, category_id, client_id, status')
+          .select(
+            'provider_id, category_id, client_id, status, listing_id, service_detail_id'
+          )
           .eq('id', dto.service_request_id)
           .maybeSingle();
 
@@ -100,6 +102,13 @@ export class ReviewsService {
           );
         }
 
+        if (serviceRequest.status?.toLowerCase() !== 'completed') {
+          throw new HttpException(
+            'You can only review completed bookings',
+            HttpStatus.BAD_REQUEST
+          );
+        }
+
         // Use provider_id from DTO if provided, otherwise from service request
         providerId = dto.provider_id || serviceRequest.provider_id;
 
@@ -111,18 +120,43 @@ export class ReviewsService {
         }
 
         serviceRequestId = dto.service_request_id;
+        serviceListingId =
+          dto.service_listing_id || serviceRequest.listing_id || null;
 
-        // Try to find a matching service listing from the provider for this category
-        const { data: listing } = await this.supabaseService
-          .from('service_listings')
-          .select('id')
-          .eq('provider_id', providerId)
-          .eq('category_id', serviceRequest.category_id)
-          .maybeSingle();
+        const { data: existingReview, error: existingReviewError } =
+          await this.supabaseService
+            .from('reviews')
+            .select('id')
+            .eq('client_id', userId)
+            .eq('service_request_id', serviceRequestId)
+            .maybeSingle();
 
-        // If we find a matching listing, attach the review to it
-        if (listing) {
-          serviceListingId = listing.id;
+        if (existingReviewError) {
+          throw new HttpException(
+            `Failed to validate existing review: ${existingReviewError.message}`,
+            HttpStatus.BAD_REQUEST
+          );
+        }
+
+        if (existingReview) {
+          throw new HttpException(
+            'You already submitted a review for this booking',
+            HttpStatus.CONFLICT
+          );
+        }
+
+        // Fallback: find a matching service listing from provider/category only if request has no listing_id
+        if (!serviceListingId) {
+          const { data: listing } = await this.supabaseService
+            .from('service_listings')
+            .select('id')
+            .eq('provider_id', providerId)
+            .eq('category_id', serviceRequest.category_id)
+            .maybeSingle();
+
+          if (listing) {
+            serviceListingId = listing.id;
+          }
         }
       }
     }
@@ -195,6 +229,28 @@ export class ReviewsService {
       success: true,
       message: 'Review created successfully',
       review: data,
+    };
+  }
+
+  async getMyReviewedServiceRequestIds(userId: string) {
+    const { data, error } = await this.supabaseService
+      .from('reviews')
+      .select('service_request_id')
+      .eq('client_id', userId)
+      .not('service_request_id', 'is', null);
+
+    if (error) {
+      throw new HttpException(
+        `Failed to fetch reviewed service requests: ${error.message}`,
+        HttpStatus.BAD_REQUEST
+      );
+    }
+
+    return {
+      success: true,
+      serviceRequestIds: (data || [])
+        .map(item => item.service_request_id)
+        .filter((id): id is string => typeof id === 'string'),
     };
   }
 

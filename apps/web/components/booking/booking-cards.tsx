@@ -42,6 +42,7 @@ interface BookingCardProps {
   isProviderFinished?: boolean;
   onClick?: () => void;
   providerId?: string;
+  hasReviewed?: boolean;
 }
 
 export default function BookingCard(booking: BookingCardProps) {
@@ -131,6 +132,7 @@ export default function BookingCard(booking: BookingCardProps) {
                 userRole={booking.userRole}
                 isProviderFinished={booking.isProviderFinished}
                 providerId={booking.providerId}
+                hasReviewed={booking.hasReviewed}
               ></BookingActionButton>
             </div>
           </div>

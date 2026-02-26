@@ -4,6 +4,12 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 
+import {
+  fetchActivityEvents,
+  type ActivityEventResponse,
+} from '../../lib/api/activityEvents';
+import { getCategoryName } from '../../lib/constants/categories';
+
 // Example providers array (replace with real data as needed)
 // Commented out for now - used when Recent Providers section is active
 // const providers = [
@@ -38,6 +44,7 @@ export function MainContent({
   profile,
   hideEditButtons = false,
   providerListings,
+  servicePreferenceListings,
 }: {
   initialSelected?: 'Provider' | 'Client';
   profile: {
@@ -53,132 +60,161 @@ export function MainContent({
     description?: string;
     images?: string[];
   }[];
+  servicePreferenceListings?: {
+    id: string;
+    category_id?: string | number;
+  }[];
 }) {
   const router = useRouter();
   const [showAllListings, setShowAllListings] = React.useState(false);
   const [currentActivityPage, setCurrentActivityPage] = React.useState(1);
+  const [recentActivities, setRecentActivities] = React.useState<
+    Array<{
+      id: string;
+      title: string;
+      detail: string;
+      listingTitle?: string;
+      servicesText?: string;
+      time: string;
+      status: string;
+      statusColor: 'green' | 'red' | 'orange' | 'gray';
+      amount: string | null;
+    }>
+  >([]);
   const displayName = profile?.full_name || 'User';
   const displayEmail = profile?.email || 'Not provided';
   const displayPhone = profile?.phone_number || 'Not provided';
 
-  // React.useEffect(() => {
-  //   if (initialSelected === 'Client' || !profile?.id) {
-  //     return;
-  //   }
-  //
-  //   const loadMetrics = async () => {
-  //     const data = await fetchProviderMetrics(profile.id as string);
-  //     if (!data) {
-  //       return;
-  //     }
-  //
-  //     setMetrics({
-  //       profileViews: data.profileViews || 0,
-  //       responseRate: data.responseRate || 0,
-  //     });
-  //   };
-  //
-  //   loadMetrics();
-  // }, [initialSelected, profile?.id]);
+  const compiledServicePreferences = React.useMemo(() => {
+    if (!servicePreferenceListings || servicePreferenceListings.length === 0) {
+      return [] as string[];
+    }
 
-  // Hardcoded recent activity data
-  const recentActivities = [
-    {
-      id: '1',
-      title: 'Service request submitted',
-      client: 'House Cleaning',
-      time: '10 mins ago',
-      status: 'Pending',
-      statusColor: 'orange',
-      amount: null,
-    },
-    {
-      id: '2',
-      title: 'Provider application confirmed',
-      client: 'Math Tutoring',
-      time: '3 hours ago',
-      status: 'In Progress',
-      statusColor: 'blue',
-      amount: null,
-    },
-    {
-      id: '3',
-      title: 'Provider application deleted',
-      client: 'Plumbing Service',
-      time: '1 day ago',
-      status: 'Cancelled',
-      statusColor: 'red',
-      amount: null,
-    },
-    {
-      id: '4',
-      title: 'Payment released',
-      client: 'AC Repair',
-      time: '2 days ago',
-      status: 'Completed',
-      statusColor: 'green',
-      amount: '₱1,200.00 released',
-    },
-    {
-      id: '5',
-      title: 'Service request cancelled',
-      client: 'Grocery Errand',
-      time: '3 days ago',
-      status: 'Cancelled',
-      statusColor: 'red',
-      amount: null,
-    },
-    {
-      id: '6',
-      title: 'Service request submitted',
-      client: 'Pet Care',
-      time: '4 days ago',
-      status: 'Pending',
-      statusColor: 'orange',
-      amount: null,
-    },
-    {
-      id: '7',
-      title: 'Provider application confirmed',
-      client: 'Home Painting',
-      time: '5 days ago',
-      status: 'In Progress',
-      statusColor: 'blue',
-      amount: null,
-    },
-    {
-      id: '8',
-      title: 'Payment released',
-      client: 'Electrical Repair',
-      time: '6 days ago',
-      status: 'Completed',
-      statusColor: 'green',
-      amount: '₱2,500.00 released',
-    },
-    {
-      id: '9',
-      title: 'Provider application deleted',
-      client: 'Laundry Service',
-      time: '1 week ago',
-      status: 'Cancelled',
-      statusColor: 'red',
-      amount: null,
-    },
-    {
-      id: '10',
-      title: 'Service request submitted',
-      client: 'Appliance Repair',
-      time: '1 week ago',
-      status: 'Pending',
-      statusColor: 'orange',
-      amount: null,
-    },
-  ];
+    return Array.from(
+      new Set(
+        servicePreferenceListings
+          .map(listing => Number(listing.category_id))
+          .filter(categoryId => Number.isFinite(categoryId))
+          .map(categoryId => getCategoryName(categoryId))
+      )
+    );
+  }, [servicePreferenceListings]);
+
+  const getRelativeTime = (isoDate: string) => {
+    const date = new Date(isoDate);
+    const now = Date.now();
+    const diffMinutes = Math.floor((now - date.getTime()) / (1000 * 60));
+
+    if (diffMinutes < 1) {
+      return 'just now';
+    }
+    if (diffMinutes < 60) {
+      return `${diffMinutes} min${diffMinutes === 1 ? '' : 's'} ago`;
+    }
+
+    const diffHours = Math.floor(diffMinutes / 60);
+    if (diffHours < 24) {
+      return `${diffHours} hour${diffHours === 1 ? '' : 's'} ago`;
+    }
+
+    const diffDays = Math.floor(diffHours / 24);
+    if (diffDays < 7) {
+      return `${diffDays} day${diffDays === 1 ? '' : 's'} ago`;
+    }
+
+    return date.toLocaleDateString();
+  };
+
+  const getStatusColor = (
+    eventType: string
+  ): 'green' | 'red' | 'orange' | 'gray' => {
+    if (
+      eventType.includes('completed') ||
+      eventType.includes('approved') ||
+      eventType.includes('accepted') ||
+      eventType.includes('confirmed') ||
+      eventType.includes('finished') ||
+      eventType.includes('released') ||
+      eventType.includes('received')
+    ) {
+      return 'green';
+    }
+
+    if (
+      eventType.includes('cancel') ||
+      eventType.includes('reject') ||
+      eventType.includes('deleted')
+    ) {
+      return 'red';
+    }
+
+    if (eventType.includes('pending') || eventType.includes('requested')) {
+      return 'orange';
+    }
+
+    return 'gray';
+  };
+
+  const formatStatusLabel = (eventType: string) =>
+    eventType
+      .split('_')
+      .filter(Boolean)
+      .map(word => word[0].toUpperCase() + word.slice(1))
+      .join(' ');
+
+  React.useEffect(() => {
+    const loadActivityEvents = async () => {
+      if (!profile?.id || providerListings) {
+        return;
+      }
+
+      const activeRole =
+        initialSelected === 'Provider'
+          ? 'provider'
+          : initialSelected === 'Client'
+            ? 'client'
+            : undefined;
+
+      const events = await fetchActivityEvents(profile.id, 50, activeRole);
+      const mapped = events.map((event: ActivityEventResponse) => ({
+        id: event.id,
+        title: event.display_title || event.title || 'Activity event',
+        detail:
+          event.display_description || event.description || event.event_type,
+        listingTitle:
+          typeof event.metadata?.listing_title === 'string'
+            ? event.metadata.listing_title
+            : undefined,
+        servicesText: Array.isArray(event.metadata?.service_names)
+          ? event.metadata.service_names
+              .filter(
+                (service): service is string => typeof service === 'string'
+              )
+              .join(', ')
+          : undefined,
+        time: getRelativeTime(event.created_at),
+        status: formatStatusLabel(event.event_type),
+        statusColor: getStatusColor(event.event_type),
+        amount: null,
+      }));
+
+      setRecentActivities(mapped);
+      setCurrentActivityPage(1);
+    };
+
+    loadActivityEvents();
+  }, [profile?.id, providerListings, initialSelected]);
 
   const activitiesPerPage = 5;
   const totalActivityPages = Math.ceil(
     recentActivities.length / activitiesPerPage
   );
+  const isProviderView = initialSelected === 'Provider';
+  const activePaginationClass = isProviderView
+    ? 'bg-hanapp-accent text-hanapp-secondary'
+    : 'bg-hanapp-primary text-white';
+  const inactivePaginationClass =
+    'bg-white text-gray-700 border border-gray-300 hover:bg-gray-100';
   const startActivityIndex = (currentActivityPage - 1) * activitiesPerPage;
   const endActivityIndex = startActivityIndex + activitiesPerPage;
   const currentActivities = recentActivities.slice(
@@ -259,60 +295,25 @@ export function MainContent({
                 Service Preferences
               </label>
               <div className="flex flex-wrap gap-2">
-                <Badge
-                  variant="outline"
-                  className="bg-blue-50 text-blue-700 border-blue-200 p-2"
-                >
-                  Errand
-                </Badge>
-                <Badge
-                  variant="outline"
-                  className="bg-blue-50 text-blue-700 border-blue-200 p-2"
-                >
-                  Laundry
-                </Badge>
-                <Badge
-                  variant="outline"
-                  className="bg-blue-50 text-blue-700 border-blue-200 p-2"
-                >
-                  Babysitting
-                </Badge>
-                <Badge
-                  variant="outline"
-                  className="bg-blue-50 text-blue-700 border-blue-200 p-2"
-                >
-                  Transport
-                </Badge>
+                {compiledServicePreferences.length > 0 ? (
+                  compiledServicePreferences.map(preference => (
+                    <Badge
+                      key={preference}
+                      variant="outline"
+                      className="bg-blue-50 text-blue-700 border-blue-200 p-2"
+                    >
+                      {preference}
+                    </Badge>
+                  ))
+                ) : (
+                  <p className="text-sm text-gray-500">
+                    No service preferences yet.
+                  </p>
+                )}
               </div>
             </div>
           )}
         </Card>
-
-        {/* {initialSelected !== 'Client' && (
-            <div className="grid grid-cols-2 gap-6">
-              <Card className="p-4 bg-white border-none drop-shadow-md text-center">
-                <h4 className="text-sm font-semibold text-gray-900 leading-tight mb-2">
-                  Response Rate
-                </h4>
-                <p className="text-3xl font-bold text-gray-900 mb-1">
-                  {metrics.responseRate}%
-                </p>
-                <p className="text-xs text-gray-900">
-                  based on chat back-and-forth
-                </p>
-              </Card>
-
-              <Card className="p-4 bg-white border-none drop-shadow-md text-center">
-                <h4 className="text-sm font-semibold text-gray-900 leading-tight mb-2">
-                  Profile views
-                </h4>
-                <p className="text-3xl font-bold text-gray-900 mb-1">
-                  {metrics.profileViews}
-                </p>
-                <p className="text-xs text-gray-900">people viewed your profile</p>
-              </Card>
-            </div>
-          )} */}
 
         {/* Recent Activity or Provider Listings */}
         {providerListings ? (
@@ -381,10 +382,12 @@ export function MainContent({
                   key={activity.id}
                   className={`flex items-center justify-between p-4 rounded-lg border-l-4 ${
                     activity.statusColor === 'green'
-                      ? 'bg-[#ECFDF5] border-[#10B981]'
+                      ? 'bg-[#F0FDF4] border-[#22C55E]'
                       : activity.statusColor === 'red'
                         ? 'bg-[#FEF2F2] border-[#EF4444]'
-                        : 'bg-gray-50 border-gray-300'
+                        : activity.statusColor === 'orange'
+                          ? 'bg-[#FFF7ED] border-[#F59E0B]'
+                          : 'bg-gray-50 border-gray-300'
                   }`}
                 >
                   <div className="flex items-center space-x-4">
@@ -393,38 +396,59 @@ export function MainContent({
                         {activity.title}
                       </h4>
                       <p className="text-sm text-gray-600">
-                        {activity.client} • {activity.time}
+                        {activity.detail} • {activity.time}
                       </p>
+                      {(activity.listingTitle || activity.servicesText) && (
+                        <p className="text-xs text-gray-500 mt-1">
+                          {activity.listingTitle
+                            ? `Listing: ${activity.listingTitle}`
+                            : ''}
+                          {activity.listingTitle && activity.servicesText
+                            ? ' • '
+                            : ''}
+                          {activity.servicesText
+                            ? `Services: ${activity.servicesText}`
+                            : ''}
+                        </p>
+                      )}
                     </div>
                   </div>
                   <span
                     className={`inline-flex items-center rounded-md border px-3 py-1 text-xs font-medium bg-transparent cursor-default select-none ${
                       activity.statusColor === 'green'
-                        ? 'border-[#10B981] text-[#10B981]'
+                        ? 'border-[#22C55E] text-[#16A34A]'
                         : activity.statusColor === 'red'
                           ? 'border-[#EF4444] text-[#EF4444]'
-                          : 'border-gray-500 text-gray-700'
+                          : activity.statusColor === 'orange'
+                            ? 'border-[#F59E0B] text-[#B45309]'
+                            : 'border-gray-500 text-gray-700'
                     }`}
                   >
                     {activity.amount || activity.status}
                   </span>
                 </div>
               ))}
+              {currentActivities.length === 0 && (
+                <p className="text-sm text-gray-600">No recent activity yet.</p>
+              )}
             </div>
 
             {/* Pagination Controls */}
             {totalActivityPages > 1 && (
               <div className="mt-6 pt-4 border-t border-gray-200 flex items-center justify-between">
-                <Button
-                  variant="outline"
+                <button
                   onClick={() =>
                     setCurrentActivityPage(prev => Math.max(1, prev - 1))
                   }
                   disabled={currentActivityPage === 1}
-                  className="text-xs px-3 py-1 h-auto"
+                  className={`w-8 h-8 rounded text-sm font-medium transition-colors ${
+                    currentActivityPage === 1
+                      ? 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed'
+                      : inactivePaginationClass
+                  }`}
                 >
-                  Previous
-                </Button>
+                  {'<'}
+                </button>
 
                 <div className="flex items-center gap-2">
                   {(() => {
@@ -452,8 +476,8 @@ export function MainContent({
                         onClick={() => setCurrentActivityPage(page)}
                         className={`w-8 h-8 rounded text-sm font-medium transition-colors ${
                           currentActivityPage === page
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                            ? activePaginationClass
+                            : inactivePaginationClass
                         }`}
                       >
                         {page}
@@ -462,18 +486,21 @@ export function MainContent({
                   })()}
                 </div>
 
-                <Button
-                  variant="outline"
+                <button
                   onClick={() =>
                     setCurrentActivityPage(prev =>
                       Math.min(totalActivityPages, prev + 1)
                     )
                   }
                   disabled={currentActivityPage === totalActivityPages}
-                  className="text-xs px-3 py-1 h-auto"
+                  className={`w-8 h-8 rounded text-sm font-medium transition-colors ${
+                    currentActivityPage === totalActivityPages
+                      ? 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed'
+                      : inactivePaginationClass
+                  }`}
                 >
-                  Next
-                </Button>
+                  {'>'}
+                </button>
               </div>
             )}
           </Card>

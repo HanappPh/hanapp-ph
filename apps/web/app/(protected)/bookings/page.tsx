@@ -49,6 +49,7 @@ interface BookingDetails {
   serviceRequestId?: number | string;
   isProviderFinished?: boolean;
   bookingGroupId?: string;
+  hasReviewed?: boolean;
   allServices?: Array<{
     id: string;
     title: string;
@@ -65,185 +66,6 @@ interface BookingDetails {
     };
   }>;
 }
-
-// Hardcoded data as fallback
-const hardcodedBookings = {
-  requested: [
-    {
-      id: 8,
-      serviceId: 1,
-      serviceName: 'Garden Maintenance',
-      providerName: 'Green Thumb Services',
-      providerImage: '/landscaper-cutting-grass.jpg',
-      rating: 4.5,
-      reviewCount: 67,
-      price: 500,
-      date: '2024-01-18',
-      time: '8:00 AM',
-      location: 'Paranaque City',
-      status: 'Pending' as const,
-      serviceImage: '/landscaper-cutting-grass.jpg',
-    },
-    {
-      id: 9,
-      serviceId: 2,
-      serviceName: 'Computer Repair',
-      providerName: 'Tech Solutions',
-      providerImage: '/phone-and-tablet-repair.png',
-      rating: 4.7,
-      reviewCount: 134,
-      price: 750,
-      date: '2024-01-20',
-      time: '3:00 PM',
-      location: 'Makati City',
-      status: 'Pending' as const,
-      serviceImage: '/phone-and-tablet-repair.png',
-    },
-  ],
-  received: [
-    {
-      id: 10,
-      serviceId: 3,
-      serviceName: 'Photography Session',
-      providerName: 'Capture Moments',
-      providerImage: '/woman-using-phone.jpg',
-      rating: 4.9,
-      reviewCount: 178,
-      price: 1200,
-      date: '2024-01-22',
-      time: '10:00 AM',
-      location: 'BGC, Taguig',
-      status: 'Pending' as const,
-      serviceImage: '/woman-using-phone.jpg',
-    },
-    {
-      id: 11,
-      serviceId: 4,
-      serviceName: 'Massage Therapy',
-      providerName: 'Relax & Heal Spa',
-      providerImage: '/nanny-with-child.jpg',
-      rating: 4.8,
-      reviewCount: 92,
-      price: 800,
-      date: '2024-01-25',
-      time: '2:00 PM',
-      location: 'Ortigas, Pasig',
-      status: 'Pending' as const,
-      serviceImage: '/woman-smiling.jpg',
-    },
-  ],
-  ongoing: [
-    {
-      id: 1,
-      serviceId: 5,
-      serviceName: 'House Cleaning',
-      providerName: 'Joven Salon',
-      providerImage: '/cleaning-service-provider.jpg',
-      rating: 4.9,
-      reviewCount: 127,
-      price: 450,
-      date: '2024-01-15',
-      time: '10:00 AM',
-      location: 'Makati, Manila',
-      status: 'Accepted' as const,
-      serviceImage: '/house-cleaning-service.png',
-    },
-    {
-      id: 2,
-      serviceId: 6,
-      serviceName: 'Tutoring Session',
-      providerName: 'Maria Santos',
-      providerImage: '/tutor-teacher.jpg',
-      rating: 4.8,
-      reviewCount: 89,
-      price: 350,
-      date: '2024-01-16',
-      time: '2:00 PM',
-      location: 'Quezon City',
-      status: 'Pending' as const,
-      serviceImage: '/tutoring-education.jpg',
-    },
-    {
-      id: 3,
-      serviceId: 6,
-      serviceName: 'Tutoring Session',
-      providerName: 'Maria Santos',
-      providerImage: '/tutor-teacher.jpg',
-      rating: 4.8,
-      reviewCount: 89,
-      price: 350,
-      date: '2024-01-16',
-      time: '2:00 PM',
-      location: 'Quezon City',
-      status: 'Paid' as const,
-      serviceImage: '/tutoring-education.jpg',
-    },
-  ],
-  past: [
-    {
-      id: 4,
-      serviceId: 7,
-      serviceName: 'Laundry Service',
-      providerName: 'Clean Express',
-      providerImage: '/laundry-service.png',
-      rating: 4.7,
-      reviewCount: 203,
-      price: 280,
-      date: '2024-01-10',
-      time: '9:00 AM',
-      location: 'Pasig City',
-      status: 'Completed' as const,
-      serviceImage: '/laundry-washing.jpg',
-    },
-    {
-      id: 5,
-      serviceId: 8,
-      serviceName: 'Home Repair',
-      providerName: 'Fix It Pro',
-      providerImage: '/handyman-repair.jpg',
-      rating: 4.9,
-      reviewCount: 156,
-      price: 650,
-      date: '2024-01-08',
-      time: '1:00 PM',
-      location: 'Taguig City',
-      status: 'Completed' as const,
-      serviceImage: '/home-repair-tools.jpg',
-    },
-  ],
-  cancelled: [
-    {
-      id: 6,
-      serviceId: 9,
-      serviceName: 'Pet Grooming',
-      providerName: 'Paws & Claws',
-      providerImage: '/pet-grooming.png',
-      rating: 4.6,
-      reviewCount: 94,
-      price: 400,
-      date: '2024-01-12',
-      time: '11:00 AM',
-      location: 'Mandaluyong',
-      status: 'Cancelled' as const,
-      serviceImage: '/pet-grooming-dog.jpg',
-    },
-    {
-      id: 7,
-      serviceId: 9,
-      serviceName: 'Pet Grooming',
-      providerName: 'Paws & Claws',
-      providerImage: '/pet-grooming.png',
-      rating: 4.6,
-      reviewCount: 94,
-      price: 400,
-      date: '2024-01-12',
-      time: '11:00 AM',
-      location: 'Mandaluyong',
-      status: 'Rejected' as const,
-      serviceImage: '/pet-grooming-dog.jpg',
-    },
-  ],
-};
 
 export default function BookingsPage() {
   const [activeTab, setActiveTab] = useState('requested'); // Default to requested tab
@@ -431,48 +253,10 @@ export default function BookingsPage() {
   // Function to handle confirming a booking (moves from received to ongoing)
   const handleConfirm = async (bookingId: number | string) => {
     try {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      if (!session?.access_token || !user?.id) {
-        return;
-      }
-
-      // Find the booking to get the service request ID
+      // Find the booking to get group matching details
       const booking = bookingsData.received.find(b => b.id === bookingId);
       if (!booking) {
         return;
-      }
-
-      // Check if it's a service request (not a job application)
-      const isServiceRequest = !String(bookingId).startsWith('app-');
-
-      if (isServiceRequest) {
-        // Call the backend API to confirm the booking
-        // Use bookingGroupId for grouped bookings, otherwise use serviceRequestId
-        const confirmId =
-          booking.bookingGroupId || booking.serviceRequestId || bookingId;
-
-        const apiUrl =
-          process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-        const response = await fetch(
-          `${apiUrl}/api/service-requests/${confirmId}/confirm`,
-          {
-            method: 'PATCH',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${session.access_token}`,
-            },
-            body: JSON.stringify({ userId: user.id }),
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error('Failed to confirm booking');
-        }
-
-        await response.json();
       }
 
       // Update local state
@@ -527,12 +311,8 @@ export default function BookingsPage() {
         return prev;
       }
 
-      // Update status to Rejected (for applications) or Cancelled
-      const newStatus: BookingDetails['status'] = String(bookingId).startsWith(
-        'app-'
-      )
-        ? 'Rejected'
-        : 'Cancelled';
+      // Provider-side delete from received means reject/decline
+      const newStatus: BookingDetails['status'] = 'Rejected';
 
       const cancelledBooking = {
         ...bookingToDelete,
@@ -636,7 +416,7 @@ export default function BookingsPage() {
     setRefreshTrigger(prev => prev + 1);
   };
 
-  // Fetch service requests from the API and merge with hardcoded data
+  // Fetch service requests from the API
   useEffect(() => {
     const fetchBookings = async () => {
       if (!user?.id) {
@@ -672,6 +452,26 @@ export default function BookingsPage() {
         }
 
         const serviceRequests = await response.json();
+
+        let reviewedServiceRequestIds = new Set<string>();
+        const reviewedResponse = await fetch(
+          `${apiUrl}/api/reviews/me/service-requests`,
+          {
+            headers: {
+              Authorization: `Bearer ${session.access_token}`,
+            },
+            cache: 'no-store',
+          }
+        );
+
+        if (reviewedResponse.ok) {
+          const reviewedPayload = await reviewedResponse.json();
+          reviewedServiceRequestIds = new Set<string>(
+            (reviewedPayload.serviceRequestIds || []).filter(
+              (id: unknown): id is string => typeof id === 'string'
+            )
+          );
+        }
 
         // Fetch service requests where user is the provider
         const providerUrl = `${apiUrl}/api/service-requests?providerId=${user.id}`;
@@ -753,6 +553,9 @@ export default function BookingsPage() {
             providerId: mainRequest.provider_id,
             isProviderFinished: allServicesFinished,
             bookingGroupId: groupId,
+            hasReviewed: requests.some((req: ServiceRequestType) =>
+              reviewedServiceRequestIds.has(String(req.id))
+            ),
             allServices: requests, // Store all services for the modal
           };
         });
@@ -824,6 +627,7 @@ export default function BookingsPage() {
             providerId: mainRequest.provider_id,
             isProviderFinished: allServicesFinished,
             bookingGroupId: groupId,
+            hasReviewed: false,
             allServices: requests, // Store all services for the modal
           };
         });
@@ -881,6 +685,7 @@ export default function BookingsPage() {
                 providerId: application.provider_id,
                 isProviderFinished:
                   serviceRequest?.is_provider_finished || false,
+                hasReviewed: false,
               };
             }
           );
@@ -932,6 +737,10 @@ export default function BookingsPage() {
                 providerId: application.provider_id,
                 isProviderFinished:
                   serviceRequest?.is_provider_finished || false,
+                hasReviewed: !!(
+                  serviceRequest?.id &&
+                  reviewedServiceRequestIds.has(String(serviceRequest.id))
+                ),
               };
             }
           );
@@ -1023,28 +832,24 @@ export default function BookingsPage() {
           received: [
             ...categorizedReceivedApplications.pending,
             ...categorizedProviderServiceRequests.pending,
-            ...hardcodedBookings.received,
           ],
           ongoing: [
             ...categorizedSentApplications.ongoing,
             ...categorizedReceivedApplications.ongoing,
             ...categorizedServiceRequests.ongoing,
             ...categorizedProviderServiceRequests.ongoing,
-            ...hardcodedBookings.ongoing,
           ],
           past: [
             ...categorizedSentApplications.past,
             ...categorizedReceivedApplications.past,
             ...categorizedServiceRequests.past,
             ...categorizedProviderServiceRequests.past,
-            ...hardcodedBookings.past,
           ],
           cancelled: [
             ...categorizedSentApplications.cancelled,
             ...categorizedReceivedApplications.cancelled,
             ...categorizedServiceRequests.cancelled,
             ...categorizedProviderServiceRequests.cancelled,
-            ...hardcodedBookings.cancelled,
           ],
         });
 
@@ -1183,11 +988,6 @@ export default function BookingsPage() {
                 }}
               >
                 Cancelled
-                {bookingsData.cancelled.length > 0 && (
-                  <Badge className="ml-2 bg-red-100 text-red-800 text-sm rounded-full tabular-nums pointer-events-none">
-                    {bookingsData.cancelled.length}
-                  </Badge>
-                )}
               </TabsTrigger>
             </TabsList>
 
