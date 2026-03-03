@@ -10,9 +10,10 @@ import React, {
 } from 'react';
 
 import type { Profile } from '../../types/profiletype';
+import { getApiBaseUrl } from '../api/baseUrl';
 import { supabase } from '../supabase/client';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_BASE_URL = getApiBaseUrl();
 
 export type UserType = 'client' | 'provider' | 'both';
 export type ActiveRole = 'client' | 'provider';
@@ -87,9 +88,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      const response = await fetch(`${API_URL}/api/user/profile/${userId}`, {
-        headers,
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/api/user/profile/${userId}`,
+        {
+          headers,
+        }
+      );
 
       if (response.ok) {
         const data: Profile = await response.json();
@@ -238,7 +242,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     phone: string
   ): Promise<{ success: boolean; error: string | null }> => {
     try {
-      const response = await fetch(`${API_URL}/api/user/send-otp`, {
+      const response = await fetch(`${API_BASE_URL}/api/user/send-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone }),
@@ -266,7 +270,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }> => {
     try {
       // Step 1: Verify OTP with backend
-      const response = await fetch(`${API_URL}/api/user/verify-otp`, {
+      const response = await fetch(`${API_BASE_URL}/api/user/verify-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone, otp }),
@@ -290,7 +294,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         // Create session via backend
         const sessionResponse = await fetch(
-          `${API_URL}/api/user/create-session`,
+          `${API_BASE_URL}/api/user/create-session`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -357,7 +361,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         normalizedPhone = `+${normalizedPhone}`;
       }
 
-      const response = await fetch(`${API_URL}/api/user/signup`, {
+      const response = await fetch(`${API_BASE_URL}/api/user/signup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -415,7 +419,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     try {
-      const response = await fetch(`${API_URL}/api/user/login`, {
+      const response = await fetch(`${API_BASE_URL}/api/user/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -471,7 +475,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      const response = await fetch(`${API_URL}/api/user/logout`, {
+      const response = await fetch(`${API_BASE_URL}/api/user/logout`, {
         method: 'POST',
         headers,
       });

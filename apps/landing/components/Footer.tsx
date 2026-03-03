@@ -59,12 +59,6 @@ const Footer = () => {
                 My Account
               </a>
               <a
-                href="#contact"
-                className="block text-white/90 hover:text-white transition-colors"
-              >
-                Contact Us
-              </a>
-              <a
                 href="#blog"
                 className="block text-white/90 hover:text-white transition-colors"
               >
@@ -95,13 +89,13 @@ const Footer = () => {
                 Accessibility
               </a>
               <a
-                href="#privacy"
+                href="https://hanapp.com.ph/privacy"
                 className="block text-white/90 hover:text-white transition-colors"
               >
                 Privacy Policy
               </a>
               <a
-                href="#terms"
+                href="https://hanapp.com.ph/terms"
                 className="block text-white/90 hover:text-white transition-colors"
               >
                 Terms & Conditions

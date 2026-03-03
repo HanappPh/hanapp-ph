@@ -18,6 +18,7 @@ import {
 import type { User } from '@supabase/supabase-js';
 
 import { CurrentUser } from '../decorators/current-user.decorator';
+import { Public } from '../decorators/public.decorator';
 import { AuthGuard } from '../guards/auth.guard';
 
 import { CreateReviewDto, UpdateReviewDto } from './dto/review.dto';
@@ -86,9 +87,23 @@ export class ReviewsController {
     return this.reviewsService.deleteReview(reviewId, user.id);
   }
 
+  @ApiBearerAuth('JWT-auth')
+  @Get('me/service-requests')
+  @ApiOperation({
+    summary: 'Get reviewed service request IDs of current user',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Reviewed service request IDs retrieved successfully',
+  })
+  async getMyReviewedServiceRequestIds(@CurrentUser() user: User) {
+    return this.reviewsService.getMyReviewedServiceRequestIds(user.id);
+  }
+
   // ===============================
   // GET REVIEWS BY SERVICE ID
   // ===============================
+  @Public()
   @Get('service/:serviceId')
   @ApiOperation({ summary: 'Get reviews by service ID (public)' })
   @ApiResponse({
@@ -102,7 +117,8 @@ export class ReviewsController {
   // ===============================
   // GET REVIEWS BY PROVIDER ID
   // ===============================
-  @Get('provider/:providerId')
+  @Public()
+  @Get('provider/:providerId') // temp route
   @ApiOperation({ summary: 'Get reviews by provider ID (public)' })
   @ApiResponse({
     status: 200,
@@ -115,6 +131,7 @@ export class ReviewsController {
   // ===============================
   // GET REVIEWS BY SERVICE LISTING ID
   // ===============================
+  @Public()
   @Get('listing/:listingId')
   @ApiOperation({ summary: 'Get reviews by service listing ID (public)' })
   @ApiResponse({

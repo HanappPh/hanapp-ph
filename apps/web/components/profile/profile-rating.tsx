@@ -1,4 +1,4 @@
-import { Button, Card } from '@hanapp-ph/commons';
+import { Card } from '@hanapp-ph/commons';
 import { Star } from 'lucide-react';
 import React from 'react';
 
@@ -14,11 +14,13 @@ interface ProfileRatingProps {
   rating?: number;
   reviewCount?: number;
   reviews?: Review[];
+  initialSelected?: 'Provider' | 'Client';
 }
 
 export function ProfileRating({
   rating = 4.8,
   reviewCount = 8,
+  initialSelected,
   reviews = [
     {
       id: '1',
@@ -174,6 +176,12 @@ export function ProfileRating({
 
   const itemsPerPage = 5;
   const totalPages = Math.ceil(reviews.length / itemsPerPage);
+  const isProviderView = initialSelected === 'Provider';
+  const activePaginationClass = isProviderView
+    ? 'bg-hanapp-accent text-hanapp-secondary'
+    : 'bg-hanapp-primary text-white';
+  const inactivePaginationClass =
+    'bg-white text-gray-700 border border-gray-300 hover:bg-gray-100';
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentReviews = reviews.slice(startIndex, endIndex);
@@ -195,9 +203,6 @@ export function ProfileRating({
             </p>
           </div>
         </div>
-        <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-6 shrink-0 w-[130px]">
-          See All Reviews
-        </Button>
       </div>
 
       <div className="border-t border-gray-200">
@@ -237,14 +242,17 @@ export function ProfileRating({
         {/* Pagination Controls */}
         {totalPages > 1 && (
           <div className="mt-4 pt-4 border-t border-gray-200 flex items-center justify-between">
-            <Button
-              variant="outline"
+            <button
               onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
               disabled={currentPage === 1}
-              className="text-xs px-3 py-1 h-auto"
+              className={`w-8 h-8 rounded text-sm font-medium transition-colors ${
+                currentPage === 1
+                  ? 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed'
+                  : inactivePaginationClass
+              }`}
             >
-              Previous
-            </Button>
+              {'<'}
+            </button>
 
             <div className="flex items-center gap-2">
               {(() => {
@@ -272,8 +280,8 @@ export function ProfileRating({
                     onClick={() => setCurrentPage(page)}
                     className={`w-8 h-8 rounded text-sm font-medium transition-colors ${
                       currentPage === page
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                        ? activePaginationClass
+                        : inactivePaginationClass
                     }`}
                   >
                     {page}
@@ -282,16 +290,19 @@ export function ProfileRating({
               })()}
             </div>
 
-            <Button
-              variant="outline"
+            <button
               onClick={() =>
                 setCurrentPage(prev => Math.min(totalPages, prev + 1))
               }
               disabled={currentPage === totalPages}
-              className="text-xs px-3 py-1 h-auto"
+              className={`w-8 h-8 rounded text-sm font-medium transition-colors ${
+                currentPage === totalPages
+                  ? 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed'
+                  : inactivePaginationClass
+              }`}
             >
-              Next
-            </Button>
+              {'>'}
+            </button>
           </div>
         )}
       </div>

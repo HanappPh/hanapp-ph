@@ -37,6 +37,7 @@ export interface ServiceListingResponse {
   rating?: number;
   review_count?: number;
   service_names?: string[]; // Array of service names from service_listing_details
+  services?: ServiceDetail[];
   provider?: {
     id: string;
     full_name: string;
