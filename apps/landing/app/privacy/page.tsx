@@ -11,7 +11,7 @@ const PrivacyPolicy = () => {
       <div className="min-h-screen bg-white pt-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-8">
-            Privacy Policy
+            Hanapp Privacy Policy
           </h1>
           <p className="text-sm text-muted-foreground mb-8 font-inter">
             (Updated – August 31, 2025)
@@ -21,12 +21,25 @@ const PrivacyPolicy = () => {
               <h2 className="text-2xl font-semibold text-gray-900 mb-3">
                 1. Introduction
               </h2>
-              <p>
-                Hanapp Technologies (&quot;we,&quot; &quot;our,&quot; or
-                &quot;us&quot;) is committed to protecting your privacy. This
-                Privacy Policy explains how we collect, use, disclose, and
-                safeguard your information when you visit our website and use
-                our services.
+              <p className="text-foreground mb-4 font-inter">
+                Hanapp Technologies Corp. (&quot;we,&quot; &quot;our,&quot; or
+                &quot;us&quot;) values your privacy. This Privacy Policy
+                explains how we collect, use, store, and protect your personal
+                information when you use our mobile app, website, or related
+                services.
+              </p>
+
+              <p className="text-foreground mb-4 font-inter">
+                Hanapp is a platform that connects customers and service
+                providers within their communities. We process personal data in
+                compliance with the Philippine Data Privacy Act of 2012 (DPA),
+                and we align with international standards such as the General
+                Data Protection Regulation (GDPR) and the California Consumer
+                Privacy Act (CCPA) where applicable.
+              </p>
+
+              <p className="text-foreground mb-4 font-inter">
+                By using Hanapp, you consent to this Privacy Policy.
               </p>
             </section>
 
@@ -34,62 +47,111 @@ const PrivacyPolicy = () => {
               <h2 className="text-2xl font-semibold text-gray-900 mb-3">
                 2. Information We Collect
               </h2>
-              <p>We may collect information about you in a variety of ways:</p>
-              <ul className="list-disc pl-6 space-y-2">
+              <p className="text-foreground mb-4 font-inter">
+                We may collect the following categories of personal data:
+              </p>
+              <ul className="list-disc pl-6 text-foreground mb-4 font-inter space-y-2">
                 <li>
-                  <strong>Personal Information:</strong> When you register,
-                  contact us, or use our services, we may collect your name,
-                  email address, phone number, address, and other personal
-                  information.
+                  <strong>Account Information - </strong>
+                  name, mobile number, email, linked Google account, and GCash
+                  number (if provided).
                 </li>
                 <li>
-                  <strong>Usage Data:</strong> We collect information about how
-                  you interact with our website, including pages visited, time
-                  spent, and actions taken.
+                  <strong>Verification Data – </strong> government-issued ID,
+                  face photo, and selfie with ID (used for Face + ID
+                  verification).
                 </li>
                 <li>
-                  <strong>Device Information:</strong> We may collect
-                  information about your device, including IP address, browser
-                  type, and operating system.
+                  <strong>Location Data – </strong> GPS-based location for
+                  matching services, alongside declared service areas.
+                </li>
+
+                <li>
+                  <strong>Service Data – </strong> job posts, bids, bookings,
+                  chat messages, feedback, and ratings.
+                </li>
+
+                <li>
+                  <strong>Device Data – </strong> IP address, device ID,
+                  operating system, app version, and session logs.
+                </li>
+
+                <li>
+                  <strong>Usage Data – </strong> app interactions (pages
+                  visited, searches, ads viewed, buttons clicked).
+                </li>
+
+                <li>
+                  <strong>Optional Marketing Data – </strong> responses to
+                  surveys, promotions, and referral programs.
                 </li>
               </ul>
+
+              <p className="text-foreground mb-4 font-inter">
+                We do not collect sensitive financial data (e.g., bank account
+                details) unless required for in-app payments and payouts.
+              </p>
             </section>
 
             <section>
               <h2 className="text-2xl font-semibold text-gray-900 mb-3">
-                3. How We Use Your Information
+                3. How We Use Your Data
               </h2>
-              <p>
-                We use the information we collect for the following purposes:
+              <p className="text-foreground mb-4 font-inter">
+                We use personal data to:
               </p>
-              <ul className="list-disc pl-6 space-y-2">
-                <li>To provide, maintain, and improve our services</li>
-                <li>To process transactions and send related information</li>
-                <li>To send promotional communications (with your consent)</li>
+              <ul className="list-disc pl-6 text-foreground mb-4 font-inter space-y-2">
+                <li>Create, manage, and secure your Hanapp account.</li>
                 <li>
-                  To respond to your inquiries and provide customer support
+                  Match customers and providers using declared location + GPS.
                 </li>
-                <li>To monitor and analyze usage patterns and trends</li>
-                <li>To comply with legal obligations</li>
+                <li>Verify identity and issue trust badges.</li>
+                <li>Facilitate in-app chat, bookings, ratings, and reviews.</li>
+                <li>Detect and prevent fraud, abuse, or duplicate accounts.</li>
+                <li>Show relevant services, providers, or advertisements.</li>
+                <li>
+                  Process payments, refunds, and disbursements (where
+                  supported).
+                </li>
+                <li>Provide customer support.</li>
+                <li>Comply with legal, regulatory, or tax obligations.</li>
+                <li>
+                  Improve the app experience, including analytics and feature
+                  testing.
+                </li>
               </ul>
+
+              <p className="text-foreground mb-4 font-inter">
+                <strong>We will never sell your personal data.</strong>
+              </p>
             </section>
 
             <section>
               <h2 className="text-2xl font-semibold text-gray-900 mb-3">
-                4. Information Sharing and Disclosure
+                4. Legal Basis for Processing
               </h2>
-              <p>
-                We do not sell, trade, or rent your personal information to
-                third parties. However, we may share your information with:
+              <p className="text-foreground mb-4 font-inter">
+                We process data under the following bases:
               </p>
-              <ul className="list-disc pl-6 space-y-2">
+              <ul className="list-disc pl-6 text-foreground mb-4 font-inter space-y-2">
                 <li>
-                  Service providers who assist us in operating our website
+                  <strong>Consent – </strong>
+                  when you upload identification, link accounts, or agree to
+                  marketing.
                 </li>
-                <li>Legal authorities when required by law</li>
                 <li>
-                  Other parties with your explicit consent or in connection with
-                  a company transaction
+                  <strong>Contractual Necessity – </strong>
+                  to enable bookings, listings, payments, and payouts.
+                </li>
+                <li>
+                  <strong>Legitimate Interest – </strong>
+                  to maintain security, detect fraud, and improve platform
+                  features.
+                </li>
+                <li>
+                  <strong>Legal Obligation – </strong>
+                  to comply with law enforcement, tax regulations, or court
+                  orders.
                 </li>
               </ul>
             </section>
@@ -98,99 +160,178 @@ const PrivacyPolicy = () => {
               <h2 className="text-2xl font-semibold text-gray-900 mb-3">
                 5. Data Security
               </h2>
-              <p>
-                We implement appropriate technical and organizational measures
-                to protect your personal information against unauthorized
-                access, alteration, disclosure, or destruction. However, no
-                method of transmission over the Internet or electronic storage
-                is 100% secure.
+              <p className="text-foreground mb-4 font-inter">
+                Hanapp may share your data only under these circumstances:
               </p>
-            </section>
 
-            <section>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-3">
-                6. Your Privacy Rights
-              </h2>
-              <p>
-                Depending on your location, you may have certain rights
-                regarding your personal information, including:
-              </p>
-              <ul className="list-disc pl-6 space-y-2">
-                <li>The right to access your personal data</li>
-                <li>The right to correct inaccurate data</li>
-                <li>The right to request deletion of your data</li>
-                <li>The right to opt-out of marketing communications</li>
-                <li>The right to data portability</li>
+              <ul className="list-disc pl-6 text-foreground mb-4 font-inter space-y-2">
+                <li>
+                  With service providers (e.g., hosting, cloud storage,
+                  analytics, SMS gateways, and payment processors).
+                </li>
+                <li>
+                  With other users – only information needed to fulfill bookings
+                  (e.g., first name, rating, declared service area).
+                </li>
+                <li>
+                  With regulators or law enforcement – when legally required, or
+                  in cases of fraud, abuse, or disputes.
+                </li>
+                <li>
+                  For dispute resolution – with authorized third parties
+                  involved in mediation.
+                </li>
               </ul>
             </section>
 
             <section>
               <h2 className="text-2xl font-semibold text-gray-900 mb-3">
-                7. Cookies
+                6. Data Retention
               </h2>
-              <p>
-                Our website may use cookies and similar tracking technologies to
-                enhance your experience. You can control cookie settings through
-                your browser preferences.
+              <p className="text-foreground mb-4 font-inter">
+                We retain personal data:
+              </p>
+              <ul className="list-disc pl-6 text-foreground mb-4 font-inter space-y-2">
+                <li>As long as your account is active.</li>
+                <li>
+                  Up to 12 months after account deletion for fraud prevention
+                  and compliance.
+                </li>
+                <li>
+                  Longer if required by law (e.g., tax or legal investigations).
+                </li>
+              </ul>
+
+              <p className="text-foreground mb-4 font-inter">
+                You may request early deletion by contacting us at
+                support@hanapp.com.ph.
               </p>
             </section>
 
             <section>
               <h2 className="text-2xl font-semibold text-gray-900 mb-3">
-                8. Third-Party Links
+                7. Data Security
               </h2>
-              <p>
-                Our website may contain links to third-party websites. We are
-                not responsible for the privacy practices of these external
-                sites. Please review their privacy policies before providing any
-                personal information.
+              <p className="text-foreground mb-4 font-inter">
+                We use industry-standard security measures, including:
+              </p>
+              <ul className="list-disc pl-6 text-foreground mb-4 font-inter space-y-2">
+                <li>Encryption of data in transit and at rest.</li>
+                <li>Strict role-based access controls.</li>
+                <li>
+                  Identity verification before granting data access or deletion.
+                </li>
+                <li>
+                  Regular audits and monitoring for unauthorized activity.
+                </li>
+              </ul>
+
+              <p className="text-foreground mb-4 font-inter">
+                ⚠️ No system is 100% secure. Users should avoid sharing
+                sensitive details (like payment references or personal
+                addresses) in open chat.
               </p>
             </section>
 
             <section>
               <h2 className="text-2xl font-semibold text-gray-900 mb-3">
-                9. Children&apos;s Privacy
+                8. Your Rights
               </h2>
-              <p>
-                Our services are not directed to children under the age of 13.
-                We do not knowingly collect personal information from children.
-                If we discover that we have collected information from a child,
-                we will promptly delete it.
+              <p className="text-foreground mb-4 font-inter">
+                Under the Philippine DPA, GDPR, and similar laws, you may:
+              </p>
+              <ul className="list-disc pl-6 text-foreground mb-4 font-inter space-y-2">
+                <li>
+                  <strong>Access </strong>
+                  your personal data.
+                </li>
+                <li>
+                  <strong>Correct </strong>
+                  inaccurate or outdated information.
+                </li>
+                <li>
+                  <strong>Request Deletion </strong>
+                  of your account and associated data.
+                </li>
+                <li>
+                  <strong>Withdraw Consent </strong>
+                  where processing is based on consent.
+                </li>
+                <li>
+                  <strong>Data Portability – </strong>
+                  request a copy of your personal data in a readable format.
+                </li>
+                <li>
+                  <strong>File a Complaint </strong>
+                  with the National Privacy Commission (NPC) or relevant
+                  authority.
+                </li>
+              </ul>
+
+              <p className="text-foreground mb-4 font-inter">
+                To exercise your rights, email us at privacy@hanapp.com.ph.
               </p>
             </section>
 
             <section>
               <h2 className="text-2xl font-semibold text-gray-900 mb-3">
-                10. Changes to This Privacy Policy
+                9. Children&apos;s Data
               </h2>
               <p>
-                We may update this Privacy Policy from time to time. Any changes
-                will be posted on this page with an updated &quot;Last
-                Updated&quot; date. Your continued use of our website following
-                the posting of changes constitutes your acceptance of those
-                changes.
+                Hanapp is intended for users aged 18 and above. We do not
+                knowingly collect or process data from minors. If we learn that
+                data has been collected from a child, it will be deleted
+                immediately.
               </p>
             </section>
 
             <section>
               <h2 className="text-2xl font-semibold text-gray-900 mb-3">
-                11. Contact Us
+                10. International Data Transfers
               </h2>
               <p>
-                If you have questions about this Privacy Policy or our privacy
-                practices, please contact us at:
+                If your information is processed outside the Philippines (e.g.,
+                by cloud services), we ensure that adequate safeguards are in
+                place to protect your privacy in line with the DPA and
+                international privacy standards.
               </p>
-              <p className="mt-3">
-                <strong>Hanapp Technologies</strong>
-                <br />
-                Email: sidneysychan007@gmail.com
-                <br />
-                Website: hanapp.com.ph
+            </section>
+            <section>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-3">
+                11. Updates to This Policy
+              </h2>
+              <p className="text-foreground mb-4 font-inter">
+                We may update this Privacy Policy from time to time. Changes
+                will be posted in-app and on our website. Significant updates
+                will be communicated via email or app notification.
+              </p>
+              <p className="text-foreground mb-4 font-inter">
+                Continued use of Hanapp after updates means you accept the
+                latest version.
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-3">
+                12. Contact Us
+              </h2>
+              <p className="text-foreground mb-4 font-inter">
+                For privacy questions or concerns, please contact our Data
+                Protection Officer (DPO):
+              </p>
+              <p className="text-foreground mb-4 font-inter">
+                📧 &nbsp;
+                <a
+                  href="mailto:privacy@hanapp.com.ph"
+                  className="text-primary hover:underline"
+                >
+                  privacy@hanapp.com.ph
+                </a>
               </p>
             </section>
 
             <div className="mt-12 pt-8 border-t border-gray-200 text-sm text-gray-600">
-              <p>Last Updated: March 4, 2026</p>
+              <p>Last Updated: August 31, 2025</p>
             </div>
           </div>
         </div>
