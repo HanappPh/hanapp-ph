@@ -58,12 +58,6 @@ const Footer = () => {
               >
                 My Account
               </a>
-              <a
-                href="#blog"
-                className="block text-white/90 hover:text-white transition-colors"
-              >
-                Blog
-              </a>
             </div>
           </div>
 
@@ -75,18 +69,6 @@ const Footer = () => {
                 className="block text-white/90 hover:text-white transition-colors"
               >
                 FAQs
-              </a>
-              <a
-                href="#sitemap"
-                className="block text-white/90 hover:text-white transition-colors"
-              >
-                Site Map
-              </a>
-              <a
-                href="#accessibility"
-                className="block text-white/90 hover:text-white transition-colors"
-              >
-                Accessibility
               </a>
               <a
                 href="/privacy"
