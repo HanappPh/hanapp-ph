@@ -89,7 +89,7 @@ const Footer = () => {
                 Accessibility
               </a>
               <a
-                href="https://hanapp.com.ph/privacy"
+                href="/privacy"
                 className="block text-white/90 hover:text-white transition-colors"
               >
                 Privacy Policy
