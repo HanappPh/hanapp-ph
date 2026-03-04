@@ -95,10 +95,10 @@ const Footer = () => {
                 Privacy Policy
               </a>
               <a
-                href="https://hanapp.com.ph/terms"
+                href="/terms"
                 className="block text-white/90 hover:text-white transition-colors"
               >
-                Terms & Conditions
+                Terms
               </a>
               <a
                 href="#cookie"
