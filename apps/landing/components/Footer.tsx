@@ -35,19 +35,19 @@ const Footer = () => {
           <div className="lg:col-span-1">
             <div className="space-y-3">
               <a
-                href="#about"
+                href="/about"
                 className="block text-white/90 hover:text-white transition-colors"
               >
                 About Us
               </a>
               <a
-                href="#mission"
+                href="/mission"
                 className="block text-white/90 hover:text-white transition-colors"
               >
                 Our Mission
               </a>
               <a
-                href="#careers"
+                href="/careers"
                 className="block text-white/90 hover:text-white transition-colors"
               >
                 Careers
@@ -65,10 +65,10 @@ const Footer = () => {
           <div className="lg:col-span-1">
             <div className="space-y-3">
               <a
-                href="#faqs"
+                href="/faq"
                 className="block text-white/90 hover:text-white transition-colors"
               >
-                FAQs
+                FAQ
               </a>
               <a
                 href="/privacy"
