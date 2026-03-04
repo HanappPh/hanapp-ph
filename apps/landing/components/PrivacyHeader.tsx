@@ -6,9 +6,13 @@ import { useEffect, useRef, useState } from 'react';
 
 interface PrivacyHeaderProps {
   showTermsLink?: boolean;
+  showPrivacyLink?: boolean;
 }
 
-export const PrivacyHeader = ({ showTermsLink = true }: PrivacyHeaderProps) => {
+export const PrivacyHeader = ({
+  showTermsLink = true,
+  showPrivacyLink = false,
+}: PrivacyHeaderProps) => {
   const [scrollY, setScrollY] = useState(0);
   const navRef = useRef<HTMLElement>(null);
 
@@ -66,6 +70,14 @@ export const PrivacyHeader = ({ showTermsLink = true }: PrivacyHeaderProps) => {
                 className="text-gray-700 hover:text-hanapp-primary transition-colors font-medium"
               >
                 Terms & Conditions
+              </Link>
+            )}
+            {showPrivacyLink && (
+              <Link
+                href="/privacy"
+                className="text-gray-700 hover:text-hanapp-primary transition-colors font-medium"
+              >
+                Privacy Policy
               </Link>
             )}
           </div>

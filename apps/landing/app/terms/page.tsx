@@ -7,7 +7,7 @@ import { PrivacyHeader } from '../../components/PrivacyHeader';
 const TermsOfUse = () => {
   return (
     <>
-      <PrivacyHeader showTermsLink={false} />
+      <PrivacyHeader showTermsLink={false} showPrivacyLink={true} />
 
       {/* Main Content */}
       <div className="min-h-screen bg-white pt-20">
@@ -37,12 +37,14 @@ const TermsOfUse = () => {
                 ensure a safe, respectful, and trustworthy experience for all
                 users.
               </p>
-              <p className="text-foreground mb-4 font-inter">
-                ⚠️ <strong>Disclaimer:</strong> Hanapp does not guarantee the
-                identity, conduct, or reliability of users. We do not conduct
-                full background checks, and we are not responsible for
-                agreements or transactions that occur outside the platform.
-              </p>
+              <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                <p className="text-red-700 font-inter">
+                  ⚠️ <strong>Disclaimer:</strong> Hanapp does not guarantee the
+                  identity, conduct, or reliability of users. We do not conduct
+                  full background checks, and we are not responsible for
+                  agreements or transactions that occur outside the platform.
+                </p>
+              </div>
             </section>
 
             <section>
