@@ -56,7 +56,7 @@ const Footer = () => {
                 href="#account"
                 className="block text-white/90 hover:text-white transition-colors"
               >
-                My Account
+                Blog
               </a>
             </div>
           </div>
