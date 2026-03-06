@@ -8,9 +8,11 @@ import { ProfileRating } from './profile-rating';
 export function ReviewsContent({
   initialSelected,
   providerId,
+  embedded = false,
 }: {
   initialSelected?: 'Provider' | 'Client';
   providerId?: string;
+  embedded?: boolean;
 }) {
   const [reviews, setReviews] = React.useState<
     {
@@ -68,22 +70,34 @@ export function ReviewsContent({
   }, [providerId]);
 
   return (
-    <main className="flex-1 p-6">
+    <main className={embedded ? 'p-6' : 'flex-1 p-6'}>
       <div className="space-y-6">
-        <Card className="p-6 bg-white border-none drop-shadow-md">
-          <h2 className="text-xl font-semibold text-gray-900 mb-6">
-            Reviews & Ratings
-          </h2>
-          <p className="text-gray-600">
-            View all reviews and ratings from your clients here.
-          </p>
-        </Card>
+        {embedded ? (
+          <div className="pb-6 border-b border-gray-200">
+            <h2 className="text-xl font-semibold text-gray-900 mb-6">
+              Reviews & Ratings
+            </h2>
+            <p className="text-gray-600">
+              View all reviews and ratings from your clients here.
+            </p>
+          </div>
+        ) : (
+          <Card className="p-6 bg-white border-none drop-shadow-md">
+            <h2 className="text-xl font-semibold text-gray-900 mb-6">
+              Reviews & Ratings
+            </h2>
+            <p className="text-gray-600">
+              View all reviews and ratings from your clients here.
+            </p>
+          </Card>
+        )}
 
         <ProfileRating
           rating={reviewStats.averageRating}
           reviewCount={reviewStats.reviewCount}
           reviews={reviews}
           initialSelected={initialSelected}
+          embedded={embedded}
         />
       </div>
     </main>

@@ -15,12 +15,14 @@ interface ProfileRatingProps {
   reviewCount?: number;
   reviews?: Review[];
   initialSelected?: 'Provider' | 'Client';
+  embedded?: boolean;
 }
 
 export function ProfileRating({
   rating = 4.8,
   reviewCount = 8,
   initialSelected,
+  embedded = false,
   reviews = [
     {
       id: '1',
@@ -186,8 +188,8 @@ export function ProfileRating({
   const endIndex = startIndex + itemsPerPage;
   const currentReviews = reviews.slice(startIndex, endIndex);
 
-  return (
-    <Card className="p-4 bg-white border-none drop-shadow-md">
+  const content = (
+    <>
       <div className="flex flex-wrap items-center gap-4 mb-4">
         <div className="flex items-center gap-4 flex-1 min-w-[150px]">
           <div className="flex items-center space-x-2">
@@ -306,6 +308,12 @@ export function ProfileRating({
           </div>
         )}
       </div>
-    </Card>
+    </>
+  );
+
+  return embedded ? (
+    <div className="p-4">{content}</div>
+  ) : (
+    <Card className="p-4 bg-white border-none drop-shadow-md">{content}</Card>
   );
 }

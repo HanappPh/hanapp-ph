@@ -43,6 +43,7 @@ export function MainContent({
   initialSelected,
   profile,
   hideEditButtons = false,
+  embedded = false,
   providerListings,
   servicePreferenceListings,
 }: {
@@ -54,6 +55,7 @@ export function MainContent({
     phone_number?: string;
   } | null;
   hideEditButtons?: boolean;
+  embedded?: boolean;
   providerListings?: {
     id: string;
     title?: string;
@@ -222,155 +224,350 @@ export function MainContent({
     endActivityIndex
   );
 
-  return (
-    <main className="flex-1 p-6">
-      <div className="space-y-6">
-        <Card className="p-6 bg-white border-none drop-shadow-md">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-gray-900">
-              Profile Information
-            </h2>
-            {!hideEditButtons && (
-              <Button
-                variant="ghost"
-                className="text-blue-600 hover:text-blue-700"
-              >
-                <Edit className="w-4 h-4 mr-2" />
-                Edit
-              </Button>
+  const profileSection = (
+    <>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-semibold text-gray-900">
+          Profile Information
+        </h2>
+        {!hideEditButtons && (
+          <Button variant="ghost" className="text-blue-600 hover:text-blue-700">
+            <Edit className="w-4 h-4 mr-2" />
+            Edit
+          </Button>
+        )}
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+        <div>
+          <div className="mb-4">
+            <label className="text-sm text-gray-600 mb-1 block">
+              Full Name
+            </label>
+            <p className="text-gray-900 font-medium">{displayName}</p>
+          </div>
+          <div className="mb-4">
+            <label className="text-sm text-gray-600 mb-1 block flex items-center">
+              <Mail className="w-4 h-4 mr-2" />
+              Email
+            </label>
+            <p className="text-gray-900">{displayEmail}</p>
+          </div>
+          <div>
+            <label className="text-sm text-gray-600 mb-1 block flex items-center">
+              <Phone className="w-4 h-4 mr-2" />
+              Phone
+            </label>
+            <p className="text-gray-900">{displayPhone}</p>
+          </div>
+        </div>
+
+        <div>
+          <div className="mb-4">
+            <label className="text-sm text-gray-600 mb-1 block flex items-center">
+              <Calendar className="w-4 h-4 mr-2" />
+              Member Since
+            </label>
+            <p className="text-gray-900">May 2023</p>
+          </div>
+          <div className="mb-4">
+            <label className="text-sm text-gray-600 mb-1 block">
+              Account Status
+            </label>
+            <p className="text-green-600 font-medium">Verified Provider</p>
+          </div>
+          <div>
+            <label className="text-sm text-gray-600 mb-1 block flex items-center">
+              <MapPin className="w-4 h-4 mr-2" />
+              Location
+            </label>
+            <p className="text-gray-900">Bacoor, Cavite</p>
+          </div>
+        </div>
+      </div>
+
+      {initialSelected !== 'Client' && (
+        <div className="mt-6">
+          <label className="text-sm text-gray-600 mb-3 block">
+            Service Preferences
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {compiledServicePreferences.length > 0 ? (
+              compiledServicePreferences.map(preference => (
+                <Badge
+                  key={preference}
+                  variant="outline"
+                  className="bg-blue-50 text-blue-700 border-blue-200 p-2"
+                >
+                  {preference}
+                </Badge>
+              ))
+            ) : (
+              <p className="text-sm text-gray-500">
+                No service preferences yet.
+              </p>
             )}
           </div>
+        </div>
+      )}
+    </>
+  );
 
-          <div className="grid grid-cols-2 gap-6">
+  return (
+    <main className={embedded ? 'p-6' : 'flex-1 p-6'}>
+      <div className="space-y-6">
+        {embedded ? (
+          <div className="pb-6 border-b border-gray-200">{profileSection}</div>
+        ) : (
+          <Card className="p-6 bg-white border-none drop-shadow-md">
+            {profileSection}
+          </Card>
+        )}
+
+        {/* Recent Activity or Provider Listings */}
+        {providerListings ? (
+          embedded ? (
             <div>
-              <div className="mb-4">
-                <label className="text-sm text-gray-600 mb-1 block">
-                  Full Name
-                </label>
-                <p className="text-gray-900 font-medium">{displayName}</p>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-gray-900">
+                  Service Listings ({providerListings.length})
+                </h2>
+                {providerListings.length > 3 && (
+                  <Button
+                    variant="ghost"
+                    className="text-[#102E50] hover:text-[#0a1f35] font-semibold"
+                    onClick={() => setShowAllListings(!showAllListings)}
+                  >
+                    {showAllListings ? 'Show Less' : 'See All'}
+                  </Button>
+                )}
               </div>
-              <div className="mb-4">
-                <label className="text-sm text-gray-600 mb-1 block flex items-center">
-                  <Mail className="w-4 h-4 mr-2" />
-                  Email
-                </label>
-                <p className="text-gray-900">{displayEmail}</p>
-              </div>
-              <div>
-                <label className="text-sm text-gray-600 mb-1 block flex items-center">
-                  <Phone className="w-4 h-4 mr-2" />
-                  Phone
-                </label>
-                <p className="text-gray-900">{displayPhone}</p>
-              </div>
-            </div>
-
-            <div>
-              <div className="mb-4">
-                <label className="text-sm text-gray-600 mb-1 block flex items-center">
-                  <Calendar className="w-4 h-4 mr-2" />
-                  Member Since
-                </label>
-                <p className="text-gray-900">May 2023</p>
-              </div>
-              <div className="mb-4">
-                <label className="text-sm text-gray-600 mb-1 block">
-                  Account Status
-                </label>
-                <p className="text-green-600 font-medium">Verified Provider</p>
-              </div>
-              <div>
-                <label className="text-sm text-gray-600 mb-1 block flex items-center">
-                  <MapPin className="w-4 h-4 mr-2" />
-                  Location
-                </label>
-                <p className="text-gray-900">Bacoor, Cavite</p>
-              </div>
-            </div>
-          </div>
-
-          {initialSelected !== 'Client' && (
-            <div className="mt-6">
-              <label className="text-sm text-gray-600 mb-3 block">
-                Service Preferences
-              </label>
-              <div className="flex flex-wrap gap-2">
-                {compiledServicePreferences.length > 0 ? (
-                  compiledServicePreferences.map(preference => (
-                    <Badge
-                      key={preference}
-                      variant="outline"
-                      className="bg-blue-50 text-blue-700 border-blue-200 p-2"
+              <div className="space-y-4">
+                {providerListings.length > 0 ? (
+                  (showAllListings
+                    ? providerListings
+                    : providerListings.slice(0, 3)
+                  ).map(listing => (
+                    <div
+                      key={listing.id}
+                      className="flex items-center p-4 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors cursor-pointer"
+                      onClick={() => router.push(`/jobs/${listing.id}`)}
                     >
-                      {preference}
-                    </Badge>
+                      <div className="flex items-center space-x-4 flex-1">
+                        {listing.images?.[0] && (
+                          <Image
+                            src={listing.images[0]}
+                            alt={listing.title || 'Service listing image'}
+                            width={60}
+                            height={60}
+                            className="rounded-lg object-cover"
+                          />
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-medium text-gray-900 truncate">
+                            {listing.title}
+                          </h4>
+                          <p className="text-sm text-gray-600 truncate">
+                            {listing.description}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
                   ))
                 ) : (
-                  <p className="text-sm text-gray-500">
-                    No service preferences yet.
+                  <p className="text-gray-500 text-center py-4">
+                    No postings available
                   </p>
                 )}
               </div>
             </div>
-          )}
-        </Card>
-
-        {/* Recent Activity or Provider Listings */}
-        {providerListings ? (
-          <Card className="p-6 bg-white border-none drop-shadow-md">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-gray-900">
-                Service Listings ({providerListings.length})
-              </h2>
-              {providerListings.length > 3 && (
-                <Button
-                  variant="ghost"
-                  className="text-[#102E50] hover:text-[#0a1f35] font-semibold"
-                  onClick={() => setShowAllListings(!showAllListings)}
-                >
-                  {showAllListings ? 'Show Less' : 'See All'}
-                </Button>
-              )}
-            </div>
-            <div className="space-y-4">
-              {providerListings.length > 0 ? (
-                (showAllListings
-                  ? providerListings
-                  : providerListings.slice(0, 3)
-                ).map(listing => (
-                  <div
-                    key={listing.id}
-                    className="flex items-center p-4 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors cursor-pointer"
-                    onClick={() => router.push(`/jobs/${listing.id}`)}
+          ) : (
+            <Card className="p-6 bg-white border-none drop-shadow-md">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-gray-900">
+                  Service Listings ({providerListings.length})
+                </h2>
+                {providerListings.length > 3 && (
+                  <Button
+                    variant="ghost"
+                    className="text-[#102E50] hover:text-[#0a1f35] font-semibold"
+                    onClick={() => setShowAllListings(!showAllListings)}
                   >
-                    <div className="flex items-center space-x-4 flex-1">
-                      {listing.images?.[0] && (
-                        <Image
-                          src={listing.images[0]}
-                          alt={listing.title || 'Service listing image'}
-                          width={60}
-                          height={60}
-                          className="rounded-lg object-cover"
-                        />
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-gray-900 truncate">
-                          {listing.title}
-                        </h4>
-                        <p className="text-sm text-gray-600 truncate">
-                          {listing.description}
-                        </p>
+                    {showAllListings ? 'Show Less' : 'See All'}
+                  </Button>
+                )}
+              </div>
+              <div className="space-y-4">
+                {providerListings.length > 0 ? (
+                  (showAllListings
+                    ? providerListings
+                    : providerListings.slice(0, 3)
+                  ).map(listing => (
+                    <div
+                      key={listing.id}
+                      className="flex items-center p-4 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors cursor-pointer"
+                      onClick={() => router.push(`/jobs/${listing.id}`)}
+                    >
+                      <div className="flex items-center space-x-4 flex-1">
+                        {listing.images?.[0] && (
+                          <Image
+                            src={listing.images[0]}
+                            alt={listing.title || 'Service listing image'}
+                            width={60}
+                            height={60}
+                            className="rounded-lg object-cover"
+                          />
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-medium text-gray-900 truncate">
+                            {listing.title}
+                          </h4>
+                          <p className="text-sm text-gray-600 truncate">
+                            {listing.description}
+                          </p>
+                        </div>
                       </div>
                     </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500 text-center py-4">
+                    No postings available
+                  </p>
+                )}
+              </div>
+            </Card>
+          )
+        ) : embedded ? (
+          <div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-6">
+              Recent Activity
+            </h2>
+            <div className="space-y-4">
+              {currentActivities.map(activity => (
+                <div
+                  key={activity.id}
+                  className={`flex items-center justify-between p-4 rounded-lg border-l-4 ${
+                    activity.statusColor === 'green'
+                      ? 'bg-[#F0FDF4] border-[#22C55E]'
+                      : activity.statusColor === 'red'
+                        ? 'bg-[#FEF2F2] border-[#EF4444]'
+                        : activity.statusColor === 'orange'
+                          ? 'bg-[#FFF7ED] border-[#F59E0B]'
+                          : 'bg-gray-50 border-gray-300'
+                  }`}
+                >
+                  <div className="flex items-center space-x-4">
+                    <div>
+                      <h4 className="font-medium text-gray-900">
+                        {activity.title}
+                      </h4>
+                      <p className="text-sm text-gray-600">
+                        {activity.detail} • {activity.time}
+                      </p>
+                      {(activity.listingTitle || activity.servicesText) && (
+                        <p className="text-xs text-gray-500 mt-1">
+                          {activity.listingTitle
+                            ? `Listing: ${activity.listingTitle}`
+                            : ''}
+                          {activity.listingTitle && activity.servicesText
+                            ? ' • '
+                            : ''}
+                          {activity.servicesText
+                            ? `Services: ${activity.servicesText}`
+                            : ''}
+                        </p>
+                      )}
+                    </div>
                   </div>
-                ))
-              ) : (
-                <p className="text-gray-500 text-center py-4">
-                  No postings available
-                </p>
+                  <span
+                    className={`inline-flex items-center rounded-md border px-3 py-1 text-xs font-medium bg-transparent cursor-default select-none ${
+                      activity.statusColor === 'green'
+                        ? 'border-[#22C55E] text-[#16A34A]'
+                        : activity.statusColor === 'red'
+                          ? 'border-[#EF4444] text-[#EF4444]'
+                          : activity.statusColor === 'orange'
+                            ? 'border-[#F59E0B] text-[#B45309]'
+                            : 'border-gray-500 text-gray-700'
+                    }`}
+                  >
+                    {activity.amount || activity.status}
+                  </span>
+                </div>
+              ))}
+              {currentActivities.length === 0 && (
+                <p className="text-sm text-gray-600">No recent activity yet.</p>
               )}
             </div>
-          </Card>
+
+            {totalActivityPages > 1 && (
+              <div className="mt-6 pt-4 border-t border-gray-200 flex items-center justify-between">
+                <button
+                  onClick={() =>
+                    setCurrentActivityPage(prev => Math.max(1, prev - 1))
+                  }
+                  disabled={currentActivityPage === 1}
+                  className={`w-8 h-8 rounded text-sm font-medium transition-colors ${
+                    currentActivityPage === 1
+                      ? 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed'
+                      : inactivePaginationClass
+                  }`}
+                >
+                  {'<'}
+                </button>
+
+                <div className="flex items-center gap-2">
+                  {(() => {
+                    const maxPagesToShow = 3;
+                    let startPage = Math.max(
+                      1,
+                      currentActivityPage - Math.floor(maxPagesToShow / 2)
+                    );
+                    const endPage = Math.min(
+                      totalActivityPages,
+                      startPage + maxPagesToShow - 1
+                    );
+
+                    if (endPage - startPage + 1 < maxPagesToShow) {
+                      startPage = Math.max(1, endPage - maxPagesToShow + 1);
+                    }
+
+                    return Array.from(
+                      { length: endPage - startPage + 1 },
+                      (_, i) => startPage + i
+                    ).map(page => (
+                      <button
+                        key={page}
+                        onClick={() => setCurrentActivityPage(page)}
+                        className={`w-8 h-8 rounded text-sm font-medium transition-colors ${
+                          currentActivityPage === page
+                            ? activePaginationClass
+                            : inactivePaginationClass
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    ));
+                  })()}
+                </div>
+
+                <button
+                  onClick={() =>
+                    setCurrentActivityPage(prev =>
+                      Math.min(totalActivityPages, prev + 1)
+                    )
+                  }
+                  disabled={currentActivityPage === totalActivityPages}
+                  className={`w-8 h-8 rounded text-sm font-medium transition-colors ${
+                    currentActivityPage === totalActivityPages
+                      ? 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed'
+                      : inactivePaginationClass
+                  }`}
+                >
+                  {'>'}
+                </button>
+              </div>
+            )}
+          </div>
         ) : (
           <Card className="p-6 bg-white border-none drop-shadow-md">
             <h2 className="text-xl font-semibold text-gray-900 mb-6">
@@ -433,7 +630,6 @@ export function MainContent({
               )}
             </div>
 
-            {/* Pagination Controls */}
             {totalActivityPages > 1 && (
               <div className="mt-6 pt-4 border-t border-gray-200 flex items-center justify-between">
                 <button
@@ -462,7 +658,6 @@ export function MainContent({
                       startPage + maxPagesToShow - 1
                     );
 
-                    // Adjust startPage if we're at the end
                     if (endPage - startPage + 1 < maxPagesToShow) {
                       startPage = Math.max(1, endPage - maxPagesToShow + 1);
                     }
@@ -505,7 +700,6 @@ export function MainContent({
             )}
           </Card>
         )}
-
         {/* Favorite Providers Section (Web version) - Commented out for now */}
       </div>
     </main>

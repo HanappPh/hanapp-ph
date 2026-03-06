@@ -119,7 +119,7 @@ export function Sidebar({
   const displayName = profile?.full_name || 'User';
 
   return (
-    <aside className="w-80 bg-white p-6">
+    <aside className="w-full md:w-80 bg-white p-6">
       {/* Profile Card */}
       <Card className="p-6 mb-6 shadow-md">
         <div className="text-center">

@@ -8,5 +8,6 @@ export interface Profile {
   user_type: UserType;
   phone_verified?: boolean;
   avatar_url?: string;
+  cover_photo_url?: string;
   created_at?: string;
 }
