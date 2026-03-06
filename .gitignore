@@ -81,3 +81,6 @@ test-output
 # Cypress environment files (contains test credentials)
 **/cypress.env.json
 cypress.env.json
+
+# Supabase CLI temp files (contain infrastructure identifiers)
+supabase/.temp/
