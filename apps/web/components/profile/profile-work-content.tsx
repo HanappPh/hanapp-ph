@@ -9,6 +9,7 @@ type Role = 'Client' | 'Provider';
 interface ProfileWorkContentProps {
   role: Role;
   serviceListings?: ServiceListingResponse[];
+  embedded?: boolean;
 }
 
 const clientRequests = [
@@ -125,7 +126,7 @@ const formatAvailabilityDays = (
 
   return availableSlots
     .map(slot => `${DAY_LABEL[slot.day]} (${slot.hours})`)
-    .join(', ');
+    .join('\n');
 };
 
 const formatAvailability = (
@@ -175,49 +176,92 @@ const formatAvailability = (
 export function ProfileWorkContent({
   role,
   serviceListings = [],
+  embedded = false,
 }: ProfileWorkContentProps) {
   if (role === 'Client') {
     return (
-      <main className="flex-1 p-6">
-        <Card className="p-6 bg-white border-none drop-shadow-md">
-          <h2 className="text-xl font-semibold text-gray-900 mb-6">
-            My Requests
-          </h2>
-          <div className="space-y-4">
-            {clientRequests.map(request => (
-              <div
-                key={request.id}
-                className={`rounded-lg border-l-4 p-4 ${request.statusClass}`}
-              >
-                <div className="flex items-center justify-between gap-4">
-                  <div>
-                    <p className="text-xs text-gray-500">{request.id}</p>
-                    <h3 className="font-semibold text-gray-900">
-                      {request.title}
-                    </h3>
-                    <p className="text-sm text-gray-700 mt-1">
-                      {request.action}
-                    </p>
+      <main className={embedded ? 'p-6' : 'flex-1 p-6'}>
+        {embedded ? (
+          <div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-6">
+              My Requests
+            </h2>
+            <div className="space-y-4">
+              {clientRequests.map(request => (
+                <div
+                  key={request.id}
+                  className={`rounded-lg border-l-4 p-4 ${request.statusClass}`}
+                >
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <p className="text-xs text-gray-500">{request.id}</p>
+                      <h3 className="font-semibold text-gray-900">
+                        {request.title}
+                      </h3>
+                      <p className="text-sm text-gray-700 mt-1">
+                        {request.action}
+                      </p>
+                    </div>
+                    <span className="inline-flex items-center rounded-md bg-[#102E50] px-3 py-1 text-xs font-medium text-white cursor-default select-none">
+                      {request.status}
+                    </span>
                   </div>
-                  <span className="inline-flex items-center rounded-md bg-[#102E50] px-3 py-1 text-xs font-medium text-white cursor-default select-none">
-                    {request.status}
-                  </span>
+                  <div className="mt-3 flex gap-2">
+                    <Button
+                      variant="outline"
+                      className="text-xs px-3 py-1 h-auto"
+                    >
+                      View details
+                    </Button>
+                    <Button className="text-xs px-3 py-1 h-auto bg-[#014182] hover:bg-[#102E50] text-white">
+                      {request.action}
+                    </Button>
+                  </div>
                 </div>
-                <div className="mt-3 flex gap-2">
-                  <Button
-                    variant="outline"
-                    className="text-xs px-3 py-1 h-auto"
-                  >
-                    View details
-                  </Button>
-                  <Button className="text-xs px-3 py-1 h-auto bg-[#014182] hover:bg-[#102E50] text-white">
-                    {request.action}
-                  </Button>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </Card>
+        ) : (
+          <Card className="p-6 bg-white border-none drop-shadow-md">
+            <h2 className="text-xl font-semibold text-gray-900 mb-6">
+              My Requests
+            </h2>
+            <div className="space-y-4">
+              {clientRequests.map(request => (
+                <div
+                  key={request.id}
+                  className={`rounded-lg border-l-4 p-4 ${request.statusClass}`}
+                >
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <p className="text-xs text-gray-500">{request.id}</p>
+                      <h3 className="font-semibold text-gray-900">
+                        {request.title}
+                      </h3>
+                      <p className="text-sm text-gray-700 mt-1">
+                        {request.action}
+                      </p>
+                    </div>
+                    <span className="inline-flex items-center rounded-md bg-[#102E50] px-3 py-1 text-xs font-medium text-white cursor-default select-none">
+                      {request.status}
+                    </span>
+                  </div>
+                  <div className="mt-3 flex gap-2">
+                    <Button
+                      variant="outline"
+                      className="text-xs px-3 py-1 h-auto"
+                    >
+                      View details
+                    </Button>
+                    <Button className="text-xs px-3 py-1 h-auto bg-[#014182] hover:bg-[#102E50] text-white">
+                      {request.action}
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        )}
       </main>
     );
   }
@@ -253,57 +297,87 @@ export function ProfileWorkContent({
   }));
 
   return (
-    <main className="flex-1 p-6">
+    <main className={embedded ? 'p-6' : 'flex-1 p-6'}>
       <div className="space-y-6">
-        <Card className="p-6 bg-white border-none drop-shadow-md">
-          <h2 className="text-xl font-semibold text-gray-900 mb-6">
-            My Services
-          </h2>
-          {providerListings.length === 0 ? (
-            <p className="text-base text-gray-600">No service listings yet.</p>
-          ) : (
-            <div className="space-y-4">
-              {providerListings.map(listing => (
-                <div
-                  key={listing.id}
-                  className="rounded-lg border border-gray-200 p-5"
-                >
-                  <div className="flex items-start justify-between gap-4 mb-3">
-                    <div className="flex items-start gap-4">
-                      <Image
-                        src={listing.image}
-                        alt={listing.title}
-                        width={96}
-                        height={96}
-                        className="w-24 h-24 rounded-lg object-cover"
-                      />
-                      <div>
-                        <h3 className="text-xl font-semibold text-gray-900">
-                          {listing.title}
-                        </h3>
-                        <span className="mt-2 inline-flex items-center rounded-md bg-[#EFF6FF] px-3 py-1.5 text-sm font-medium text-[#1E40AF] cursor-default select-none">
-                          {listing.category}
-                        </span>
-                        <p className="text-base text-gray-600 mt-2">
-                          {listing.description}
-                        </p>
-                        <p className="text-sm text-gray-600 mt-2">
-                          <span className="font-semibold text-gray-700">
-                            Accepted areas:
-                          </span>{' '}
-                          {listing.acceptedAreas.length > 0
-                            ? listing.acceptedAreas.join(', ')
-                            : 'Not specified'}
-                        </p>
-                        <p className="text-sm text-gray-600 mt-1">
-                          <span className="font-semibold text-gray-700">
-                            Availability:
-                          </span>{' '}
-                          {listing.availability}
-                        </p>
+        {embedded ? (
+          <div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-6">
+              My Services
+            </h2>
+            {providerListings.length === 0 ? (
+              <p className="text-base text-gray-600">
+                No service listings yet.
+              </p>
+            ) : (
+              <div className="space-y-4">
+                {providerListings.map(listing => (
+                  <div
+                    key={listing.id}
+                    className="rounded-lg border border-gray-200 p-5"
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4 mb-3">
+                      <div className="flex items-start gap-3 sm:gap-4 w-full sm:w-auto">
+                        <Image
+                          src={listing.image}
+                          alt={listing.title}
+                          width={96}
+                          height={96}
+                          className="w-20 h-20 sm:w-24 sm:h-24 rounded-lg object-cover flex-shrink-0"
+                        />
+                        <div className="min-w-0">
+                          <h3 className="text-lg sm:text-xl font-semibold text-gray-900 break-words">
+                            {listing.title}
+                          </h3>
+                          <span className="mt-2 inline-flex items-center rounded-md bg-[#EFF6FF] px-3 py-1.5 text-sm font-medium text-[#1E40AF] cursor-default select-none">
+                            {listing.category}
+                          </span>
+                          <p className="text-sm sm:text-base text-gray-600 mt-2 break-words">
+                            {listing.description}
+                          </p>
+                          <p className="text-sm text-gray-600 mt-2 break-words">
+                            <span className="font-semibold text-gray-700">
+                              Accepted areas:
+                            </span>{' '}
+                            {listing.acceptedAreas.length > 0
+                              ? listing.acceptedAreas.join(', ')
+                              : 'Not specified'}
+                          </p>
+                          <p className="text-sm text-gray-600 mt-1 break-words">
+                            <span className="font-semibold text-gray-700 block">
+                              Availability:
+                            </span>
+                            <span className="whitespace-pre-line block">
+                              {listing.availability}
+                            </span>
+                          </p>
+                        </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
+
+                    <div className="rounded-md border border-gray-100 bg-gray-50 p-4">
+                      <div className="space-y-3">
+                        {listing.details.map(detail => (
+                          <div
+                            key={detail.id}
+                            className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 rounded-md bg-white px-4 py-3"
+                          >
+                            <div className="min-w-0">
+                              <span className="text-base text-gray-900 break-words block">
+                                {detail.title}
+                              </span>
+                              <p className="text-sm text-gray-600 break-words">
+                                {detail.description}
+                              </p>
+                            </div>
+                            <span className="inline-flex items-center rounded-md bg-[#F5C45E] px-3 py-1.5 text-sm font-medium text-[#102E50] cursor-default select-none self-start sm:self-auto">
+                              {detail.rate}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="mt-3 flex justify-end">
                       <Button
                         variant="outline"
                         className="text-sm px-4 py-1.5 h-auto border-[#102E50] text-[#102E50]"
@@ -312,34 +386,102 @@ export function ProfileWorkContent({
                       </Button>
                     </div>
                   </div>
-
-                  <div className="rounded-md border border-gray-100 bg-gray-50 p-4">
-                    <div className="space-y-3">
-                      {listing.details.map(detail => (
-                        <div
-                          key={detail.id}
-                          className="flex items-center justify-between rounded-md bg-white px-4 py-3"
-                        >
-                          <div>
-                            <span className="text-base text-gray-900">
-                              {detail.title}
-                            </span>
-                            <p className="text-sm text-gray-600">
-                              {detail.description}
-                            </p>
-                          </div>
-                          <span className="inline-flex items-center rounded-md bg-[#F5C45E] px-3 py-1.5 text-sm font-medium text-[#102E50] cursor-default select-none">
-                            {detail.rate}
+                ))}
+              </div>
+            )}
+          </div>
+        ) : (
+          <Card className="p-6 bg-white border-none drop-shadow-md">
+            <h2 className="text-xl font-semibold text-gray-900 mb-6">
+              My Services
+            </h2>
+            {providerListings.length === 0 ? (
+              <p className="text-base text-gray-600">
+                No service listings yet.
+              </p>
+            ) : (
+              <div className="space-y-4">
+                {providerListings.map(listing => (
+                  <div
+                    key={listing.id}
+                    className="rounded-lg border border-gray-200 p-5"
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4 mb-3">
+                      <div className="flex items-start gap-3 sm:gap-4 w-full sm:w-auto">
+                        <Image
+                          src={listing.image}
+                          alt={listing.title}
+                          width={96}
+                          height={96}
+                          className="w-20 h-20 sm:w-24 sm:h-24 rounded-lg object-cover flex-shrink-0"
+                        />
+                        <div className="min-w-0">
+                          <h3 className="text-lg sm:text-xl font-semibold text-gray-900 break-words">
+                            {listing.title}
+                          </h3>
+                          <span className="mt-2 inline-flex items-center rounded-md bg-[#EFF6FF] px-3 py-1.5 text-sm font-medium text-[#1E40AF] cursor-default select-none">
+                            {listing.category}
                           </span>
+                          <p className="text-sm sm:text-base text-gray-600 mt-2 break-words">
+                            {listing.description}
+                          </p>
+                          <p className="text-sm text-gray-600 mt-2 break-words">
+                            <span className="font-semibold text-gray-700">
+                              Accepted areas:
+                            </span>{' '}
+                            {listing.acceptedAreas.length > 0
+                              ? listing.acceptedAreas.join(', ')
+                              : 'Not specified'}
+                          </p>
+                          <p className="text-sm text-gray-600 mt-1 break-words">
+                            <span className="font-semibold text-gray-700 block">
+                              Availability:
+                            </span>
+                            <span className="whitespace-pre-line block">
+                              {listing.availability}
+                            </span>
+                          </p>
                         </div>
-                      ))}
+                      </div>
+                    </div>
+
+                    <div className="rounded-md border border-gray-100 bg-gray-50 p-4">
+                      <div className="space-y-3">
+                        {listing.details.map(detail => (
+                          <div
+                            key={detail.id}
+                            className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 rounded-md bg-white px-4 py-3"
+                          >
+                            <div className="min-w-0">
+                              <span className="text-base text-gray-900 break-words block">
+                                {detail.title}
+                              </span>
+                              <p className="text-sm text-gray-600 break-words">
+                                {detail.description}
+                              </p>
+                            </div>
+                            <span className="inline-flex items-center rounded-md bg-[#F5C45E] px-3 py-1.5 text-sm font-medium text-[#102E50] cursor-default select-none self-start sm:self-auto">
+                              {detail.rate}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="mt-3 flex justify-end">
+                      <Button
+                        variant="outline"
+                        className="text-sm px-4 py-1.5 h-auto border-[#102E50] text-[#102E50]"
+                      >
+                        Edit
+                      </Button>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </Card>
+                ))}
+              </div>
+            )}
+          </Card>
+        )}
       </div>
     </main>
   );

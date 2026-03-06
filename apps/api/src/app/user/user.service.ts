@@ -361,7 +361,9 @@ export class UserService {
     // Public profile endpoint - returns non-sensitive user information
     const { data, error } = await this.supabaseService
       .from('users')
-      .select('id, full_name, avatar_url, email, phone, user_type, created_at')
+      .select(
+        'id, full_name, avatar_url, cover_photo_url, email, phone, user_type, created_at'
+      )
       .eq('id', userId)
       .single();
 

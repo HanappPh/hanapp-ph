@@ -19,7 +19,11 @@ interface ProviderServiceRequest {
   updated_at?: string;
 }
 
-export function ProfileEarningsContent() {
+export function ProfileEarningsContent({
+  embedded = false,
+}: {
+  embedded?: boolean;
+}) {
   const { user, session } = useAuth();
   const [loading, setLoading] = React.useState(true);
   const [payoutHistory, setPayoutHistory] = React.useState<
@@ -159,57 +163,111 @@ export function ProfileEarningsContent() {
   }, [user?.id, session?.access_token]);
 
   return (
-    <main className="flex-1 p-6">
+    <main className={embedded ? 'p-6' : 'flex-1 p-6'}>
       <div className="space-y-6">
-        <Card className="border-none p-6 bg-gradient-to-b from-[#FFDD8E] to-[#F5C45E] drop-shadow-md">
-          <h3 className="text-sm text-gray-700 mb-2">Total Earnings</h3>
-          <p className="text-3xl font-bold text-[#102E50]">
-            ₱ {totalEarnings.toLocaleString()}
-          </p>
-        </Card>
+        {embedded ? (
+          <div className="border border-[#F5C45E] p-6 bg-gradient-to-b from-[#FFDD8E] to-[#F5C45E] rounded-lg">
+            <h3 className="text-sm text-gray-700 mb-2">Total Earnings</h3>
+            <p className="text-3xl font-bold text-[#102E50]">
+              ₱ {totalEarnings.toLocaleString()}
+            </p>
+          </div>
+        ) : (
+          <Card className="border-none p-6 bg-gradient-to-b from-[#FFDD8E] to-[#F5C45E] drop-shadow-md">
+            <h3 className="text-sm text-gray-700 mb-2">Total Earnings</h3>
+            <p className="text-3xl font-bold text-[#102E50]">
+              ₱ {totalEarnings.toLocaleString()}
+            </p>
+          </Card>
+        )}
 
-        <Card className="p-6 bg-white border-none drop-shadow-md">
-          <h2 className="text-xl font-semibold text-gray-900 mb-6">
-            Payout History
-          </h2>
-          {loading ? (
-            <p className="text-sm text-gray-600">Loading payout history...</p>
-          ) : payoutHistory.length === 0 ? (
-            <p className="text-sm text-gray-600">No payout history yet.</p>
-          ) : (
-            <div className="space-y-3">
-              {payoutHistory.map(item => (
-                <div
-                  key={item.id}
-                  className="flex items-center justify-between rounded-lg border border-gray-200 p-3"
-                >
-                  <div>
-                    <p className="text-xs text-gray-500">
-                      Booking ID: {item.bookingReference}
-                    </p>
-                    <h4 className="font-medium text-gray-900">
-                      {item.service}
-                    </h4>
-                    {item.services.length > 0 && (
-                      <p className="text-xs text-gray-600 mt-1">
-                        Services: {item.services.join(', ')}
+        {embedded ? (
+          <div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-6">
+              Payout History
+            </h2>
+            {loading ? (
+              <p className="text-sm text-gray-600">Loading payout history...</p>
+            ) : payoutHistory.length === 0 ? (
+              <p className="text-sm text-gray-600">No payout history yet.</p>
+            ) : (
+              <div className="space-y-3">
+                {payoutHistory.map(item => (
+                  <div
+                    key={item.id}
+                    className="flex items-center justify-between rounded-lg border border-gray-200 p-3"
+                  >
+                    <div>
+                      <p className="text-xs text-gray-500">
+                        Booking ID: {item.bookingReference}
                       </p>
-                    )}
-                    <p className="text-sm text-gray-600">{item.date}</p>
+                      <h4 className="font-medium text-gray-900">
+                        {item.service}
+                      </h4>
+                      {item.services.length > 0 && (
+                        <p className="text-xs text-gray-600 mt-1">
+                          Services: {item.services.join(', ')}
+                        </p>
+                      )}
+                      <p className="text-sm text-gray-600">{item.date}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-semibold text-[#102E50]">
+                        {item.amount}
+                      </p>
+                      <Badge className="bg-[#10B981] text-white">
+                        {item.status}
+                      </Badge>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="font-semibold text-[#102E50]">
-                      {item.amount}
-                    </p>
-                    <Badge className="bg-[#10B981] text-white">
-                      {item.status}
-                    </Badge>
+                ))}
+              </div>
+            )}
+          </div>
+        ) : (
+          <Card className="p-6 bg-white border-none drop-shadow-md">
+            <h2 className="text-xl font-semibold text-gray-900 mb-6">
+              Payout History
+            </h2>
+            {loading ? (
+              <p className="text-sm text-gray-600">Loading payout history...</p>
+            ) : payoutHistory.length === 0 ? (
+              <p className="text-sm text-gray-600">No payout history yet.</p>
+            ) : (
+              <div className="space-y-3">
+                {payoutHistory.map(item => (
+                  <div
+                    key={item.id}
+                    className="flex items-center justify-between rounded-lg border border-gray-200 p-3"
+                  >
+                    <div>
+                      <p className="text-xs text-gray-500">
+                        Booking ID: {item.bookingReference}
+                      </p>
+                      <h4 className="font-medium text-gray-900">
+                        {item.service}
+                      </h4>
+                      {item.services.length > 0 && (
+                        <p className="text-xs text-gray-600 mt-1">
+                          Services: {item.services.join(', ')}
+                        </p>
+                      )}
+                      <p className="text-sm text-gray-600">{item.date}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-semibold text-[#102E50]">
+                        {item.amount}
+                      </p>
+                      <Badge className="bg-[#10B981] text-white">
+                        {item.status}
+                      </Badge>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </Card>
+                ))}
+              </div>
+            )}
+          </Card>
+        )}
       </div>
     </main>
   );

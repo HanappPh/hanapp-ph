@@ -88,6 +88,11 @@ export class UpdateProfileDto {
   @IsOptional()
   avatar_url?: string;
 
+  @ApiProperty({ required: false, example: 'https://example.com/cover.jpg' })
+  @IsString()
+  @IsOptional()
+  cover_photo_url?: string;
+
   @ApiProperty({ required: false, example: 'Software Developer' })
   @IsString()
   @IsOptional()
