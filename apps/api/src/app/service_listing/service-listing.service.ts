@@ -105,12 +105,15 @@ export class ServiceListingService {
       // Fetch service details to calculate minimum price for each listing
       const { data: serviceDetails } = await supabase
         .from('service_listing_details')
-        .select('listing_id, title, rate')
+        .select(
+          'id, listing_id, title, description, rate, charge, is_addon, created_at, updated_at'
+        )
         .in('listing_id', listingIds);
 
-      // Create a map of listing_id to minimum service rate and service names
+      // Create maps for quick lookups by listing id
       const minPriceMap = new Map<string, number>();
       const serviceNamesMap = new Map<string, string[]>();
+      const serviceDetailsMap = new Map<string, typeof serviceDetails>();
       if (serviceDetails) {
         serviceDetails.forEach(service => {
           // Track minimum price
@@ -118,6 +121,15 @@ export class ServiceListingService {
           if (!currentMin || service.rate < currentMin) {
             minPriceMap.set(service.listing_id, service.rate);
           }
+
+          // Track detailed services
+          const existingDetails =
+            serviceDetailsMap.get(service.listing_id) || [];
+          serviceDetailsMap.set(service.listing_id, [
+            ...existingDetails,
+            service,
+          ]);
+
           // Track service names
           const existingNames = serviceNamesMap.get(service.listing_id) || [];
           serviceNamesMap.set(service.listing_id, [
@@ -133,7 +145,7 @@ export class ServiceListingService {
         ratings?.map(r => [r.service_listing_id, r]) || []
       );
 
-      // Attach provider, category, rating data, calculated minimum price, and service names to each listing
+      // Attach provider, category, rating data, calculated minimum price, and service details to each listing
       return data.map(listing => ({
         ...listing,
         provider: providerMap.get(listing.provider_id) || null,
@@ -145,6 +157,7 @@ export class ServiceListingService {
         review_count: ratingsMap.get(listing.id)?.review_count || 0,
         price_from: listing.price_from || minPriceMap.get(listing.id) || null,
         service_names: serviceNamesMap.get(listing.id) || [],
+        services: serviceDetailsMap.get(listing.id) || [],
       }));
     }
 

@@ -35,37 +35,25 @@ const Footer = () => {
           <div className="lg:col-span-1">
             <div className="space-y-3">
               <a
-                href="#about"
+                href="/about"
                 className="block text-white/90 hover:text-white transition-colors"
               >
                 About Us
               </a>
               <a
-                href="#mission"
+                href="/mission"
                 className="block text-white/90 hover:text-white transition-colors"
               >
                 Our Mission
               </a>
               <a
-                href="#careers"
+                href="/careers"
                 className="block text-white/90 hover:text-white transition-colors"
               >
                 Careers
               </a>
               <a
-                href="#account"
-                className="block text-white/90 hover:text-white transition-colors"
-              >
-                My Account
-              </a>
-              <a
-                href="#contact"
-                className="block text-white/90 hover:text-white transition-colors"
-              >
-                Contact Us
-              </a>
-              <a
-                href="#blog"
+                href="/blog"
                 className="block text-white/90 hover:text-white transition-colors"
               >
                 Blog
@@ -77,34 +65,22 @@ const Footer = () => {
           <div className="lg:col-span-1">
             <div className="space-y-3">
               <a
-                href="#faqs"
+                href="/faq"
                 className="block text-white/90 hover:text-white transition-colors"
               >
-                FAQs
+                FAQ
               </a>
               <a
-                href="#sitemap"
-                className="block text-white/90 hover:text-white transition-colors"
-              >
-                Site Map
-              </a>
-              <a
-                href="#accessibility"
-                className="block text-white/90 hover:text-white transition-colors"
-              >
-                Accessibility
-              </a>
-              <a
-                href="#privacy"
+                href="/privacy"
                 className="block text-white/90 hover:text-white transition-colors"
               >
                 Privacy Policy
               </a>
               <a
-                href="#terms"
+                href="/terms"
                 className="block text-white/90 hover:text-white transition-colors"
               >
-                Terms & Conditions
+                Terms
               </a>
               <a
                 href="#cookie"

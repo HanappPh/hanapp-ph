@@ -4,7 +4,7 @@ import {
   Star,
   Briefcase,
   DollarSign,
-  Shield,
+  Settings,
   CreditCard,
   LogOut,
 } from 'lucide-react';
@@ -26,6 +26,8 @@ export function Sidebar({
   clickedColor,
   profile,
   hideRoleToggle = false,
+  currentTab = 'Profile',
+  onTabChange,
 }: {
   initialSelected?: 'Provider' | 'Client';
   mainColorDark?: string;
@@ -41,6 +43,8 @@ export function Sidebar({
     avatar_url?: string;
   } | null;
   hideRoleToggle?: boolean;
+  currentTab?: string;
+  onTabChange?: (tab: string) => void;
 }) {
   const [selected, setSelected] = React.useState<'Provider' | 'Client'>(
     initialSelected ?? 'Client'
@@ -225,13 +229,115 @@ export function Sidebar({
               className="flex items-center gap-3 w-full justify-start pl-2 rounded-md"
               style={{
                 background:
-                  activeRole === 'provider' ? accentColorDark : clickedColor,
-                color: '#fff',
+                  currentTab === 'Profile'
+                    ? activeRole === 'provider'
+                      ? accentColorDark
+                      : clickedColor
+                    : '',
+                color: currentTab === 'Profile' ? '#fff' : '#6b7280',
+              }}
+              onClick={() => onTabChange?.('Profile')}
+              onMouseOver={e => {
+                if (currentTab !== 'Profile') {
+                  e.currentTarget.style.background = hoverColor || '';
+                }
+              }}
+              onMouseOut={e => {
+                if (currentTab !== 'Profile') {
+                  e.currentTarget.style.background = '';
+                }
               }}
             >
               <User className="w-5 h-5" />
               Profile
             </Button>
+            {selected !== 'Client' && (
+              <Button
+                variant="ghost"
+                className="flex items-center gap-3 w-full justify-start pl-2 rounded-md"
+                style={{
+                  background:
+                    currentTab === 'Reviews'
+                      ? activeRole === 'provider'
+                        ? accentColorDark
+                        : clickedColor
+                      : '',
+                  color: currentTab === 'Reviews' ? '#fff' : '#6b7280',
+                }}
+                onClick={() => onTabChange?.('Reviews')}
+                onMouseOver={e => {
+                  if (currentTab !== 'Reviews') {
+                    e.currentTarget.style.background = hoverColor || '';
+                  }
+                }}
+                onMouseOut={e => {
+                  if (currentTab !== 'Reviews') {
+                    e.currentTarget.style.background = '';
+                  }
+                }}
+              >
+                <Star className="w-5 h-5" />
+                Reviews
+              </Button>
+            )}
+            {selected !== 'Client' && (
+              <Button
+                variant="ghost"
+                className="flex items-center gap-3 w-full justify-start pl-2 rounded-md"
+                style={{
+                  background:
+                    currentTab === 'MyServices'
+                      ? activeRole === 'provider'
+                        ? accentColorDark
+                        : clickedColor
+                      : '',
+                  color: currentTab === 'MyServices' ? '#fff' : '#6b7280',
+                }}
+                onClick={() => onTabChange?.('MyServices')}
+                onMouseOver={e => {
+                  if (currentTab !== 'MyServices') {
+                    e.currentTarget.style.background = hoverColor || '';
+                  }
+                }}
+                onMouseOut={e => {
+                  if (currentTab !== 'MyServices') {
+                    e.currentTarget.style.background = '';
+                  }
+                }}
+              >
+                <Briefcase className="w-5 h-5" />
+                My Services
+              </Button>
+            )}
+            {selected !== 'Client' && (
+              <Button
+                variant="ghost"
+                className="flex items-center gap-3 w-full justify-start pl-2 rounded-md"
+                style={{
+                  background:
+                    currentTab === 'Earnings'
+                      ? activeRole === 'provider'
+                        ? accentColorDark
+                        : clickedColor
+                      : '',
+                  color: currentTab === 'Earnings' ? '#fff' : '#6b7280',
+                }}
+                onClick={() => onTabChange?.('Earnings')}
+                onMouseOver={e => {
+                  if (currentTab !== 'Earnings') {
+                    e.currentTarget.style.background = hoverColor || '';
+                  }
+                }}
+                onMouseOut={e => {
+                  if (currentTab !== 'Earnings') {
+                    e.currentTarget.style.background = '';
+                  }
+                }}
+              >
+                <DollarSign className="w-5 h-5" />
+                Earnings
+              </Button>
+            )}
             <Button
               variant="ghost"
               className="flex items-center gap-3 w-full justify-start text-gray-600 pl-2 rounded-md"
@@ -241,44 +347,8 @@ export function Sidebar({
               }
               onMouseOut={e => (e.currentTarget.style.background = '')}
             >
-              <Star className="w-5 h-5" />
-              Reviews
-            </Button>
-            <Button
-              variant="ghost"
-              className="flex items-center gap-3 w-full justify-start text-gray-600 pl-2 rounded-md"
-              style={{}}
-              onMouseOver={e =>
-                (e.currentTarget.style.background = hoverColor || '')
-              }
-              onMouseOut={e => (e.currentTarget.style.background = '')}
-            >
-              <Briefcase className="w-5 h-5" />
-              My Services
-            </Button>
-            <Button
-              variant="ghost"
-              className="flex items-center gap-3 w-full justify-start text-gray-600 pl-2 rounded-md"
-              style={{}}
-              onMouseOver={e =>
-                (e.currentTarget.style.background = hoverColor || '')
-              }
-              onMouseOut={e => (e.currentTarget.style.background = '')}
-            >
-              <DollarSign className="w-5 h-5" />
-              Earnings
-            </Button>
-            <Button
-              variant="ghost"
-              className="flex items-center gap-3 w-full justify-start text-gray-600 pl-2 rounded-md"
-              style={{}}
-              onMouseOver={e =>
-                (e.currentTarget.style.background = hoverColor || '')
-              }
-              onMouseOut={e => (e.currentTarget.style.background = '')}
-            >
-              <Shield className="w-5 h-5" />
-              Security
+              <Settings className="w-5 h-5" />
+              Settings
             </Button>
             <Button
               variant="ghost"
