@@ -4,15 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 
-interface PrivacyHeaderProps {
-  showTermsLink?: boolean;
-  showPrivacyLink?: boolean;
-}
-
-export const PrivacyHeader = ({
-  showTermsLink = true,
-  showPrivacyLink = false,
-}: PrivacyHeaderProps) => {
+export const PrivacyHeader = () => {
   const [scrollY, setScrollY] = useState(0);
   const navRef = useRef<HTMLElement>(null);
 
@@ -56,30 +48,14 @@ export const PrivacyHeader = ({
             </Link>
           </div>
 
-          {/* Right Side - Navigation Links */}
-          <div className="flex items-center space-x-8 h-full">
+          {/* Right Side - Navigation Links (only Home) */}
+          <div className="flex items-center h-full">
             <Link
               href="/"
               className="text-gray-700 hover:text-hanapp-primary transition-colors font-medium"
             >
               Home
             </Link>
-            {showTermsLink && (
-              <Link
-                href="/terms"
-                className="text-gray-700 hover:text-hanapp-primary transition-colors font-medium"
-              >
-                Terms & Conditions
-              </Link>
-            )}
-            {showPrivacyLink && (
-              <Link
-                href="/privacy"
-                className="text-gray-700 hover:text-hanapp-primary transition-colors font-medium"
-              >
-                Privacy Policy
-              </Link>
-            )}
           </div>
         </div>
       </div>
