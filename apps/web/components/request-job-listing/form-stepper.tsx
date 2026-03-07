@@ -1,15 +1,6 @@
-import { Check, type LucideIcon } from 'lucide-react';
+import { Check } from 'lucide-react';
 
-interface Step {
-  label: string;
-  icon: LucideIcon;
-}
-
-interface FormStepperProps {
-  steps: Step[];
-  currentStep: number;
-  theme?: 'primary' | 'accent';
-}
+import type { FormStepperProps } from './types/form-stepper.types';
 
 export function FormStepper({
   steps,

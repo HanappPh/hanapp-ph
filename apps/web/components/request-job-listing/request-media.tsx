@@ -1,6 +1,7 @@
 'use client';
 
 import { Upload, X } from 'lucide-react';
+import Image from 'next/image';
 import React, { useEffect, useRef, useState } from 'react';
 
 import { supabase } from '../../lib/supabase/client';
@@ -206,10 +207,13 @@ export function ImageUploadSection({
             {uploadedUrls.map((url, index) => (
               <div key={url} className="relative w-full">
                 <div className="w-full aspect-square bg-gray-100 rounded-md overflow-hidden border border-gray-200">
-                  <img
+                  <Image
                     src={url}
                     alt={getNameFromUrl(url)}
-                    className="w-full h-full object-cover"
+                    fill
+                    unoptimized
+                    className="object-cover"
+                    sizes="(max-width: 640px) 45vw, 110px"
                   />
                 </div>
                 <button
