@@ -53,7 +53,7 @@ const Footer = () => {
                 Careers
               </a>
               <a
-                href="#account"
+                href="/blog"
                 className="block text-white/90 hover:text-white transition-colors"
               >
                 Blog
