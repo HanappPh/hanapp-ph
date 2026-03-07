@@ -7,7 +7,7 @@ import { PrivacyHeader } from '../../components/PrivacyHeader';
 const TermsOfUse = () => {
   return (
     <>
-      <PrivacyHeader showTermsLink={false} showPrivacyLink={true} />
+      <PrivacyHeader />
 
       {/* Main Content */}
       <div className="min-h-screen bg-white pt-20">

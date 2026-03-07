@@ -42,7 +42,7 @@ const articles = [
 const Blog = () => {
   return (
     <>
-      <PrivacyHeader showTermsLink={true} showPrivacyLink={false} />
+      <PrivacyHeader />
 
       <div className="min-h-screen bg-white pt-20">
         <div className="bg-gray-100 py-16">

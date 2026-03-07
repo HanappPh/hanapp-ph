@@ -89,7 +89,7 @@ const FAQ = () => {
 
   return (
     <>
-      <PrivacyHeader showTermsLink={true} showPrivacyLink={false} />
+      <PrivacyHeader />
 
       {/* Main Content */}
       <div className="min-h-screen bg-white pt-20">
