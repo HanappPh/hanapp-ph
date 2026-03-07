@@ -106,7 +106,7 @@ export class ServiceListingService {
       const { data: serviceDetails } = await supabase
         .from('service_listing_details')
         .select(
-          'id, listing_id, title, description, rate, charge, is_addon, created_at, updated_at'
+          'id, listing_id, title, description, rate, charge, created_at, updated_at'
         )
         .in('listing_id', listingIds);
 

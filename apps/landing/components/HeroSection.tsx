@@ -118,7 +118,7 @@ const HeroSection = () => {
                 Sign up here
               </button>
               <button className="px-6 py-3 sm:px-8 sm:py-4 bg-white/20 text-white border-2 border-white/30 rounded-lg font-semibold text-sm sm:text-base hover:bg-white/30 transition-colors shadow-lg backdrop-blur-sm">
-                Test demo
+                Learn More
               </button>
             </div>
           </div>

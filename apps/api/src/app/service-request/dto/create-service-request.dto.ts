@@ -1,3 +1,4 @@
+import { Transform } from 'class-transformer';
 import {
   IsString,
   IsNotEmpty,
@@ -50,23 +51,26 @@ export class CreateServiceRequestDto {
   @IsNotEmpty()
   jobLocation!: string;
 
+  @Transform(({ value }) => (value === '' ? undefined : value))
+  @IsOptional()
   @IsDateString()
-  @IsNotEmpty()
-  jobDate!: string;
+  jobDate?: string;
 
+  @Transform(({ value }) => (value === '' ? undefined : value))
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
   @Matches(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, {
     message: 'Time must be in HH:MM format',
   })
-  jobTime!: string;
+  jobTime?: string;
 
+  @Transform(({ value }) => (value === '' ? undefined : value))
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
   @Matches(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, {
     message: 'Time 2 must be in HH:MM format',
   })
-  jobTime2!: string;
+  jobTime2?: string;
 
   @IsArray()
   @IsOptional()

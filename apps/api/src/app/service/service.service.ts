@@ -20,7 +20,6 @@ export class ServiceService {
         rate: createDto.rate,
         charge: createDto.charge,
         listing_id: listingId,
-        is_addon: createDto.isAddon,
       })
       .select()
       .single();
